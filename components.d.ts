@@ -7,7 +7,14 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
+    AppSmartGuard: typeof import('./src/components/AppSmartGuard.vue')['default']
+    BaseScrollbar: typeof import('./src/components/BaseScrollbar.vue')['default']
+    ElBadge: typeof import('element-plus/es')['ElBadge']
+    ElDialog: typeof import('element-plus/es')['ElDialog']
+    ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
+    InspectConfirmBox: typeof import('./src/components/InspectConfirmBox.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

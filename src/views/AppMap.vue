@@ -1,0 +1,91 @@
+<style lang="scss" scoped>
+	.map-container {
+		pointer-events: none;
+		position: fixed;
+		width: 100vw;
+		height: 100vh;
+		& > .item {
+			position: absolute;
+			pointer-events: auto;
+			img {
+				width: 100%;
+				height: 100%;
+				object-fit: contain;
+			}
+			@for $i from 1 to 6 {
+				&:nth-of-type(#{$i}) {
+					width: calc(var(--width)*1px);
+					height: calc(var(--height)*1px);
+					top: calc(var(--top)*1px);
+					left: calc(var(--left)*1px);
+				}
+			}
+		}
+	}
+</style>
+
+<template>
+	<div class="map-container">
+		<template v-for="item in _reactive.data.cardList" :key="item.id">
+			<div class="item"
+				:style="{
+					'--width': item.width,
+					'--height': item.height,
+					'--top': item.points[0],
+					'--left': item.points[1]
+				}"
+			>
+				<img :src="item.image">
+			</div>
+		</template>
+	</div>
+</template>
+
+<script setup lang="ts">
+	import {
+		reactive
+	} from 'vue';
+
+	const _reactive = reactive({
+		data: {
+			cardList: [
+				{
+					id: 1,
+					width: 311,
+					height: 145,
+					points: [100,20],
+					image: require('@/assets/images/background/system-mangle.png')
+				},
+				{
+					id: 2,
+					width: 311,
+					height: 785,
+					points: [265,20],
+					image: require('@/assets/images/background/system-data.png')
+				},
+				{
+					id: 3,
+					width: 311,
+					height:  229,
+					points: [100,1589],
+					image: require('@/assets/images/background/operation-data.png')
+				},
+				{
+					id: 4,
+					width: 311,
+					height:315,
+					points: [349,1589],
+					image: require('@/assets/images/background/charg-data.png')
+				},
+				{
+					id: 5,
+					width: 311,
+					height: 366,
+					points: [684,1589],
+					image: require('@/assets/images/background/income-overview.png')
+				},
+			]
+		}
+	});
+
+</script>

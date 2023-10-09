@@ -14,5 +14,12 @@ module.exports = defineConfig({
         resolvers: [ElementPlusResolver()],
       }),
     ]
-  }
+  },
+  css: {
+    loaderOptions: {
+      scss: {
+        additionalData: `@import "@/assets/styles/global";`
+      }
+    }
+  },
 })

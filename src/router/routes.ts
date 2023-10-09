@@ -17,7 +17,15 @@ const routes :RouteRecordRaw[] = [
 	{
 		name: 'index',
 		path: '/',
+		redirect: '/map',
 		component: () => import('@/views/AppIndex.vue'),
+		children: [
+			{
+				name: 'map',
+				path: 'map',
+				component: () => import('@/views/AppMap.vue')
+			}
+		]
 	}
 ]
 
