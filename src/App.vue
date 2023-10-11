@@ -1,8 +1,10 @@
 <style lang="scss">
 	#app {
+		user-select: none;
+		display: flex;
+
 		width: 100vw;
 		height: 100vh;
-		user-select: none;
 		background-color: black;
 	}
 </style>
@@ -10,12 +12,20 @@
 <template>
 	<RouterView v-slot="{Component, route}">
 		<KeepAlive>
-			<component :is="Component" v-if="route.meta.keepAlive"></component>
+			<el-config-provider
+				:locale="zhCn"
+			>
+				<component :is="Component" v-if="route.meta.keepAlive"></component>
+			</el-config-provider>
 		</KeepAlive>
-		<component :is="Component" v-if="! route.meta.keepAlive"></component>
+		<el-config-provider
+			:locale="zhCn"
+		>
+			<component :is="Component" v-if="! route.meta.keepAlive"></component>
+		</el-config-provider>
 	</RouterView>
 </template>
 
 <script setup lang="ts">
-
+	import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 </script>

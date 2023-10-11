@@ -1,6 +1,5 @@
 <style lang="scss" scoped>
 	.smart-guard-container {
-		position: fixed;
 		width: 841px;
 		height: 58px;
 		pointer-events: none;

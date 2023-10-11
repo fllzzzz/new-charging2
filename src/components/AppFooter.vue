@@ -1,12 +1,12 @@
 <style lang="scss" scoped>
 	.footer-container {
-		position: fixed;
 		width: 100vw;
 		height: 53px;
 		pointer-events: none;
 		box-sizing: border-box;
 		background-repeat: no-repeat;
 		background-size: contain;
+		opacity: 0.8;
 		background-image: url('@/assets/images/background/index-footer.png');
 		& > .item {
 			pointer-events: auto;

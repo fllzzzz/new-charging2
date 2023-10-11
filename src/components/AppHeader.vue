@@ -1,6 +1,5 @@
 <style lang="scss" scoped>
 	.header-container {
-		position: fixed;
 		width: 100vw;
 		height: 200px;
 		pointer-events: none;
@@ -108,6 +107,7 @@
 					margin-left: 0 !important;
 				}
 				:deep(.el-badge) {
+					pointer-events: none;
 					.el-badge__content.is-fixed {
 						right: 20px;
 						top: 5px;
@@ -198,7 +198,9 @@
 				v-for="item in _reactive.data.inspectInfoList"
 				:key="item.id"
 			>
-				<div class="box" :id="'inspect-' + item.type">
+				<div class="box" :id="'inspect-' + item.type"
+					@click="clickDispenser"
+				>
 					<el-badge
 						:hidden="item.hidden"
 						:value="item.value"
@@ -219,15 +221,14 @@
 
 <script setup lang="ts">
 	import {
+		useRouter
+	} from 'vue-router';
+
+	import {
 		reactive
 	} from 'vue';
 
-	const weatherUnitMapper = new Map<string, string>([
-		['温度', '℃'],
-		['湿度', '%'],
-		['降雨', 'mm'],
-		['风速', 'm/s'],
-	])
+	const router = useRouter();
 
 	const _reactive = reactive({
 		data: {
@@ -272,4 +273,27 @@
 			]
 		}
 	});
+
+	const weatherUnitMapper = new Map<string, string>([
+		['温度', '℃'],
+		['湿度', '%'],
+		['降雨', 'mm'],
+		['风速', 'm/s'],
+	])
+
+	const clickEventInvoke = new Map<string, ((
+		event :MouseEvent,
+		...args :any[]
+	) => void)>([
+		['inspect-history', (event, ...args) => {
+			router.push({name: 'inspect-history'});
+		}]
+	]);
+
+	const clickDispenser = (event :MouseEvent) => {
+		const id = (event.target as HTMLElement).id;
+		const fn = clickEventInvoke.get(id);
+		if(!fn) return;
+		fn(event);
+	};
 </script>

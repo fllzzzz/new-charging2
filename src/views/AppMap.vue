@@ -43,6 +43,10 @@
 
 <script setup lang="ts">
 	import {
+		usePublish
+	} from '@/hooks/EventEmitter';
+
+	import {
 		reactive
 	} from 'vue';
 
@@ -87,5 +91,8 @@
 			]
 		}
 	});
+
+	usePublish<boolean>('AppFooterState', true);
+	usePublish<boolean>('AppSmartGuardState', true);
 
 </script>

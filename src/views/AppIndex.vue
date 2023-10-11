@@ -1,11 +1,14 @@
 <style lang="scss" scoped>
 	.header-container {
+		position: fixed;
 		top: 0;
 	}
 	.footer-container {
+		position: fixed;
 		bottom: 0;
 	}
 	.smart-guard-container {
+		position: fixed;
 		top: 113px;
 		left: 542px;
 	}
@@ -19,7 +22,7 @@
 		v-if="_reactive.state.footer"
 	></AppFooter>
 	<AppsmartGuard
-		v-if="_reactive.state.smartGuad"
+		v-if="_reactive.state.smartGuard"
 	></AppsmartGuard>
 	<RouterView v-slot="{ Component, route }">
 		<KeepAlive>
@@ -35,6 +38,10 @@
 	import AppHeader from '@/components/AppHeader.vue';
 
 	import {
+		useSubscribe
+	} from '@/hooks/EventEmitter';
+
+	import {
 		reactive
 	} from 'vue';
 
@@ -42,7 +49,27 @@
 		state: {
 			header: true,
 			footer: true,
-			smartGuad: true,
+			smartGuard: true,
 		}
+	});
+
+	useSubscribe<boolean>('AppHeaderState', (ctx, ...args) => {
+		if(ctx === true)
+			_reactive.state.header = true;
+		else if(ctx === false)
+			_reactive.state.header = false;
+	});
+
+	useSubscribe<boolean>('AppFooterState', (ctx, ...args) => {
+		if(ctx === true)
+			_reactive.state.footer = true;
+		else if(ctx === false)
+			_reactive.state.footer = false;
+	});
+	useSubscribe<boolean>('AppSmartGuardState', (ctx, ...args) => {
+		if(ctx === true)
+			_reactive.state.smartGuard = true;
+		else if(ctx === false)
+			_reactive.state.smartGuard = false;
 	});
 </script>

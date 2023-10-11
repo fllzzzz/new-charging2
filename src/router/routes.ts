@@ -3,17 +3,17 @@ import type {
 } from 'vue-router'
 
 const routes :RouteRecordRaw[] = [
-/* 	{
+	{
 		name: 'tester',
 		path: '/tester',
 		children: [
 			{
 				name: 'view1',
 				path: 'view1',
-				component: () => import('@/views/tester/testerView1.vue'),
+				component: () => import('@/views/TesterView1.vue'),
 			}
 		]
-	}, */
+	},
 	{
 		name: 'index',
 		path: '/',
@@ -24,7 +24,12 @@ const routes :RouteRecordRaw[] = [
 				name: 'map',
 				path: 'map',
 				component: () => import('@/views/AppMap.vue')
-			}
+			},
+			{
+				name: 'inspect-history',
+				path: '/inspect-history',
+				component: () => import('@/views/InspectHistory.vue')
+			},
 		]
 	}
 ]
