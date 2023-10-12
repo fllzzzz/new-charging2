@@ -1,10 +1,11 @@
 <style lang="scss" scoped>
+
 </style>
 
 <template>
-	<InspectDateFilter></InspectDateFilter>
+	<AppHeaderLevel2></AppHeaderLevel2>
 </template>
 
 <script setup lang="ts">
-	import InspectDateFilter from '@/components/InspectDateFilter.vue';
+	import AppHeaderLevel2 from '@/components/AppHeaderLevel2.vue';
 </script>

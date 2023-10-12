@@ -1,5 +1,5 @@
 <style lang="scss" scoped>
-	.inspect-date-filter-container {
+	.inspect-filter-container {
 		width: 1194px;
 		height: 32px;
 		display: flex;
@@ -97,7 +97,7 @@
 </style>
 
 <template>
-	<div class="inspect-date-filter-container">
+	<div class="inspect-filter-container">
 		<span>历史查询</span>
 		<div class="box" id="preset-filter">
 			<template 

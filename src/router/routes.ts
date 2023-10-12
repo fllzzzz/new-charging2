@@ -26,9 +26,15 @@ const routes :RouteRecordRaw[] = [
 				component: () => import('@/views/AppMap.vue')
 			},
 			{
-				name: 'inspect-history',
-				path: '/inspect-history',
-				component: () => import('@/views/InspectHistory.vue')
+				name: 'inspect-data',
+				path: '/inspect-data/:model',
+				component: () => import('@/views/InspectData.vue'),
+				props: true
+			},
+			{
+				name: 'overview',
+				path: 'overview',
+				component: () => import('@/views/AppOverview.vue')
 			},
 		]
 	}

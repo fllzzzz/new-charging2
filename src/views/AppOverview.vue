@@ -1,9 +1,9 @@
 <style lang="scss" scoped>
-	.map-container {
-		pointer-events: none;
-		position: fixed;
+	.overview-container {
 		width: 100vw;
 		height: 100vh;
+		position: fixed;
+		pointer-events: none;
 		& > .item {
 			position: absolute;
 			pointer-events: auto;
@@ -25,7 +25,7 @@
 </style>
 
 <template>
-	<div class="map-container">
+	<div class="overview-container">
 		<template v-for="item in _reactive.data.cardList" :key="item.id">
 			<div class="item"
 				:style="{
@@ -55,44 +55,45 @@
 			cardList: [
 				{
 					id: 1,
-					width: 311,
-					height: 145,
-					points: [100,20],
-					image: require('@/assets/images/background/system-mangle.png')
+					width: 343,
+					height: 247,
+					points: [120,18],
+					image: require('@/assets/images/background/system-data-1.png')
 				},
 				{
 					id: 2,
-					width: 311,
-					height: 785,
-					points: [265,20],
-					image: require('@/assets/images/background/system-data.png')
+					width: 343,
+					height: 343,
+					points: [382,18],
+					image: require('@/assets/images/background/charging-data.png')
 				},
 				{
 					id: 3,
-					width: 311,
-					height:  229,
-					points: [100,1589],
-					image: require('@/assets/images/background/operation-data.png')
+					width: 343,
+					height: 265,
+					points: [731,18],
+					image: require('@/assets/images/background/outside-env.png')
 				},
 				{
 					id: 4,
-					width: 311,
-					height:315,
-					points: [349,1589],
-					image: require('@/assets/images/background/charg-data.png')
+					width: 343,
+					height: 468,
+					points: [120,1560],
+					image: require('@/assets/images/background/system-mangle-1.png')
 				},
 				{
-					id: 5,
-					width: 311,
-					height: 366,
-					points: [684,1589],
-					image: require('@/assets/images/background/income-overview.png')
+					id: 1,
+					width: 343,
+					height: 388,
+					points: [608,1560],
+					image: require('@/assets/images/background/income-overview-1.png')
 				},
 			]
 		}
 	});
 
+	usePublish<string>('AppFooterModel', 'inside');
 	usePublish<boolean>('AppFooterState', true);
+	usePublish<boolean>('AppHeaderL2State', true);
 	usePublish<boolean>('AppSmartGuardState', true);
-	usePublish<string>('AppFooterModel', 'outside');
 </script>

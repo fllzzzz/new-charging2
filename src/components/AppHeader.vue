@@ -86,6 +86,7 @@
 			height: 33px;
 			line-height: 33px;
 			span {
+				pointer-events: none;
 				font-size: 45px;
 				font-family: YouSheBiaoTiHei;
 				font-weight: 400;
@@ -190,7 +191,9 @@
 				</div>
 			</template>
 		</div>
-		<div class="item" id="title">
+		<div class="item" id="title"
+			@click="clickDispenser"
+		>
 			<span>充电站智慧管家系统</span>
 		</div>
 		<div class="item" id="option-group">
@@ -227,6 +230,9 @@
 	import {
 		reactive
 	} from 'vue';
+	import {
+		usePublish
+	} from '@/hooks/EventEmitter';
 
 	const router = useRouter();
 
@@ -286,8 +292,29 @@
 		...args :any[]
 	) => void)>([
 		['inspect-history', (event, ...args) => {
-			router.push({name: 'inspect-history'});
-		}]
+			router.push({
+				name: 'inspect-data',
+				params: {
+					model: 'history'
+				}
+			});
+		}],
+		['inspect-warn', (event, ...args) => {
+			router.push({
+				name: 'inspect-data',
+				params: {
+					model: 'warn'
+				}
+			});
+		}],
+		['title', (event, ...args) => {
+			usePublish('iframerMessage', {
+				ctid: 10111
+			})
+			router.push({
+				name: 'map',
+			});
+		}],
 	]);
 
 	const clickDispenser = (event :MouseEvent) => {

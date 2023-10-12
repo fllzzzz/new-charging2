@@ -1,0 +1,99 @@
+<style lang="scss" scoped>
+	.header-level2-container {
+		height: 38px;
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: flex-start;
+		align-items: center;
+		pointer-events: none;
+		& > .item {
+			pointer-events: auto;
+			margin-right: 28px;
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+	}
+</style>
+
+<template>
+	<div class="header-level2-container">
+		<template
+			v-for="item in _reactive.data.itemList"
+			:key="item.id"
+		>
+			<img
+				class="item"
+				:draggable="false"
+				:id="item.name"
+				:src="item.imageList[0]"
+				@click="clickDispensere"
+			>
+		</template>
+	</div>
+</template>
+
+<script setup lang="ts">
+	import {
+		reactive
+	} from 'vue';
+
+	const _reactive = reactive({
+		data: {
+			itemList: [
+				{
+					id: 1,
+					name: 'fusionReplay',
+					showName: '融合回放',
+					state: 0,
+					imageList: [
+						require('@/assets/images/background/fusionReplay_default.png'),
+						require('@/assets/images/background/fusionReplay_active.png'),
+					]
+				},
+				{
+					id: 2,
+					name: 'videoTracking',
+					showName: '视频追视',
+					state: 0,
+					imageList: [
+						require('@/assets/images/background/videoTracking_default.png'),
+						require('@/assets/images/background/videoTracking_active.png'),
+					]
+				},
+				{
+					id: 3,
+					name: 'senselessTracking',
+					showName: '无感追视',
+					state: 0,
+					imageList: [
+						require('@/assets/images/background/senselessTracking_default.png'),
+						require('@/assets/images/background/senselessTracking_active.png'),
+					]
+				},
+			]
+		}
+	});
+
+	const clickDispensere = (event :MouseEvent) => {
+		const oldHightLightElement = _reactive.data.itemList.filter(item => {
+			return item.state === 1;
+		});
+		if(oldHightLightElement.length > 0) {
+			oldHightLightElement.forEach(item => {
+				[item.imageList[0], item.imageList[1]] =
+					[item.imageList[1], item.imageList[0]];
+					item.state = 0;
+			});
+		}
+
+		const id = (event.target as HTMLElement).id;
+		const target = _reactive.data.itemList.find(item => {
+			return item.name === id;
+		});
+		if(!target) return;
+		[target.imageList[0], target.imageList[1]] =
+			[target.imageList[1], target.imageList[0]];
+		target.state = 1;
+	};
+</script>

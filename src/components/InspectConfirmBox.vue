@@ -156,19 +156,27 @@
 
 	const emits = defineEmits(['close']);
 
+	const props = defineProps({
+		type: {
+			type: String,
+			required: true,
+			default: undefined
+		}
+	});
+
 	const _reactive = reactive({
 		data: {
 			contentList: [
 				{
 					id: 1,
 					title: '巡检方式',
-					value: '视频巡检',
+					value: props.type,
 					options: {}
 				},
 				{
 					id: 1,
 					title: '任务时间',
-					value: '2023-08-21 17:23:56',
+					value: new Date().toLocaleString(),
 					options: {}
 				},
 				{

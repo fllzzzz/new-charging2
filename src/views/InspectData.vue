@@ -1,8 +1,8 @@
 <style lang="scss" scoped>
-	
-	.inspect-history-container {
+	.inspect-data-container {
 		width: 100vw;
 		height: 100vh;
+		position: fixed;
 		background-color: rgba(0, 9, 14, 1);
 		#title {
 			width: 1856px;
@@ -32,7 +32,6 @@
 			}
 		}
 	}
-
 	.inspect-table-container {
 		position: fixed;
 		bottom: 88px;
@@ -43,7 +42,7 @@
 		right: 32px;
 		bottom: 32px;
 	}
-	.inspect-date-filter-container {
+	.inspect-filter-container {
 		position: fixed;
 		top: 160px;
 		left: 32px;
@@ -51,13 +50,16 @@
 </style>
 
 <template>
-	<div class="inspect-history-container">
+	<div class="inspect-data-container">
 		<div id="title">
-			<span>历史巡检</span>
-			<img src="@/assets/images/icon/close-1.png">
+			<span>{{ _reactive.data.title }}</span>
+			<img src="@/assets/images/icon/close-1.png"
+				id="close"
+				@click="clickDispenser"
+			>
 		</div>
 		<InspectDateFilter
-			class="inspect-date-filter-container"
+			class="inspect-filter-container"
 		></InspectDateFilter>
 		<InspectTable
 			class="inspect-table-container"
@@ -71,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-	import InspectDateFilter from '@/components/InspectDateFilter.vue';
+	import InspectDateFilter from '@/components/InspectFilter.vue';
 	import BasePagination from '@/components/BasePagination.vue';
 	import InspectTable from '@/components/InspectTable.vue';
 
@@ -79,8 +81,34 @@
 		usePublish
 	} from '@/hooks/EventEmitter';
 
-	usePublish<boolean>('AppFooterState', false);
-	usePublish<boolean>('AppSmartGuardState', false);
+	import {
+		useRouter
+	} from 'vue-router';
+
+	import {
+		watch,
+		reactive
+	} from 'vue';
+
+	type ModelInovkeType = {
+		title :string;
+	};
+
+	const props = defineProps({
+		model: {
+			type: String,
+			required: false,
+			default: undefined
+		}
+	});
+
+	const router = useRouter();
+
+	const _reactive = reactive({
+		data: {
+			title: undefined as undefined | string,
+		}
+	});
 
 	const _static = {
 		data: {
@@ -134,4 +162,43 @@
 			]
 		}
 	};
+
+	const modelInovke = new Map<string, ModelInovkeType>([
+		['history', {
+			title: '历史巡检',
+		}],
+		['warn', {
+			title: '告警',
+		}],
+	]);
+
+	const clickEventInovke = new Map<string, ((
+		event :MouseEvent,
+		...args :any[]
+	) => void)>([
+		['close', () => {
+			router.back();
+			usePublish<boolean>('AppFooterState', true);
+			usePublish<boolean>('AppSmartGuardState', true);
+			usePublish<boolean>('AppHeaderL2State', true);
+		}]
+	]);
+
+	usePublish<boolean>('AppFooterState', false);
+	usePublish<boolean>('AppHeaderL2State', false);
+	usePublish<boolean>('AppSmartGuardState', false);
+
+	const clickDispenser = (event :MouseEvent) => {
+		const id = (event.target as HTMLElement).id;
+		const fn = clickEventInovke.get(id);
+		if(!fn)	return;
+		fn(event);
+	};
+
+	watch(() => props.model, (model) => {
+		if(!model) return;
+		_reactive.data.title = modelInovke.get(model)?.title;
+	}, {
+		immediate: true,
+	});
 </script>

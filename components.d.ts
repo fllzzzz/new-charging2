@@ -7,8 +7,11 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    AppFooterInside: typeof import('./src/components/AppFooterInside.vue')['default']
+    AppFooterOutside: typeof import('./src/components/AppFooterOutside.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
+    AppHeaderLevel2: typeof import('./src/components/AppHeaderLevel2.vue')['default']
+    AppIFramer: typeof import('./src/components/AppIFramer.vue')['default']
     AppSmartGuard: typeof import('./src/components/AppSmartGuard.vue')['default']
     BasePagination: typeof import('./src/components/BasePagination.vue')['default']
     BaseScrollbar: typeof import('./src/components/BaseScrollbar.vue')['default']
@@ -22,7 +25,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     InspectConfirmBox: typeof import('./src/components/InspectConfirmBox.vue')['default']
-    InspectDateFilter: typeof import('./src/components/InspectDateFilter.vue')['default']
+    InspectFilter: typeof import('./src/components/InspectFilter.vue')['default']
     InspectTable: typeof import('./src/components/InspectTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
