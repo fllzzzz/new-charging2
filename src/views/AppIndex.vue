@@ -12,6 +12,7 @@
 		position: fixed;
 		top: 113px;
 		left: 542px;
+		z-index: 1100;
 	}
 	.header-level2-container {
 		position: fixed;
@@ -36,12 +37,11 @@
 	></component>
 	<AppsmartGuard
 		v-if="_reactive.state.smartGuard"
-		class="fixed"
 	></AppsmartGuard>
 	<AppHeaderLevel2
 		v-if="_reactive.state.headerL2"
 	></AppHeaderLevel2>
-	<AppIFramer></AppIFramer>
+<!-- 	<AppIFramer></AppIFramer> -->
 	<RouterView v-slot="{ Component, route }">
 		<KeepAlive>
 			<component :is="Component" v-if="route.meta.KeepAlive"></component>

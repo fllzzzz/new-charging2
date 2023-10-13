@@ -49,8 +49,17 @@
 
 <script setup lang="ts">
 	import {
+		watch,
 		reactive
 	} from 'vue';
+
+	import {
+		useRoute,
+		useRouter
+	} from 'vue-router';
+
+	const route = useRoute();
+	const router = useRouter();
 
 	const _reactive = reactive({
 		data: {
@@ -134,11 +143,13 @@
 			[target.imageList[1], target.imageList[0]];
 		target.state = 1;
 
-/* 		switch(id) {
-			case '':
-				
+		switch(id) {
+			case 'monitor':
+				router.push({
+					name: 'monitor'
+				});
 				break;
-			case '':
+/* 			case '':
 				
 				break;
 			case '':
@@ -152,7 +163,21 @@
 				break;
 			case '':
 
-				break;
-		} */
+				break; */
+		}
 	};
+
+	watch(() => route.name, (name) => {
+		const target = _reactive.data.btnList.find(btn => {
+			if(btn.name === name) {
+				btn.state = 1;
+				return true;
+			}
+		});
+		if(!target) return;
+		[target.imageList[0], target.imageList[1]] =
+		[target.imageList[1], target.imageList[0]]
+	}, {
+		immediate: true
+	})
 </script>

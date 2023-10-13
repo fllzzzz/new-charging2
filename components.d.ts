@@ -27,6 +27,10 @@ declare module 'vue' {
     InspectConfirmBox: typeof import('./src/components/InspectConfirmBox.vue')['default']
     InspectFilter: typeof import('./src/components/InspectFilter.vue')['default']
     InspectTable: typeof import('./src/components/InspectTable.vue')['default']
+    MonitorVideoBoxFull: typeof import('./src/components/MonitorVideoBoxFull.vue')['default']
+    MonitorVideoBoxHeader: typeof import('./src/components/MonitorVideoBoxHeader.vue')['default']
+    MonitorVideoBoxMiddle: typeof import('./src/components/MonitorVideoBoxMiddle.vue')['default']
+    MonitorVideoBoxSmall: typeof import('./src/components/MonitorVideoBoxSmall.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

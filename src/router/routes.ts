@@ -27,7 +27,7 @@ const routes :RouteRecordRaw[] = [
 			},
 			{
 				name: 'inspect-data',
-				path: '/inspect-data/:model',
+				path: 'inspect-data/:model',
 				component: () => import('@/views/InspectData.vue'),
 				props: true
 			},
@@ -35,6 +35,11 @@ const routes :RouteRecordRaw[] = [
 				name: 'overview',
 				path: 'overview',
 				component: () => import('@/views/AppOverview.vue')
+			},
+			{
+				name: 'monitor',
+				path: '/monitor',
+				component: () => import('@/views/AppMonitor.vue')
 			},
 		]
 	}
