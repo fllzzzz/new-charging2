@@ -3,7 +3,6 @@
 		width: initial;
 		max-width: initial;
 		background-color: transparent !important;
-		bottom: calc(88 * v-bind('screenManager.currentRatio.value[1]') * 1px);
 	}
 	:deep(.table-header) {
 		th.el-table__cell {

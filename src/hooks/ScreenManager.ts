@@ -24,7 +24,7 @@ function fn() {
 			parseFloat((window.innerWidth / size.width).toFixed(3))
 		)
 		currentRatio.value.push(
-			parseFloat((window.innerHeight / 1080).toFixed(3))
+			parseFloat((window.innerHeight / size.height).toFixed(3))
 		)
 	}, 20);
 

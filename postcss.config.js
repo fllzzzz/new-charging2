@@ -11,7 +11,8 @@ module.exports = defineConfig({
 			minPixelValue: 0.1,
 			selectorBlackList: [
 				'.el-badge__content.is-fixed',
-				'.el-table__cell'
+				'.el-table__cell',
+				'.inspect-table-container'
 			],
 			propList: ['*'],
 		}
