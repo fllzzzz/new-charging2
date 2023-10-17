@@ -38,8 +38,23 @@ const routes :RouteRecordRaw[] = [
 			},
 			{
 				name: 'monitor',
-				path: '/monitor',
+				path: 'monitor',
 				component: () => import('@/views/AppMonitor.vue')
+			},
+			{
+				name: 'inspect',
+				path: 'inspect/:model',
+				component: () => import('@/views/AppInspect.vue')
+			},
+			{
+				name: 'immediate-controller',
+				path: 'immediate-controller',
+				component: () => import('@/views/AppImmediateController.vue')
+			},
+			{
+				name: 'scene-controller',
+				path: 'scene-controller',
+				component: () => import('@/views/AppSceneController.vue')
 			},
 		]
 	}

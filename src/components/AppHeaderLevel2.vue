@@ -7,6 +7,7 @@
 		align-items: center;
 		pointer-events: none;
 		& > .item {
+			height: 100%;
 			pointer-events: auto;
 			margin-right: 28px;
 			&:last-child {

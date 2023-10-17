@@ -10,18 +10,23 @@
 			pointer-events: auto;
 		}
 		#btn-group {
+			width: 1066px;
+			height: 37px;
 			pointer-events: none;
+			position: absolute;
+			left: 418px;
+			bottom: 13px;
 			display: flex;
 			flex-flow: row nowrap;
 			justify-content: space-between;
 			align-items: center;
-			width: 1066px;
-			height: 37px;
-			position: absolute;
-			left: 418px;
-			bottom: 10px;
 			& > .btn {
 				pointer-events: auto;
+				height: 100%;
+				img {
+					height: 100%;
+					object-fit: fill;
+				}
 			}
 		}
 	}
@@ -111,7 +116,7 @@
 				},
 				{
 					id: 6,
-					name: 'scene',
+					name: 'scene-controller',
 					state: 0,
 					imageList: [
 						require('@/assets/images/background/scene_default.png'),
@@ -149,25 +154,35 @@
 					name: 'monitor'
 				});
 				break;
-/* 			case '':
-				
+			case 'video-inspect':
+				router.push({
+					path: 'inspect/video'
+				});
 				break;
-			case '':
-				
+			case 'digital-inspect':
+				router.push({
+					path: 'inspect/digital'
+				});
 				break;
-			case '':
-
+			case 'immediate-controller':
+				router.push({
+					name: 'immediate-controller'
+				});
 				break;
-			case '':
-
+			case 'scene-controller':
+				router.push({
+					name: 'scene-controller'
+				});
 				break;
-			case '':
-
-				break; */
+			case 'overview':
+				router.push({
+					name: 'overview'
+				});
+				break;
 		}
 	};
 
-	watch(() => route.name, (name) => {
+/* 	watch(() => route.name, (name) => {
 		const target = _reactive.data.btnList.find(btn => {
 			if(btn.name === name) {
 				btn.state = 1;
@@ -179,5 +194,5 @@
 		[target.imageList[1], target.imageList[0]]
 	}, {
 		immediate: true
-	})
+	}) */
 </script>

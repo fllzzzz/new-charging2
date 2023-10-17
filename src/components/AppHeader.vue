@@ -104,14 +104,29 @@
 			justify-content: flex-end;
 			justify-content: center;
 			& > .box {
+				margin-left: 30px;
+				height: 100%;
 				&:first-child {
 					margin-left: 0 !important;
 				}
 				:deep(.el-badge) {
 					pointer-events: none;
+					height: 100%;
 					.el-badge__content.is-fixed {
-						right: 20px;
+						right: 22px;
 						top: 5px;
+						width: 21px;
+						height: 19px;
+						@media screen and (min-width: 2160px){
+							right: 33px;
+							top: 12px;
+							width: 34px;
+							height: 30px;
+						}
+					}
+					img {
+						width: 100%;height: 100%;
+						object-fit: fill;
 					}
 				}
 				@for $i from 1 to 4 {
@@ -155,10 +170,6 @@
 								border-left: 5px solid transparent;
 								border-right: 5px solid transparent;
 							}
-						}@else {
-							width: 42px;
-							height: 100%;
-							margin-left: 30px;
 						}
 					}
 				}

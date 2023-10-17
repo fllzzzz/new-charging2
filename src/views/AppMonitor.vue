@@ -7,7 +7,7 @@
 		top: 83px;
 		right: 27px;
 		background-repeat: no-repeat;
-		background-repeat: 100% 100%;
+		background-size: 100% 100%;
 		background-image: url('@/assets/images/background/btn-1.png');
 		display: flex;
 		flex-flow: row nowrap;
@@ -17,7 +17,7 @@
 			pointer-events: none;
 			width: 24px;
 			height: 24px;
-			object-fit: contain;
+			object-fit: fill;
 			margin-right: 4px;
 			margin-left: 8px;
 		}

@@ -41,7 +41,7 @@
 	<AppHeaderLevel2
 		v-if="_reactive.state.headerL2"
 	></AppHeaderLevel2>
-<!-- 	<AppIFramer></AppIFramer> -->
+	<AppIFramer></AppIFramer>
 	<RouterView v-slot="{ Component, route }">
 		<KeepAlive>
 			<component :is="Component" v-if="route.meta.KeepAlive"></component>
