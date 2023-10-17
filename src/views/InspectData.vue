@@ -34,7 +34,7 @@
 	}
 	.inspect-table-container {
 		position: fixed;
-		bottom: 88px;
+		bottom: calc(88 * v-bind('screenManager.currentRatio.value[1]') * 1px);
 		left: 32px;
 	}
 	.base-pagination-container {
@@ -73,6 +73,8 @@
 </template>
 
 <script setup lang="ts">
+	import screenManager from '@/hooks/ScreenManager';
+
 	import InspectDateFilter from '@/components/InspectFilter.vue';
 	import BasePagination from '@/components/BasePagination.vue';
 	import InspectTable from '@/components/InspectTable.vue';
@@ -116,37 +118,37 @@
 				{
 					label: '序号',
 					prop: 'id',
-					width: 93
+					width: 103
 				},
 				{
 					label: '站名',
 					prop: 'stationName',
-					width: 253
+					width: 263
 				},
 				{
 					label: '巡检开始时间',
 					prop: 'startTime',
-					width: 220
+					width: 230
 				},
 				{
 					label: '巡检内容',
 					prop: 'inspectContent',
-					width: 450
+					width: 460
 				},
 				{
 					label: '巡检方式',
 					prop: 'inspectType',
-					width: 133
+					width: 143
 				},
 				{
 					label: '巡检结果',
 					prop: 'inspectResult',
-					width: 320
+					width: 330
 				},
 				{
 					label: 'options',
 					prop: 'options',
-					width: 300
+					width: 320
 				},
 			],
 			rowList: [

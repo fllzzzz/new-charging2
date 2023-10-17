@@ -1,7 +1,6 @@
 <style lang="scss">
 	#app {
 		user-select: none;
-		display: flex;
 	}
 </style>
 
@@ -24,4 +23,8 @@
 
 <script setup lang="ts">
 	import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+
+	import pachResizeObserver from '@/utils/patchResizeObserver';
+
+	pachResizeObserver();
 </script>

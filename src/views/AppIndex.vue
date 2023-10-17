@@ -20,20 +20,23 @@
 		right: 29px;
 		z-index: 1100;
 	}
-	.fixed {
+	.fixed-height {
 		z-index: 1000;
+	}
+	.fixed-lower {
+		z-index: 0;
 	}
 </style>
 
 <template>
 	<AppHeader
-		class="fixed"
+		class="fixed-height"
 		v-if="_reactive.state.header"
 	></AppHeader>
 	<component
 		v-if="_reactive.state.footer"
 		:is="footerChanger"
-		class="fixed"
+		class="fixed-height"
 	></component>
 	<AppsmartGuard
 		v-if="_reactive.state.smartGuard"
@@ -41,13 +44,15 @@
 	<AppHeaderLevel2
 		v-if="_reactive.state.headerL2"
 	></AppHeaderLevel2>
-	<AppIFramer></AppIFramer>
 	<RouterView v-slot="{ Component, route }">
 		<KeepAlive>
 			<component :is="Component" v-if="route.meta.KeepAlive"></component>
 		</KeepAlive>
 		<component :is="Component" v-if="! route.meta.KeepAlive"></component>
 	</RouterView>
+	<AppIFramer
+		class=""
+	></AppIFramer>
 </template>
 
 <script setup lang="ts">

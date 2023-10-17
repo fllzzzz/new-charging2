@@ -1,23 +1,19 @@
 <style lang="scss" scoped>
-	.iframer-container {
+	iframe {
 		width: 100vw;
 		height: 100vh;
-		display: flex;
-		iframe {
-			width: 100%;
-			height: 100%;
-			border: none;
-		}
+		position: fixed;
+		top: 0;left: 0;
+		z-index: -1000;
+
 	}
 </style>
 
 <template>
-	<div class="iframer-container">
-		<iframe
-			src="http://192.168.1.114:18901"
-			ref="elIFrame"
-		></iframe>
-	</div>
+	<iframe
+		src="http://192.168.1.114:18901"
+		ref="elIFrame"
+	></iframe>
 </template>
 
 <script setup lang="ts">

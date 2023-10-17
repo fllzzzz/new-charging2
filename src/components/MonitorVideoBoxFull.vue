@@ -241,6 +241,7 @@
 						model: 1
 					});
 					usePublish('monitorTotalBtnState', true);
+					usePublish('AppFooterModel', 'inside');
 					usePublish('AppFooterState', true);
 					break;
 				case 'to-middle':
@@ -248,6 +249,7 @@
 						model: 2
 					});
 					usePublish('monitorTotalBtnState', true);
+					usePublish('AppFooterModel', 'inside');
 					usePublish('AppFooterState', true);
 					break;
 				case 'to-mulit':
@@ -273,6 +275,7 @@
 	const closeHandler = () => {
 		usePublish('monitorVideoBox', 0)
 		usePublish('AppSmartGuardState', true);
+		usePublish('AppFooterModel', 'inside');
 		usePublish('AppFooterState', true);
 		usePublish('monitorTotalBtnState', true);
 	};

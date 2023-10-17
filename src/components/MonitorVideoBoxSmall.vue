@@ -2,7 +2,6 @@
 	.monitor-videoBox-small-container {
 		width: 494px;
 		height: 311px;
-		pointer-events: none;
 		display: flex;
 		flex-flow: column nowrap;
 		justify-content: flex-start;

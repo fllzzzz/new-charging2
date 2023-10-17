@@ -1,61 +1,72 @@
 <style lang="scss" scoped>
-	.box#total {
-		z-index: 1100;
-		width: 108px;
-		height: 36px;
+	.monitor-container {
+		width: 100vw;
+		height: 100vh;
 		position: fixed;
-		top: 83px;
-		right: 27px;
-		background-repeat: no-repeat;
-		background-size: 100% 100%;
-		background-image: url('@/assets/images/background/btn-1.png');
-		display: flex;
-		flex-flow: row nowrap;
-		justify-content: flex-start;
-		align-items: center;
-		img {
-			pointer-events: none;
-			width: 24px;
-			height: 24px;
-			object-fit: fill;
-			margin-right: 4px;
-			margin-left: 8px;
+		top: 0;left: 0;
+		z-index: 1100;
+		pointer-events: none;
+		& > .item {
+			position: absolute;
+			pointer-events: auto;
+			z-index: 1100;
 		}
-		span {
-			pointer-events: none;
-			font-size: 14px;
-			font-family: Source Han Sans CN;
-			font-weight: 500;
-			color: #FFFFFF;
-			text-shadow: 0px 1px 0px rgba(0,25,19,0.66);
+		#total {
+			width: 108px;
+			height: 36px;
+			top: 83px;
+			right: 27px;
+			background-repeat: no-repeat;
+			background-size: 100% 100%;
+			background-image: url('@/assets/images/background/btn-1.png');
+			display: flex;
+			flex-flow: row nowrap;
+			justify-content: flex-start;
+			align-items: center;
+			img {
+				pointer-events: none;
+				width: 24px;
+				height: 24px;
+				object-fit: fill;
+				margin-right: 4px;
+				margin-left: 8px;
+			}
+			span {
+				pointer-events: none;
+				font-size: 14px;
+				font-family: Source Han Sans CN;
+				font-weight: 500;
+				color: #FFFFFF;
+				text-shadow: 0px 1px 0px rgba(0,25,19,0.66);
+			}
 		}
 	}
+
 	.is-small {
-		position: fixed;
 		top: 129px;
 		right: 27px;
-		z-index: 1100;
 	}
 	.is-middle {
-		position: fixed;
 		top: 220px;
 		right: 300px;
-		z-index: 1100;
 	}
 </style>
 
 <template>
-	<div class="box" id="total"
-		v-if="_reatcive.state.totalBtn"
-		@click="totalClickHandler"
-	>
-		<img src="@/assets/images/icon/monitor.png">
-		<span>全部监控</span>
+	<div class="monitor-container">
+		<div class="item" id="total"
+			v-if="_reatcive.state.totalBtn"
+			@click="totalClickHandler"
+		>
+			<img src="@/assets/images/icon/monitor.png">
+			<span>全部监控</span>
+		</div>
+		<component
+			class="item"
+			:is="setVideoBoxModel"
+			:class="boxClassNameSetter"
+		></component>
 	</div>
-	<component
-		:is="setVideoBoxModel"
-		:class="boxClassNameSetter"
-	></component>
 </template>
 
 <script setup lang="ts">
@@ -85,8 +96,9 @@
 	});
 
 	usePublish('AppHeaderL2State', false);
+	usePublish('AppFooterModel', 'inside');
 	usePublish('AppFooterState', true);
-
+	
 	const setVideoBoxModel = computed(() => {
 		if(_reatcive.state.videoBoxModel === 0)
 			return null;

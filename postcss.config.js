@@ -10,7 +10,8 @@ module.exports = defineConfig({
 			fontViewportUnit: 'vw',
 			minPixelValue: 0.1,
 			selectorBlackList: [
-				'.el-badge__content.is-fixed'
+				'.el-badge__content.is-fixed',
+				'.el-table__cell'
 			],
 			propList: ['*'],
 		}

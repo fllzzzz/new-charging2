@@ -10,6 +10,7 @@
 		align-items: center;
 		background-repeat: no-repeat;
 		background-size: fill;
+		pointer-events: none;
 		& > .item {
 			height: 100%;
 			&:first-child{

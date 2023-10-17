@@ -3,11 +3,11 @@
 		width: initial;
 		max-width: initial;
 		background-color: transparent !important;
+		bottom: calc(88 * v-bind('screenManager.currentRatio.value[1]') * 1px);
 	}
 	:deep(.table-header) {
 		th.el-table__cell {
-			height: 50px;
-			width: 50px;
+			height: calc(50 * v-bind('screenManager.currentRatio.value[1]') * 1px);
 			background: rgba(11,77,98,0.90);
 			border-left: 1px solid #042630;
 			border-bottom: 0;
@@ -20,7 +20,7 @@
 	:deep(.table-row) {
 		--el-table-row-hover-bg-color: none;
 		td.el-table__cell {
-			height: 48px;
+			height: calc(48 * v-bind('screenManager.currentRatio.value[1]') * 1px);
 			border-bottom: 0;
 			font-size: 14px;
 			font-family: PingFang SC;
@@ -53,7 +53,7 @@
 				<el-table-column
 					:label="column.label"
 					:prop="column.prop"
-					:width="column.width"
+					:width="column.width * screenManager.currentRatio.value[0]"
 					align="center"
 				></el-table-column>
 			</template>
@@ -62,6 +62,8 @@
 </template>
 
 <script setup lang="ts">
+	import screenManager from '@/hooks/ScreenManager';
+
 	import type {
 		PropType
 	} from 'vue';
@@ -106,6 +108,9 @@
 			rowList: [] as RowListType
 		}
 	});
+
+	screenManager.useCreate(1920, 1080);
+	screenManager.useExecute();
 
 	const setRowStyle = (row :any) => {
 		if(row.rowIndex % 2 == 0)
