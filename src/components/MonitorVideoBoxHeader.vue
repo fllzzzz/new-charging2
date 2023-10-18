@@ -81,11 +81,16 @@
 
 <script setup lang="ts">
 	import {
-		usePublish
+		usePublish,
+		useSubscribe
 	} from '@/hooks/EventEmitter';
 
+	import hunter from '@/utils/Hunter';
+
 	import {
-		MonitorVideoBox
+		MonitorVideoBox,
+		DeviceInfo,
+		SenselessTrackingVideoBox
 	} from '@/types';
 
 	import {
@@ -151,6 +156,16 @@
 		}
 	});
 
+	const _static = {
+		data: {
+			deviceInfo: null as null | DeviceInfo,
+		}
+	};
+
+	useSubscribe<DeviceInfo>('deviceInfo', (ctx) => {
+		_static.data.deviceInfo = ctx;
+	});
+
 	const clickHandler = (event :MouseEvent) => {
 		const id = (event.target as HTMLElement).id;
 		const target = _reactive.data.btnList.find(btn => btn.name === id);
@@ -159,6 +174,21 @@
 		usePublish<MonitorVideoBox>('monitorVideoBox',{
 			model: target.code,
 		});
+
+		hunter(() => _static.data.deviceInfo, {
+			cycle: 10,
+			frequency: 10
+		}).then(result => {
+			if (target.code === undefined) return;
+			usePublish<SenselessTrackingVideoBox>(
+				'senselessTrackingVideoBox',{
+					model: target.code,
+					deviceInfo: result
+				}
+			);
+		}).catch(err => {
+			console.log(err);
+		})
 	};
 
 	onMounted(() => {

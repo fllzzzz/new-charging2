@@ -9,10 +9,19 @@
 
 <template>
 	<div class="inspect-container">
-		<InspectEditorVideo></InspectEditorVideo>
+		<InspectEditorVideo
+			model="maker"
+		></InspectEditorVideo>
 	</div>
 </template>
 
 <script setup lang="ts">
 	import InspectEditorVideo from '@/components/InspectEditorVideo.vue';
+
+	import {
+		usePublish,
+		useSubscribe
+	} from '@/hooks/EventEmitter';
+
+	usePublish('AppFooterState', false);
 </script>

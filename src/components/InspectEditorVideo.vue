@@ -99,7 +99,9 @@
 			flex-flow: row nowrap;
 			justify-content: space-between;
 			align-items: center;
+			pointer-events: none;
 			& > .btn {
+				pointer-events: auto;
 				width: 88px;
 				height: 32px;
 				background-repeat: no-repeat;
@@ -110,6 +112,9 @@
 				justify-content: center;
 				align-items: center;
 				margin-right: 16px;
+				& > * {
+					pointer-events: none;
+				}
 				&:last-child {
 					margin-right: 0;
 				}
@@ -196,7 +201,9 @@
 				></el-input>
 			</div>
 		</div>
-		<div class="item">
+		<div class="item"
+			@click="clickEventHandler"
+		>
 			<template
 				v-for="btn in _reactive.data.btnList"
 				:key="btn.id"
@@ -218,8 +225,30 @@
 	} from '@/hooks/InspectManager';
 
 	import {
+		useRouter
+	} from 'vue-router';
+
+	import {
 		reactive
 	} from 'vue';
+
+	import type{
+		PropType
+	} from 'vue';
+
+	type Model = 'maker' | 'editor' ;
+
+	const props = defineProps({
+		model: {
+			type: String as PropType<Model>,
+			required: false,
+			default: undefined
+		}
+	});
+
+	const emits = defineEmits(['destory']);
+
+	const router = useRouter();
 
 	const _reactive = reactive({
 		data: {
@@ -252,4 +281,27 @@
 			inputBoxContent: undefined as undefined | string,
 		}
 	});
+
+	const clickEventInvoke = new Map<string, ((
+		event?: MouseEvent,
+		...args :any[]
+	) => void)>([
+		['exit', () => {
+			if(props.model === 'editor') {
+				emits('destory');
+				return;
+			}else if(props.model === 'maker') {
+				router.back();
+			}else {
+				return;
+			}
+		}]
+	]);
+
+	const clickEventHandler = (event :MouseEvent) => {
+		const id = (event.target as HTMLElement).id;
+		const fn = clickEventInvoke.get(id);
+		if(!fn) return;
+		fn()
+	};
 </script>

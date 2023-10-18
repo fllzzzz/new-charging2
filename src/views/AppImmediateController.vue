@@ -299,6 +299,12 @@
 				margin-left: 400px;
 			}
 		}
+		#left-box {
+			width: 300px;
+			height: 789px;
+			left: 20px;
+			top: 98px;
+		}
 	}
 </style>
 
@@ -435,6 +441,9 @@
 				<div id="inner"></div>
 			</div>
 		</div>
+		<div class="item" id="left-box">
+			<AppConsole></AppConsole>
+		</div>
 		<template v-if="state.cardDialogOpen">
 			<ImmedaiteControllerCard
 				:dialogOpen="state.cardDialogOpen"
@@ -464,7 +473,13 @@
 </template>
 
 <script setup lang="ts">
+	import AppConsole from '@/components/AppConsole.vue';
 	import ImmedaiteControllerCard from '@/components/ImmedaiteControllerCard.vue';
+
+	import {
+		usePublish,
+		useSubscribe
+	} from '@/hooks/EventEmitter';
 
 	import {
 		ref,
@@ -515,6 +530,9 @@
 		'step-6' = '5,1428',
 		'step-7' = '6,1658',
 	}
+
+	usePublish('AppFooterModel', 'inside');
+	usePublish('AppFooterState', true);
 
 	const getRootStyle = computed(() => {
 		return dataBase.value.rootStyle;

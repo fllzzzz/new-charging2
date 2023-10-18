@@ -36,8 +36,14 @@
 
 <script setup lang="ts">
 	import {
+		useRouter
+	} from 'vue-router';
+
+	import {
 		reactive
 	} from 'vue';
+
+	const router = useRouter();
 
 	const _reactive = reactive({
 		data: {
@@ -96,5 +102,23 @@
 		[target.imageList[0], target.imageList[1]] =
 			[target.imageList[1], target.imageList[0]];
 		target.state = 1;
+
+		if(id === 'fusionReplay') {
+			router.push({
+				name: 'fusion-replay'
+			});
+		}
+
+		if(id === 'videoTracking') {
+			router.push({
+				name: 'video-tracking'
+			});
+		}
+
+		if(id === 'senselessTracking') {
+			router.push({
+				name: 'senseless-tracking'
+			});
+		}
 	};
 </script>

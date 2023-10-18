@@ -2,23 +2,18 @@
 	.scene-controller {
 		width: 100vw;
 		height: 100vh;
-		position: absolute;
-		background: transparent;
-		box-sizing: border-box;
+		position: fixed;
 		pointer-events: none;
-		display: flex;
-		flex-flow: row nowrap;
-		justify-content: space-around;
-		align-items: flex-start;
-		padding-top: 120px;
-		padding-bottom: 21px;
 		& > .item {
 			box-sizing: border-box;
 			pointer-events: auto;
 			background-repeat: no-repeat;
 			background-size: contain;
+			position: absolute;
 		}
 		& > .item#handle-setups {
+			top: 98px;
+			right: 20px;
 			width: 300px;
 			height: 610px;
 			background-image: url('@/assets/images/background/immcontroller-handle-list.png');
@@ -109,6 +104,46 @@
 				}
 			}
 		}
+		#rightDown-box {
+			right: 20px;
+			bottom: 193px;
+			width: 300px;
+			height: 246px;
+			background-image: url('@/assets/images/background/immcontroller-person.png');
+			span {
+				position: absolute;
+				&:nth-of-type(1) {
+					top: 10px;
+					left: 23px;
+					font-size: 14px;
+					font-family: Source Han Sans CN;
+					font-weight: 500;
+					color: #00FFFF;
+					line-height: 34px;
+				}
+				&:nth-of-type(2), &:nth-of-type(3) {
+					top: 57px;
+					font-size: 14px;
+					font-family: Source Han Sans CN;
+					font-weight: 400;
+					line-height: 26px;
+				}
+				&:nth-of-type(2) {
+					left: 34px;
+					color: #00FFFF;
+				}
+				&:nth-of-type(3) {
+					left: 90px;
+					color: #FFFFFF;
+				}
+			}
+		}
+		#left-box {
+			width: 300px;
+			height: 789px;
+			left: 20px;
+			top: 98px;
+		}
 	}
 </style>
 
@@ -179,8 +214,25 @@
 				</el-timeline>
 			</div>
 		</div>
+		<div class="item" id="rightDown-box">
+			<span>注意事项</span>
+			<span>刘某某</span>
+			<span>15276500709</span>
+		</div>
+		<div class="item" id="left-box">
+			<AppConsole></AppConsole>
+		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+	import AppConsole from '@/components/AppConsole.vue';
+
+	import {
+		usePublish,
+		useSubscribe
+	} from '@/hooks/EventEmitter';
+
+	usePublish('AppFooterModel', 'inside');
+	usePublish('AppFooterState', true);
 </script>

@@ -56,6 +56,16 @@ const routes :RouteRecordRaw[] = [
 				path: 'scene-controller',
 				component: () => import('@/views/AppSceneController.vue')
 			},
+			{
+				name: 'fusion-replay',
+				path: 'fusion-replay',
+				component: () => import('@/views/AppFusionReplay.vue')
+			},
+			{
+				name: 'senseless-tracking',
+				path: 'senseless-tracking',
+				component: () => import('@/views/AppSenselessTracking.vue')
+			},
 		]
 	}
 ]

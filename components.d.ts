@@ -7,15 +7,19 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AppConsole: typeof import('./src/components/AppConsole.vue')['default']
+    AppDeviceList: typeof import('./src/components/AppDeviceList.vue')['default']
     AppFooterInside: typeof import('./src/components/AppFooterInside.vue')['default']
     AppFooterOutside: typeof import('./src/components/AppFooterOutside.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
     AppHeaderLevel2: typeof import('./src/components/AppHeaderLevel2.vue')['default']
     AppIFramer: typeof import('./src/components/AppIFramer.vue')['default']
+    AppRingController: typeof import('./src/components/AppRingController.vue')['default']
     AppSmartGuard: typeof import('./src/components/AppSmartGuard.vue')['default']
     BasePagination: typeof import('./src/components/BasePagination.vue')['default']
     BaseScrollbar: typeof import('./src/components/BaseScrollbar.vue')['default']
     ElBadge: typeof import('element-plus/es')['ElBadge']
+    ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElCheckboxGroup: typeof import('element-plus/es')['ElCheckboxGroup']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
@@ -26,6 +30,7 @@ declare module 'vue' {
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSelect: typeof import('element-plus/es')['ElSelect']
+    ElSorollbar: typeof import('element-plus/es')['ElSorollbar']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTimeline: typeof import('element-plus/es')['ElTimeline']
