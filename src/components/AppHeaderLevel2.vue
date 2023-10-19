@@ -39,6 +39,8 @@
 		useHeightLight
 	} from '@/hooks/HeightLightManager';
 
+	import clickEvent from '@/hooks/useClickEvent';
+
 	import {
 		useRouter,
 		useRoute
@@ -50,6 +52,7 @@
 
 	const router = useRouter();
 	const route = useRoute();
+	const {getTarget,slefClose} = clickEvent;
 
 	const _reactive = reactive({
 		data: {
@@ -89,12 +92,22 @@
 	});
 
 	const clickDispensere = (event :MouseEvent) => {
-		const id = (event.target as HTMLElement).id;
-		const target = _reactive.data.itemList.find(item => item.name === id);
-		if(!target) return;
+		const targetData = getTarget<typeof _reactive.data.itemList[0]>(
+			event,
+			_reactive.data.itemList,
+			item => item.name
+		);
+
+		if(!targetData) return;
+
+		slefClose(targetData.data,() => {
+			router.push({
+				name: 'overview',
+			});
+		});
 
 		router.push({
-			name: target.name
+			name: targetData.data.name
 		}).then(() => {
 			useHeightLight(event,_reactive.data.itemList, route)
 		});
