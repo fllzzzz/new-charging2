@@ -30,6 +30,8 @@
 			padding: 10px 18px 8px 18px;
 			box-shadow: none;
 			background-color: transparent;
+			background-repeat: no-repeat;
+			background-size: 100% 100%;
 			background-image: url('@/assets/images/background/search.png');
 			.el-input__inner {
 				font-size: 16px;

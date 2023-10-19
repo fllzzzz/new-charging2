@@ -100,13 +100,38 @@
 							&:nth-of-type(#{$i}) {
 								flex: 1;
 								background-image: url('@/assets/images/background/videoBox-full-body-right.png');
+								display: flex;
+								flex-flow: column nowrap;
+								justify-content: flex-start;
+								align-items: flex-start;
+								& > .block {
+									width: 100%;
+									box-sizing: border-box;
+								}
+								& > .block:nth-of-type(1) {
+									height: 575px;
+									border-bottom: 1px solid #219E99;
+									padding-top: 16px;
+									padding-left: 16px;
+									display: flex;
+									flex-flow: row nowrap;
+									justify-content: center;
+									align-items: flex-start;
+								}
+								& > .block:nth-of-type(2) {
+									flex: 1;
+									padding: 16px 0 0 16px;
+									display: flex;
+									flex-flow: row nowrap;
+									justify-content: center;
+									align-items: flex-start;
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-
 	}
 </style>
 
@@ -140,12 +165,22 @@
 		</div>
 		<div class="item">
 			<div class="box"></div>
-			<div class="box"></div>
+			<div class="box">
+				<div class="block">
+					<AppDeviceList></AppDeviceList>
+				</div>
+				<div class="block">
+					<AppCloudController></AppCloudController>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+	import AppCloudController from './AppCloudController.vue';
+	import AppDeviceList from './AppDeviceList.vue';
+
 	import {
 		usePublish
 	} from '@/hooks/EventEmitter';
@@ -273,7 +308,9 @@
 	};
 
 	const closeHandler = () => {
-		usePublish('monitorVideoBox', 0)
+		usePublish('monitorVideoBox', {
+			model: 0
+		})
 		usePublish('AppSmartGuardState', true);
 		usePublish('AppFooterModel', 'inside');
 		usePublish('AppFooterState', true);

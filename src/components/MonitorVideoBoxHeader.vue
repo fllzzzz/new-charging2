@@ -90,13 +90,15 @@
 	import {
 		MonitorVideoBox,
 		DeviceInfo,
-		SenselessTrackingVideoBox
+		SenselessTrackingVideoBox,
+		VideoBoxHeaderBtnState
 	} from '@/types';
 
 	import {
 		ref,
 		reactive,
-		onMounted
+		onMounted,
+		onBeforeUnmount,
 	} from 'vue';
 
 	const elContainer = ref<HTMLElement | null>(null);
@@ -131,6 +133,7 @@
 					id: 1,
 					name: 'zoom',
 					state: 0,
+					lock: 0,
 					code: undefined as undefined | number,
 					imageList: [
 						require<string>('@/assets/images/icon/size-up.png'),
@@ -142,6 +145,7 @@
 					id: 2,
 					name: 'fullScreen',
 					state: 0,
+					lock: 0,
 					code: 3,
 					imageList: [require<string>('@/assets/images/icon/full.png')]
 				},
@@ -149,6 +153,7 @@
 					id: 3,
 					name: 'close',
 					state: 0,
+					lock: 0,
 					code: 0,
 					imageList: [require<string>('@/assets/images/icon/close.png')]
 				},
@@ -164,6 +169,16 @@
 
 	useSubscribe<DeviceInfo>('deviceInfo', (ctx) => {
 		_static.data.deviceInfo = ctx;
+	});
+
+	useSubscribe<VideoBoxHeaderBtnState>('videoBoxHeaderBtnState', (ctx) => {
+		for(let i=0; i < _reactive.data.btnList.length; i++) {
+			if(_reactive.data.btnList[i].name === ctx.name) {
+				_reactive.data.btnList[i].lock = 1;
+				_reactive.data.btnList[i].state = ctx.state;
+				return;
+			}
+		}
 	});
 
 	const clickHandler = (event :MouseEvent) => {
@@ -199,6 +214,7 @@
 			props.btnLayout.forEach(name => {
 				_reactive.data.btnList.forEach(btn => {
 					if(btn.name === name) {
+						if(btn.lock === 1) return;
 						btn.state = 1;
 						if(btn.name === 'zoom') {
 							if(props.zoomState < 0) {
@@ -213,5 +229,11 @@
 				});
 			});
 		}
+	});
+
+	onBeforeUnmount(() => {
+		_reactive.data.btnList.forEach(btn => {
+			btn.lock = 0;
+		});
 	});
 </script>

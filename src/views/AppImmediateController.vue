@@ -650,7 +650,6 @@
 	const immedaiteCardConfirmHandler = (() => {
 		let data :string[];
 		return (step :keyof typeof stepsData ) => {
-			console.log('jx-clg',stepsData[step]);
 			data = stepsData[step].split(',');
 			state.value.handleStep[parseInt(data[0])] = 1;
 			dataBase.value.rootStyle['--pace-width'] = parseInt(data[1]);

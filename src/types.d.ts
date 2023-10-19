@@ -11,3 +11,8 @@ export type SenselessTrackingVideoBox = {
 	model :number;
 	deviceInfo :DeviceInfo | null;
 };
+
+export type VideoBoxHeaderBtnState = {
+	name :string;
+	state :number;
+};

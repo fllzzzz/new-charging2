@@ -27,8 +27,6 @@ function fn() {
 			parseFloat((window.innerHeight / size.height).toFixed(3))
 		)
 	}, 20);
-
-	console.log('jxjx', currentRatio, currentSize);
 }
 
 export default {

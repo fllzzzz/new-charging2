@@ -30,10 +30,21 @@
 				background-image: url('@/assets/images/background/videoBox-middle-body-left.png');
 			}
 			#right {
+				padding-top: 16px;
 				flex: 1;
+				display: flex;
+				flex-flow: row nowrap;
+				justify-content: flex-start;
+				align-items: flex-start;
+				box-sizing: border-box;
+				padding-left: 14px;
 				background-image: url('@/assets/images/background/videoBox-middle-body-right.png');
 			}
 		}
+	}
+	.cloudController-container {
+		width: 238px;
+		height: 332px;
 	}
 </style>
 
@@ -48,11 +59,14 @@
 		</div>
 		<div class="item" id="body">
 			<div class="box" id="left"></div>
-			<div class="box" id="right"></div>
+			<div class="box" id="right">
+				<AppCloudController></AppCloudController>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+	import AppCloudController from '@/components/AppCloudController.vue';
 	import MonitorVideoBoxHeader from './MonitorVideoBoxHeader.vue';
 </script>

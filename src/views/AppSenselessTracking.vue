@@ -27,10 +27,7 @@
 				class="item"
 				v-if="item.state === 1"
 				:is="item.model"
-				:style="{
-					top: item.points[0] + 'px',
-					left: item.points[1] + 'px'
-				}"
+				:style="videoBoxStyleSetter(item)"
 			></component>
 		</template>
 	</div>
@@ -48,11 +45,8 @@
 	import {
 		DeviceInfo,
 		SenselessTrackingVideoBox,
+		VideoBoxHeaderBtnState
 	} from '@/types';
-
-	import type {
-		Component
-	} from 'vue';
 
 	import {
 		reactive,
@@ -65,7 +59,7 @@
 				{
 					id: 1,
 					state: 1,
-					model: MonitorVideoBoxSmall as Component | null,
+					model: MonitorVideoBoxSmall as any,
 					points: [176,410],
 					deviceInfo: {
 						deviceSerial: 'default',
@@ -75,7 +69,7 @@
 				{
 					id: 2,
 					state: 1,
-					model: MonitorVideoBoxSmall as Component | null,
+					model: MonitorVideoBoxSmall as any,
 					points: [176,1018],
 					deviceInfo: {
 						deviceSerial: 'default',
@@ -85,7 +79,7 @@
 				{
 					id: 3,
 					state: 1,
-					model: MonitorVideoBoxSmall as Component | null,
+					model: MonitorVideoBoxSmall as any,
 					points: [572,410],
 					deviceInfo: {
 						deviceSerial: 'default',
@@ -95,7 +89,7 @@
 				{
 					id: 4,
 					state: 1,
-					model: MonitorVideoBoxSmall as Component | null,
+					model: MonitorVideoBoxSmall as any,
 					points: [572,1018],
 					deviceInfo: {
 						deviceSerial: 'default',
@@ -105,6 +99,27 @@
 			]
 		}
 	});
+
+	usePublish('AppHeaderL2State', true);
+	usePublish('AppSmartGuardState', false);
+	usePublish('AppFooterModel', 'inside');
+	usePublish('AppFooterState', true);
+
+	const videoBoxStyleSetter = (item :typeof _reactive.data.monitorList[0]) => {
+		if(!item.model) return;
+		if(item.model.__name === 'MonitorVideoBoxMiddle') {
+			return {
+				top: '50%',
+				left: '50%',
+				transform: 'translate(-50%, -50%)'
+			}
+		}else {
+			return {
+				top: item.points[0] + 'px',
+				left: item.points[1] + 'px'
+			}
+		}
+	};
 
 	useSubscribe<SenselessTrackingVideoBox>('senselessTrackingVideoBox', (ctx, ...args) => {
 		if(ctx.model === 2) {
@@ -121,6 +136,11 @@
 			});
 
 			_reactive.data.monitorList = result;
+
+			usePublish<VideoBoxHeaderBtnState>('videoBoxHeaderBtnState',{
+				name: 'fullScreen',
+				state: 0
+			});
 		}
 
 		if(ctx.model === 1) {
@@ -134,15 +154,19 @@
 
 		if(ctx.model === 0) {
 			const index = _reactive.data.monitorList.findIndex(item => {
-				return item.model == MonitorVideoBoxMiddle;
+				if(
+					item.model &&
+					item.model.__name === 'MonitorVideoBoxMiddle'
+				) {
+					return true;
+				}
 			});
-
-			console.log('jx',index);
 
 			if(index !== -1) {
 				_reactive.data.monitorList.forEach((item, key) => {
 					item.model = MonitorVideoBoxSmall;
 				});
+				return;
 			}
 
 			const result = _reactive.data.monitorList.map(item => {

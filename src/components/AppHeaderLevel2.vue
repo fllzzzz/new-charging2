@@ -36,7 +36,12 @@
 
 <script setup lang="ts">
 	import {
-		useRouter
+		useHeightLight
+	} from '@/hooks/HeightLightManager';
+
+	import {
+		useRouter,
+		useRoute
 	} from 'vue-router';
 
 	import {
@@ -44,13 +49,14 @@
 	} from 'vue';
 
 	const router = useRouter();
+	const route = useRoute();
 
 	const _reactive = reactive({
 		data: {
 			itemList: [
 				{
 					id: 1,
-					name: 'fusionReplay',
+					name: 'fusion-replay',
 					showName: '融合回放',
 					state: 0,
 					imageList: [
@@ -60,7 +66,7 @@
 				},
 				{
 					id: 2,
-					name: 'videoTracking',
+					name: 'video-tracking',
 					showName: '视频追视',
 					state: 0,
 					imageList: [
@@ -70,7 +76,7 @@
 				},
 				{
 					id: 3,
-					name: 'senselessTracking',
+					name: 'senseless-tracking',
 					showName: '无感追视',
 					state: 0,
 					imageList: [
@@ -83,42 +89,14 @@
 	});
 
 	const clickDispensere = (event :MouseEvent) => {
-		const oldHightLightElement = _reactive.data.itemList.filter(item => {
-			return item.state === 1;
-		});
-		if(oldHightLightElement.length > 0) {
-			oldHightLightElement.forEach(item => {
-				[item.imageList[0], item.imageList[1]] =
-					[item.imageList[1], item.imageList[0]];
-					item.state = 0;
-			});
-		}
-
 		const id = (event.target as HTMLElement).id;
-		const target = _reactive.data.itemList.find(item => {
-			return item.name === id;
-		});
+		const target = _reactive.data.itemList.find(item => item.name === id);
 		if(!target) return;
-		[target.imageList[0], target.imageList[1]] =
-			[target.imageList[1], target.imageList[0]];
-		target.state = 1;
 
-		if(id === 'fusionReplay') {
-			router.push({
-				name: 'fusion-replay'
-			});
-		}
-
-		if(id === 'videoTracking') {
-			router.push({
-				name: 'video-tracking'
-			});
-		}
-
-		if(id === 'senselessTracking') {
-			router.push({
-				name: 'senseless-tracking'
-			});
-		}
+		router.push({
+			name: target.name
+		}).then(() => {
+			useHeightLight(event,_reactive.data.itemList, route)
+		});
 	};
 </script>

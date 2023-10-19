@@ -66,6 +66,11 @@ const routes :RouteRecordRaw[] = [
 				path: 'senseless-tracking',
 				component: () => import('@/views/AppSenselessTracking.vue')
 			},
+			{
+				name: 'video-tracking',
+				path: 'video-tracking',
+				component: () => import('@/views/AppVideoTracking.vue')
+			},
 		]
 	}
 ]

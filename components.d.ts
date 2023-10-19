@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AppCloudController: typeof import('./src/components/AppCloudController.vue')['default']
     AppConsole: typeof import('./src/components/AppConsole.vue')['default']
     AppDeviceList: typeof import('./src/components/AppDeviceList.vue')['default']
     AppFooterInside: typeof import('./src/components/AppFooterInside.vue')['default']
@@ -26,11 +27,11 @@ declare module 'vue' {
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElInput: typeof import('element-plus/es')['ElInput']
+    ElOption: typeof import('element-plus/es')['ElOption']
     ElPagination: typeof import('element-plus/es')['ElPagination']
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSelect: typeof import('element-plus/es')['ElSelect']
-    ElSorollbar: typeof import('element-plus/es')['ElSorollbar']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTimeline: typeof import('element-plus/es')['ElTimeline']
@@ -44,6 +45,7 @@ declare module 'vue' {
     MonitorVideoBoxHeader: typeof import('./src/components/MonitorVideoBoxHeader.vue')['default']
     MonitorVideoBoxMiddle: typeof import('./src/components/MonitorVideoBoxMiddle.vue')['default']
     MonitorVideoBoxSmall: typeof import('./src/components/MonitorVideoBoxSmall.vue')['default']
+    MonitorVideoBoxSmallExt: typeof import('./src/components/MonitorVideoBoxSmallExt.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

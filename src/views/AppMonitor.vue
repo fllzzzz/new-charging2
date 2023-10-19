@@ -4,12 +4,11 @@
 		height: 100vh;
 		position: fixed;
 		top: 0;left: 0;
-		z-index: 1100;
 		pointer-events: none;
+		z-index: v-bind('_reatcive.data.zIndex');
 		& > .item {
 			position: absolute;
 			pointer-events: auto;
-			z-index: 1100;
 		}
 		#total {
 			width: 108px;
@@ -85,10 +84,14 @@
 
 	import {
 		reactive,
-		computed
+		computed,
+		nextTick
 	} from 'vue';
 
 	const _reatcive = reactive({
+		data: {
+			zIndex: 1100,
+		},
 		state: {
 			videoBoxModel: 1, // 0: close 1: small, 2: middle, 3: full, 
 			totalBtn: true,
@@ -114,12 +117,14 @@
 	useSubscribe<MonitorVideoBox>('monitorVideoBox', (data) => {
 		if(data.model === 1 || data.model === 0) {
 			usePublish('AppSmartGuardState', true);
+			_reatcive.data.zIndex = 1100;
 		}
 		if(data.model === 2) {
 			usePublish('AppSmartGuardState', false);
+			_reatcive.data.zIndex = 1100;
 		}
 		if(data.model === 3) {
-			//
+			_reatcive.data.zIndex = 900;
 		}
 		_reatcive.state.videoBoxModel = data.model;
 	})
@@ -137,6 +142,7 @@
 	});
 
 	const totalClickHandler = () => {
+		_reatcive.data.zIndex = 900;
 		_reatcive.state.videoBoxModel = 3;
 	};
 </script>

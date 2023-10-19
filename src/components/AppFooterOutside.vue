@@ -24,7 +24,7 @@
 			.btn {
 				pointer-events: auto;
 			}
-			span {
+			span.btn {
 				font-size: 23px;
 				color: #FFFFFF;
 				margin-bottom: 1.5px;
@@ -35,6 +35,9 @@
 					margin-right: 16.5px;
 					margin-bottom: 2px;
 				}
+			}
+			img.btn {
+				width: 50%;height: 100%;
 			}
 		}
 	}
