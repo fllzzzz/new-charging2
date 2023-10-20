@@ -91,6 +91,7 @@
 		}
 	});
 
+	let oldTarget :any;
 	const clickDispensere = (event :MouseEvent) => {
 		const targetData = getTarget<typeof _reactive.data.itemList[0]>(
 			event,
@@ -105,6 +106,16 @@
 				name: 'overview',
 			});
 		});
+
+		if(oldTarget === target) {
+			router.push({
+				name: 'overview'
+			});
+			return;
+		}
+
+		oldTarget = target;
+
 
 		router.push({
 			name: targetData.data.name
