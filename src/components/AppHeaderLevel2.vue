@@ -88,10 +88,21 @@
 		}
 	});
 
+	let oldTarget :any;
 	const clickDispensere = (event :MouseEvent) => {
 		const id = (event.target as HTMLElement).id;
 		const target = _reactive.data.itemList.find(item => item.name === id);
 		if(!target) return;
+
+		if(oldTarget === target) {
+			router.push({
+				name: 'overview'
+			});
+			return;
+		}
+
+		oldTarget = target;
+
 
 		router.push({
 			name: target.name

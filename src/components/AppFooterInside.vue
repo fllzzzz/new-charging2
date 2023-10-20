@@ -144,39 +144,72 @@
 			return btn.name === id;
 		});
 		if(!target) return;
-		[target.imageList[0], target.imageList[1]] =
-			[target.imageList[1], target.imageList[0]];
-		target.state = 1;
 
 		switch(id) {
 			case 'monitor':
 				router.push({
 					name: 'monitor'
+				}).then(() => {
+					if(route.name === 'monitor') {
+						[target.imageList[0], target.imageList[1]] =
+						[target.imageList[1], target.imageList[0]];
+						target.state = 1;
+					}
 				});
 				break;
 			case 'video-inspect':
 				router.push({
 					path: 'inspect/video'
+				}).then(() => {
+					if(route.name === 'video-inspect') {
+						[target.imageList[0], target.imageList[1]] =
+						[target.imageList[1], target.imageList[0]];
+						target.state = 1;
+					}
 				});
 				break;
 			case 'digital-inspect':
 				router.push({
 					path: 'inspect/digital'
+				}).then(() => {
+					if(route.name === 'digital-inspect') {
+						[target.imageList[0], target.imageList[1]] =
+						[target.imageList[1], target.imageList[0]];
+						target.state = 1;
+					}
 				});
 				break;
 			case 'immediate-controller':
 				router.push({
 					name: 'immediate-controller'
+				}).then(() => {
+					if(route.name === 'immediate-controller') {
+						[target.imageList[0], target.imageList[1]] =
+						[target.imageList[1], target.imageList[0]];
+						target.state = 1;
+					}
 				});
 				break;
 			case 'scene-controller':
 				router.push({
 					name: 'scene-controller'
+				}).then(() => {
+					if(route.name === 'scene-controller') {
+						[target.imageList[0], target.imageList[1]] =
+						[target.imageList[1], target.imageList[0]];
+						target.state = 1;
+					}
 				});
 				break;
 			case 'overview':
 				router.push({
 					name: 'overview'
+				}).then(() => {
+					if(route.name === 'overview') {
+						[target.imageList[0], target.imageList[1]] =
+						[target.imageList[1], target.imageList[0]];
+						target.state = 1;
+					}
 				});
 				break;
 		}
