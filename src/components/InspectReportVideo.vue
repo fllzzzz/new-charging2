@@ -192,7 +192,9 @@
 				<img src="@/assets/images/icon/report.png">
 				<span>巡检报告</span>
 			</div>
-			<img src="@/assets/images/icon/close.png">
+			<img src="@/assets/images/icon/close.png"
+				@click="closeHandler"
+			>
 		</div>
 		<div class="item" id="body">
 			<div class="box" id="content">
@@ -253,6 +255,8 @@
 		reactive
 	} from 'vue';
 
+	const emits = defineEmits(['close']);
+
 	const _reactive = reactive({
 		data: {
 			btnList: [
@@ -292,4 +296,8 @@
 			],
 		}
 	});
+
+	const closeHandler = () => {
+		emits('close');
+	};
 </script>

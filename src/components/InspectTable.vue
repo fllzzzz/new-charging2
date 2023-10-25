@@ -33,6 +33,33 @@
 	:deep(.el-table__inner-wrapper) {
 		&::before {display: none;}
 	}
+
+	.btn-group {
+		height: 100%;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		flex-flow: row nowrap;
+		align-items: center;
+	}
+	.btn {
+		width: 78px;
+		height: 32px;
+		background: linear-gradient(0deg, rgba(20,205,198,0.88) 0%, rgba(20,205,198,0.3) 100%);
+		opacity: 0.8;
+		border-radius: 2px;
+		margin-right: 16px;
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: center;
+		align-items: center;
+		&:last-child {
+			margin-right: 0;
+		}
+		& > * {
+			pointer-events: none;
+		}
+	}
 </style>
 
 <template>
@@ -49,12 +76,44 @@
 				v-for="column, index in _reactive.data.columnList"
 				:key="index"
 			>
-				<el-table-column
-					:label="column.label"
-					:prop="column.prop"
-					:width="column.width * screenManager.currentRatio.value[0]"
-					align="center"
-				></el-table-column>
+				<template v-if="column.prop === 'options'">
+					<el-table-column
+						:label="column.label"
+						:width="column.width * screenManager.currentRatio.value[0]"
+						align="center"
+					>
+						<template #default="{row}">
+							<template v-if="row.id">
+								<div class="btn-group"
+									@click="optionsClickHandler(
+										$event,
+										row.inspectType
+									)"
+								>
+									<template 
+										v-for="item, index in row[column.prop]"
+										:key="index"
+									>
+										<div class="btn"
+											:id="item"
+										>
+											<span>{{ item }}</span>
+										</div>
+									</template>
+								</div>
+							</template>
+						</template>
+					</el-table-column>
+				</template>
+				<template v-else>
+					<el-table-column
+						:label="column.label"
+						:prop="column.prop"
+						:width="column.width * screenManager.currentRatio.value[0]"
+						align="center"
+					>
+					</el-table-column>
+				</template>
 			</template>
 		</template>
 	</el-table>
@@ -82,6 +141,8 @@
 	type RowListType = {
 		[key :string] :any;
 	}[];
+
+	const emits = defineEmits(['openReport']);
 
 	const props = defineProps({
 		rowNumber: {
@@ -118,6 +179,12 @@
 			return {backgroundColor: 'rgba(3, 30, 46, 1)'}
 	};
 
+	const optionsClickHandler = (event :MouseEvent, ...args :any[]) => {
+		const id = (event.target as HTMLElement).id;
+		if(id === '查看报告') emits('openReport', ...args);
+		if(id === '告警查看') emits('openReport', 'alarmCheck');
+	};
+
 	onMounted(() => {
 		const rowListLength = _reactive.data.rowList.length;
 		if( rowListLength < props.rowNumber) {
@@ -146,6 +213,7 @@
 			_reactive.data.columnList = props.columnList;
 		}
 	}, {
-		immediate: true
+		immediate: true,
+		deep: true
 	});
 </script>

@@ -157,7 +157,9 @@
 				<img src="@/assets/images/icon/report.png">
 				<span>巡检报告</span>
 			</div>
-			<img src="@/assets/images/icon/close.png">
+			<img src="@/assets/images/icon/close.png"
+				@click="closeHandler"
+			>
 		</div>
 		<div class="item" id="body">
 			<div class="box" id="content">
@@ -211,6 +213,8 @@
 	import {
 		reactive
 	} from 'vue';
+
+	const emits = defineEmits(['close']);
 
 	const unitMapper = new Map<string, string>([
 		['temp', '℃'],
@@ -333,5 +337,9 @@
 	const getStatus = (length :number) => {
 		if (length > 0) return '状态异常';
 		else return '状态正常';
+	};
+
+	const closeHandler = () => {
+		emits('close');
 	};
 </script>

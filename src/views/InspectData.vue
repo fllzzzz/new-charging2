@@ -47,6 +47,17 @@
 		top: 160px;
 		left: 32px;
 	}
+
+	.report-container {
+		position: fixed;
+		top: 193px;
+		right: 31px;
+	}
+	.alarm-card-container {
+		position: fixed;
+		top: 83px;
+		right: 16px;
+	}
 </style>
 
 <template>
@@ -63,18 +74,26 @@
 		></InspectDateFilter>
 		<InspectTable
 			class="inspect-table-container"
-			:column-list="_static.data.columnList"
-			:row-list="_static.data.rowList"
+			:column-list="_reactive.data.tableData.columnList"
+			:row-list="_reactive.data.tableData.rowList"
+			@open-report="openReportHandler"
 		></InspectTable>
 		<BasePagination
 			class="base-pagination-container"
 		></BasePagination>
+		<component
+			:is="_reactive.data.reportModel"
+			:class="_reactive.data.boxClassName"
+			@close="reportCloseHandler"
+		></component>
 	</div>
 </template>
 
 <script setup lang="ts">
+	import InspectAlarmCheck from '@/components/InspectAlarmCheck.vue';
+	import InspectReportDigital from '@/components/InspectReportDigital.vue';
+	import InspectReportVideo from '@/components/InspectReportVideo.vue';
 	import screenManager from '@/hooks/ScreenManager';
-
 	import InspectDateFilter from '@/components/InspectFilter.vue';
 	import BasePagination from '@/components/BasePagination.vue';
 	import InspectTable from '@/components/InspectTable.vue';
@@ -108,60 +127,124 @@
 
 	const _reactive = reactive({
 		data: {
+			boxClassName: undefined as undefined | string,
 			title: undefined as undefined | string,
+			reportModel: null as null | any,
+			tableData: {
+				rowList: null as null | any,
+				columnList: null as null | any
+			}
 		}
 	});
 
 	const _static = {
 		data: {
-			columnList: [
-				{
-					label: '序号',
-					prop: 'id',
-					width: 103
-				},
-				{
-					label: '站名',
-					prop: 'stationName',
-					width: 263
-				},
-				{
-					label: '巡检开始时间',
-					prop: 'startTime',
-					width: 230
-				},
-				{
-					label: '巡检内容',
-					prop: 'inspectContent',
-					width: 460
-				},
-				{
-					label: '巡检方式',
-					prop: 'inspectType',
-					width: 143
-				},
-				{
-					label: '巡检结果',
-					prop: 'inspectResult',
-					width: 330
-				},
-				{
-					label: 'options',
-					prop: 'options',
-					width: 320
-				},
-			],
-			rowList: [
-				{
-					id: 1,
-					stationName: 'stationName',
-					startTime: 'startTime',
-					inspectContent: 'inspectContent',
-					inspectType: 'inspectType',
-					inspectResult: 'inspectResult',
-					options: ['查看报告', '下载报告'],
-				}
-			]
+			historyModel: {
+				columnList: [
+					{
+						label: '序号',
+						prop: 'id',
+						width: 103
+					},
+					{
+						label: '站名',
+						prop: 'stationName',
+						width: 263
+					},
+					{
+						label: '巡检开始时间',
+						prop: 'startTime',
+						width: 230
+					},
+					{
+						label: '巡检内容',
+						prop: 'inspectContent',
+						width: 460
+					},
+					{
+						label: '巡检方式',
+						prop: 'inspectType',
+						width: 143
+					},
+					{
+						label: '巡检结果',
+						prop: 'inspectResult',
+						width: 330
+					},
+					{
+						label: 'options',
+						prop: 'options',
+						width: 320
+					},
+				],
+				rowList: [
+					{
+						id: 1,
+						stationName: '站名称',
+						startTime: '开始时间',
+						inspectContent: '巡检内容',
+						inspectType: '视频巡检',
+						inspectResult: '巡检结果',
+						options: ['查看报告', '下载报告'],
+					}
+				]
+			},
+			warnModel: {
+				columnList: [
+					{
+						label: '序号',
+						prop: 'id',
+						width: 93
+					},
+					{
+						label: '站名',
+						prop: 'stationName',
+						width: 232
+					},
+					{
+						label: '告警内容',
+						prop: 'alarmContent',
+						width: 388
+					},
+					{
+						label: '摄像头名称',
+						prop: 'monitorName',
+						width: 256
+					},
+					{
+						label: '告警时间',
+						prop: 'alarmTime',
+						width: 213
+					},
+					{
+						label: '问题类型',
+						prop: 'alarmType',
+						width: 185
+					},
+					{
+						label: '处理状态',
+						prop: 'handleStatus',
+						width: 139
+					},
+					{
+						label: '告警确认',
+						prop: 'options',
+						width: 344
+					},
+				],
+				rowList: [
+					{
+						id: 1,
+						stationName: '站名称',
+						alarmContent: ['充电枪未归位', '充电桩外观损坏', '充电桩生锈'],
+						monitorName: '1号充电桩东北角',
+						alarmTime: '2023/5/16 14:29：32',
+						alarmType: '充电桩问题',
+						handleStatus: '未处理',
+						options: ['告警查看', '已处理', '处置报告']
+					}
+				]
+			}
 		}
 	};
 
@@ -197,9 +280,39 @@
 		fn(event);
 	};
 
+	const openReportHandler = (...args :any) => {
+		if(args[0] === '视频巡检') {
+			_reactive.data.reportModel = InspectReportVideo;
+			_reactive.data.boxClassName = 'report-container';
+		}else if(args[0] === '数字巡检') {
+			_reactive.data.reportModel = InspectReportDigital;
+			_reactive.data.boxClassName = 'report-container';
+		}else if(args[0] === 'alarmCheck'){
+			_reactive.data.reportModel = InspectAlarmCheck;
+			_reactive.data.boxClassName = 'alarm-card-container';
+		}else {
+			_reactive.data.reportModel = null;
+		}
+	};
+
+	const reportCloseHandler = () => {
+		_reactive.data.reportModel = null;
+	};
+
 	watch(() => props.model, (model) => {
 		if(!model) return;
 		_reactive.data.title = modelInovke.get(model)?.title;
+		if(model === 'history') {
+			_reactive.data.tableData.columnList = 
+				_static.data.historyModel.columnList;
+			_reactive.data.tableData.rowList = 
+				_static.data.historyModel.rowList;
+		}else if(model === 'warn') {
+			_reactive.data.tableData.columnList = 
+				_static.data.warnModel.columnList;
+			_reactive.data.tableData.rowList = 
+				_static.data.warnModel.rowList;
+		}
 	}, {
 		immediate: true,
 	});
