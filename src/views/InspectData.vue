@@ -105,6 +105,11 @@
 	import InspectTable from '@/components/InspectTable.vue';
 
 	import {
+		useAnchorPointSetter,
+		useAnchorPointGetter
+	} from '@/hooks/routerManager';
+
+	import {
 		usePublish
 	} from '@/hooks/EventEmitter';
 
@@ -263,12 +268,24 @@
 		}],
 	]);
 
+	useAnchorPointSetter(from => {
+		from = from!;
+		if(!from.name) return;
+		return ['inspectData',{
+			type: 'name',
+			location: (from.name).toString()
+		}]
+	});
+
 	const clickEventInovke = new Map<string, ((
 		event :MouseEvent,
 		...args :any[]
 	) => void)>([
 		['close', () => {
-			router.back();
+			const target = useAnchorPointGetter('inspectData');
+			if(! target) return;
+			router.push(target);
+
 			usePublish<boolean>('AppFooterState', true);
 			usePublish<boolean>('AppSmartGuardState', true);
 			usePublish<boolean>('AppHeaderL2State', true);

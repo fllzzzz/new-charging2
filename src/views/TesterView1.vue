@@ -16,6 +16,4 @@
 	const compMapper = new Map<string, Component>([
 		['middle', MonitorVideoBoxMiddle],
 	]);
-
-	console.log('jx',compMapper);
 </script>

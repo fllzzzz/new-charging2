@@ -54,8 +54,13 @@
 
 <script setup lang="ts">
 	import {
-		watch,
-		reactive
+		useRouteHighLight
+	} from '@/hooks/routerManager';
+
+	import {
+		onMounted,
+		reactive,
+		nextTick
 	} from 'vue';
 
 	import {
@@ -128,71 +133,41 @@
 	});
 
 	const clickDispensere = (event :MouseEvent) => {
-		const oldHightLightElement = _reactive.data.btnList.filter(btn => {
-			return btn.state === 1;
-		});
-		if(oldHightLightElement.length > 0) {
-			oldHightLightElement.forEach(btn => {
-				[btn.imageList[0], btn.imageList[1]] =
-					[btn.imageList[1], btn.imageList[0]];
-					btn.state = 0;
-			});
-		}
-
 		const id = (event.target as HTMLElement).id;
-		const target = _reactive.data.btnList.find(btn => {
-			return btn.name === id;
-		});
-		if(!target) return;
-		[target.imageList[0], target.imageList[1]] =
-			[target.imageList[1], target.imageList[0]];
-		target.state = 1;
+		const target = _reactive.data.btnList.find(
+			item => item.name === id
+		);
 
-		switch(id) {
-			case 'monitor':
-				router.push({
-					name: 'monitor'
-				});
-				break;
-			case 'video-inspect':
-				router.push({
-					path: 'inspect/video'
-				});
-				break;
-			case 'digital-inspect':
-				router.push({
-					path: 'inspect/digital'
-				});
-				break;
-			case 'immediate-controller':
-				router.push({
-					name: 'immediate-controller'
-				});
-				break;
-			case 'scene-controller':
-				router.push({
-					name: 'scene-controller'
-				});
-				break;
-			case 'overview':
-				router.push({
-					name: 'overview'
-				});
-				break;
+		if(
+			target?.name === 'video-inspect' ||
+			target?.name === 'digital-inspect'
+		) {
+			const _target = target.name.split('-')[0];
+			router.push({
+				path: `inspect/${_target}`
+			});
+			return;
 		}
+
+		router.push({
+			name: target?.name
+		})
 	};
 
-/* 	watch(() => route.name, (name) => {
-		const target = _reactive.data.btnList.find(btn => {
-			if(btn.name === name) {
-				btn.state = 1;
-				return true;
-			}
+	onMounted(() => {
+		nextTick(() => {
+			useRouteHighLight(
+				'AppFooterInside',
+				_reactive.data.btnList,
+				(ctx) => {
+					_reactive.data.btnList = ctx.map((item, index) => {
+						return {
+							id: index + 1,
+							...item
+						}
+					})
+				}
+			);
 		});
-		if(!target) return;
-		[target.imageList[0], target.imageList[1]] =
-		[target.imageList[1], target.imageList[0]]
-	}, {
-		immediate: true
-	}) */
+	});
 </script>

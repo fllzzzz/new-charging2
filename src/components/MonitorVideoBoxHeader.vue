@@ -217,8 +217,6 @@
 		}).catch(err => {
 			console.log(err);
 		})
-
-		console.log('jx', target.code, videoBox.value);
 	};
 
 	onMounted(() => {

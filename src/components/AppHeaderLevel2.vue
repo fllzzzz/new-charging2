@@ -89,8 +89,26 @@
 		}
 	});
 
-	useRouteHighLight(_reactive.data.itemList);
+/* 	useRouteHighLight(
+		'AppHeaderLevel2',
+		_reactive.data.itemList
+	); */
+	
 	const clickDispensere = (event :MouseEvent) => {
-		//
+		const id = (event.target as HTMLElement).id;
+		const target = _reactive.data.itemList.find(
+			item => item.name === id
+		);
+
+		if(target?.state === 1) {
+			router.push({
+				name: 'overview'
+			});
+			return;
+		}
+
+		router.push({
+			name: target?.name
+		})
 	};
 </script>

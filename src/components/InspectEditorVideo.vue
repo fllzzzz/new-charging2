@@ -292,6 +292,9 @@
 				return;
 			}else if(props.model === 'maker') {
 				router.back();
+				/* router.push({
+					name: 'overview',
+				}); */
 			}else {
 				return;
 			}
