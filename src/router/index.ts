@@ -1,3 +1,7 @@
+import {
+	useSaveRouter
+} from '@/hooks/routerManager';
+
 import routes from './routes';
 
 import {
@@ -5,7 +9,13 @@ import {
 	createWebHashHistory
 } from 'vue-router'
 
-export default createRouter({
+const router = createRouter({
 	history: createWebHashHistory(),
 	routes
 });
+
+router.beforeEach((to, from) => {
+	useSaveRouter(from ,to);
+})
+
+export default router;

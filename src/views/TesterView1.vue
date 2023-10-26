@@ -1,11 +1,21 @@
-<style lang="scss" scoped>
+<style lang="scss">
 
 </style>
 
 <template>
-	<AppHighTemperatureWarning></AppHighTemperatureWarning>
+	<div></div>
 </template>
 
 <script setup lang="ts">
-	import AppHighTemperatureWarning from '@/components/AppHighTemperatureWarning.vue';
+	import MonitorVideoBoxMiddle from '@/components/MonitorVideoBoxMiddle.vue';
+
+	import type {
+		Component
+	} from 'vue';
+
+	const compMapper = new Map<string, Component>([
+		['middle', MonitorVideoBoxMiddle],
+	]);
+
+	console.log('jx',compMapper);
 </script>

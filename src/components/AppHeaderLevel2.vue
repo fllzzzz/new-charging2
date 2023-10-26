@@ -36,10 +36,8 @@
 
 <script setup lang="ts">
 	import {
-		useHeightLight
-	} from '@/hooks/HeightLightManager';
-
-	import clickEvent from '@/hooks/useClickEvent';
+		useRouteHighLight
+	} from '@/hooks/routerManager';
 
 	import {
 		useRouter,
@@ -47,12 +45,12 @@
 	} from 'vue-router';
 
 	import {
-		reactive
+		reactive,
+		onMounted
 	} from 'vue';
 
 	const router = useRouter();
 	const route = useRoute();
-	const {getTarget,slefClose} = clickEvent;
 
 	const _reactive = reactive({
 		data: {
@@ -91,25 +89,8 @@
 		}
 	});
 
+	useRouteHighLight(_reactive.data.itemList);
 	const clickDispensere = (event :MouseEvent) => {
-		const targetData = getTarget<typeof _reactive.data.itemList[0]>(
-			event,
-			_reactive.data.itemList,
-			item => item.name
-		);
-
-		if(!targetData) return;
-
-		slefClose(targetData.data,() => {
-			router.push({
-				name: 'overview',
-			});
-		});
-
-		router.push({
-			name: targetData.data.name
-		}).then(() => {
-			useHeightLight(event,_reactive.data.itemList, route)
-		});
+		//
 	};
 </script>

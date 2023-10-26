@@ -11,7 +11,7 @@ import {
 	ref
 } from 'vue';
 
-export const videoBoxModel = ref<Component | undefined>(undefined);
+export const videoBox= ref<Component | undefined>(undefined);
 
 const compMapper = new Map<string, Component>([
 	['small', MonitorVideoBoxSmall],
@@ -21,4 +21,10 @@ const compMapper = new Map<string, Component>([
 ]);
 export const useChangeModle = (
 	model :'small' | 'middle' | 'full' | 'small-ext'
-) => videoBoxModel.value = compMapper.get(model);
+	
+) => {
+	/* console.log('jx,inter', model, compMapper.get('middle'));
+	videoBox.value = compMapper.get(model); */
+	debugger;
+	compMapper.get('middle')
+}

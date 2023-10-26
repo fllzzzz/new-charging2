@@ -53,6 +53,11 @@
 		top: 193px;
 		right: 31px;
 	}
+	.handleReport-container {
+		position: fixed;
+		top: 170px;
+		right: 31px;
+	}
 	.alarm-card-container {
 		position: fixed;
 		top: 83px;
@@ -90,6 +95,7 @@
 </template>
 
 <script setup lang="ts">
+	import InspectReportHandle from '@/components/InspectReportHandle.vue';
 	import InspectAlarmCheck from '@/components/InspectAlarmCheck.vue';
 	import InspectReportDigital from '@/components/InspectReportDigital.vue';
 	import InspectReportVideo from '@/components/InspectReportVideo.vue';
@@ -290,6 +296,9 @@
 		}else if(args[0] === 'alarmCheck'){
 			_reactive.data.reportModel = InspectAlarmCheck;
 			_reactive.data.boxClassName = 'alarm-card-container';
+		}else if(args[0] === 'handleReport'){
+			_reactive.data.reportModel = InspectReportHandle;
+			_reactive.data.boxClassName = 'handleReport-container';
 		}else {
 			_reactive.data.reportModel = null;
 		}

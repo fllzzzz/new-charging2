@@ -183,6 +183,7 @@
 		const id = (event.target as HTMLElement).id;
 		if(id === '查看报告') emits('openReport', ...args);
 		if(id === '告警查看') emits('openReport', 'alarmCheck');
+		if(id === '处置报告') emits('openReport', 'handleReport');
 	};
 
 	onMounted(() => {

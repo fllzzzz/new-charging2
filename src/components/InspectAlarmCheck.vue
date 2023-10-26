@@ -75,9 +75,6 @@
 			flex-flow: row nowrap;
 			justify-content: space-between;
 			align-items: center;
-			& > * {
-				pointer-events: none;
-			}
 			img {
 				width: 18px;
 				height: 18px;
@@ -96,6 +93,9 @@
 				flex-flow: row nowrap;
 				justify-content: center;
 				align-items: center;
+				& > * {
+					pointer-events: none;
+				}
 			}
 		}
 		#video-btn-group {
@@ -103,6 +103,7 @@
 			height: 32px;
 			margin-left: 30px;
 			align-self: flex-start;
+			pointer-events: none;
 			& > .btn {
 				width: 96px;
 				height: 32px;
@@ -110,6 +111,14 @@
 				border: 1px solid #036D6A;
 				opacity: 0.9;
 				border-radius: 2px;
+				pointer-events: auto;
+				& > * {
+					pointer-events: none;
+				}
+				&.is-active {
+					background: linear-gradient(0deg, rgba(18,212,214,0.88) 0%, rgba(20,205,198,0.3) 100%);
+					opacity: 0.8;
+				}
 			}
 		}
 		#video {
@@ -215,24 +224,29 @@
 			</template>
 
 		</div>
-		<div class="item" id="video-btn-group">
-			<div class="btn">
+		<div class="item" id="video-btn-group"
+			@click="videoBtnClickHandler"
+		>
+			<div class="btn" id="video">
 				<img src="@/assets/images/icon/video-capter-1.png">
 				<span>告警录屏</span>
 			</div>
-			<div class="btn">
+			<div class="btn" id="monitor">
 				<img src="@/assets/images/icon/monitor.png">
 				<span>实时监控</span>
 			</div>
 		</div>
 		<div class="item" id="video">
-			<MonitorVideoBoxSmall></MonitorVideoBoxSmall>
+			<MonitorVideoBoxSmall
+				v-if="_reactive.state.videoBox"
+			></MonitorVideoBoxSmall>
 		</div>
 		<div class="item" id="option-btn-group">
 			<div class="btn">
 				<span>自动处理</span>
 			</div>
-			<div class="btn">
+			<div class="btn"
+				@click="clickImmConHandler">
 				<span>现场管控</span>
 			</div>
 		</div>
@@ -247,12 +261,21 @@
 	} from '@/types';
 
 	import {
+		useRouter
+	} from 'vue-router';
+
+	import {
 		reactive
 	} from 'vue';
+
+	const router = useRouter();
 
 	const emits = defineEmits(['close']);
 
 	const _reactive = reactive({
+		state: {
+			videoBox: false
+		},
 		data: {
 			deviceInfo: {} as DeviceInfo,
 			time: new Date().toLocaleString(),
@@ -265,4 +288,20 @@
 	const closeHandler = () => {
 		emits('close');
 	};
+
+	const clickImmConHandler = () => {
+		router.push({
+			name: 'scene-controller'
+		})
+	};
+
+	const videoBtnClickHandler = (() => {
+		let _el :HTMLElement;
+		return (event :MouseEvent) => {
+			if(!_reactive.state.videoBox) _reactive.state.videoBox = true;
+			if(_el) _el.classList.remove('is-active');
+			(event.target as HTMLElement).classList.add('is-active');
+			_el = (event.target as HTMLElement);
+		}
+	})();
 </script>

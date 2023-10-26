@@ -81,6 +81,11 @@
 
 <script setup lang="ts">
 	import {
+		useChangeModle,
+		videoBox
+	} from '@/hooks/videoBoxManager';
+
+	import {
 		usePublish,
 		useSubscribe
 	} from '@/hooks/EventEmitter';
@@ -125,6 +130,12 @@
 			default: 1
 		}
 	});
+
+	enum modelInovke {
+		'small' = 1,
+		'middle' = 2,
+		'full' = 3
+	}
 
 	const _reactive = reactive({
 		data: {
@@ -190,6 +201,8 @@
 			model: target.code,
 		});
 
+		useChangeModle(modelInovke[target.code] as "small" | "middle" | "full" | "small-ext");
+
 		hunter(() => _static.data.deviceInfo, {
 			cycle: 10,
 			frequency: 10
@@ -204,6 +217,8 @@
 		}).catch(err => {
 			console.log(err);
 		})
+
+		console.log('jx', target.code, videoBox.value);
 	};
 
 	onMounted(() => {
