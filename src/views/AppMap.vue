@@ -43,12 +43,23 @@
 
 <script setup lang="ts">
 	import {
-		usePublish
+		ctid_12721
+	} from '@/types';
+
+	import {
+		usePublish,
+		useSubscribe
 	} from '@/hooks/EventEmitter';
 
 	import {
 		reactive
 	} from 'vue';
+
+	import {
+		useRouter
+	} from 'vue-router';
+
+	const router = useRouter();
 
 	const _reactive = reactive({
 		data: {
@@ -95,4 +106,10 @@
 	usePublish<boolean>('AppFooterState', true);
 	usePublish<boolean>('AppSmartGuardState', true);
 	usePublish<string>('AppFooterModel', 'outside');
+
+	useSubscribe<ctid_12721>('getIFramerMsg_12721', () => {
+		router.push({
+			name: 'overview'
+		});
+	});
 </script>

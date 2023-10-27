@@ -23,8 +23,6 @@ export const useChangeModle = (
 	model :'small' | 'middle' | 'full' | 'small-ext'
 	
 ) => {
-	/* console.log('jx,inter', model, compMapper.get('middle'));
-	videoBox.value = compMapper.get(model); */
 	debugger;
 	compMapper.get('middle')
 }

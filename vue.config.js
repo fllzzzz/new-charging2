@@ -13,7 +13,8 @@ module.exports = defineConfig({
       Components({
         resolvers: [ElementPlusResolver()],
       }),
-    ]
+    ],
+    devtool: 'source-map',
   },
   css: {
     loaderOptions: {

@@ -58,9 +58,7 @@
 	} from '@/hooks/routerManager';
 
 	import {
-		onMounted,
 		reactive,
-		nextTick
 	} from 'vue';
 
 	import {
@@ -132,6 +130,11 @@
 		}
 	});
 
+	useRouteHighLight()(
+		'AppFooterInside',
+		_reactive.data.btnList,
+	);
+
 	const clickDispensere = (event :MouseEvent) => {
 		const id = (event.target as HTMLElement).id;
 		const target = _reactive.data.btnList.find(
@@ -153,21 +156,4 @@
 			name: target?.name
 		})
 	};
-
-	onMounted(() => {
-		nextTick(() => {
-			useRouteHighLight(
-				'AppFooterInside',
-				_reactive.data.btnList,
-				(ctx) => {
-					_reactive.data.btnList = ctx.map((item, index) => {
-						return {
-							id: index + 1,
-							...item
-						}
-					})
-				}
-			);
-		});
-	});
 </script>

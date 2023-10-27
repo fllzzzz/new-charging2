@@ -16,3 +16,14 @@ export type VideoBoxHeaderBtnState = {
 	name :string;
 	state :number;
 };
+
+export type ctid_14521 = {
+	StationNumber :number;
+	StationID :string;
+	StationName :string;
+	Report :string;
+};
+
+export type ctid_12721 = {
+	chargestationid :string
+};

@@ -182,6 +182,10 @@
 	import AppDeviceList from './AppDeviceList.vue';
 
 	import {
+		useCompStateChanger
+	} from '@/hooks/compController';
+
+	import {
 		usePublish
 	} from '@/hooks/EventEmitter';
 
@@ -238,9 +242,10 @@
 		}
 	});
 
-	usePublish('AppSmartGuardState', false);
-	usePublish('AppFooterState', false);
 	usePublish('monitorTotalBtnState', false);
+
+	useCompStateChanger('AppSmartGuard', false);
+	useCompStateChanger('AppFooter', false);
 
 	const clickEventInovke = new Map<string[], ((
 		...args :any[]
@@ -277,7 +282,7 @@
 					});
 					usePublish('monitorTotalBtnState', true);
 					usePublish('AppFooterModel', 'inside');
-					usePublish('AppFooterState', true);
+					useCompStateChanger('AppFooter', true);
 					break;
 				case 'to-middle':
 					usePublish<MonitorVideoBox>('monitorVideoBox', {
@@ -285,7 +290,7 @@
 					});
 					usePublish('monitorTotalBtnState', true);
 					usePublish('AppFooterModel', 'inside');
-					usePublish('AppFooterState', true);
+					useCompStateChanger('AppFooter', true);
 					break;
 				case 'to-mulit':
 					/*  */
@@ -311,9 +316,9 @@
 		usePublish('monitorVideoBox', {
 			model: 0
 		})
-		usePublish('AppSmartGuardState', true);
+		useCompStateChanger('AppSmartGuard', true);
 		usePublish('AppFooterModel', 'inside');
-		usePublish('AppFooterState', true);
+		useCompStateChanger('AppFooter', true);
 		usePublish('monitorTotalBtnState', true);
 	};
 </script>

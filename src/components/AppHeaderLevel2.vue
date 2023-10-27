@@ -89,10 +89,10 @@
 		}
 	});
 
-/* 	useRouteHighLight(
+	useRouteHighLight()(
 		'AppHeaderLevel2',
 		_reactive.data.itemList
-	); */
+	);
 	
 	const clickDispensere = (event :MouseEvent) => {
 		const id = (event.target as HTMLElement).id;

@@ -151,6 +151,10 @@
 	import BaseScrollbar from './BaseScrollbar.vue';
 
 	import {
+		usePublish
+	} from '@/hooks/EventEmitter';	
+
+	import {
 		reactive
 	} from 'vue';
 
@@ -196,8 +200,15 @@
 		...args :any[]
 	) => void)>([
 		[['cancel', 'close'], (event) => {
-			emits('close',999);
+			emits('close');
 		}],
+		['confirm', () => {
+			emits('close');
+			usePublish('setIframerMsg', {
+				ctid: 14311,
+				state: "open"
+			});
+		}]
 	]);
 
 	const clickDispenser = (event :MouseEvent) => {

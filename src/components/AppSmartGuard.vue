@@ -68,6 +68,14 @@
 
 <script setup lang="ts">
 	import {
+		ctid_14521
+	} from '@/types';
+
+	import {
+		useMsgHandler
+	} from '@/hooks/messageManager';
+
+	import {
 		useSubscribe
 	} from '@/hooks/EventEmitter';
 
@@ -81,10 +89,11 @@
 		}
 	});
 
-	useSubscribe<{
-		level :'warn' | 'info' | 'debug';
-		msg :string;
-	}>('SmartGuardBroadCast', (ctx) => {
-		_reactive.data.broadCastMsg = ctx.msg;
+	useSubscribe<ctid_14521>('getIFramerMsg_14521', (ctx) => {
+		const msg = useMsgHandler<ctid_14521>('info', ctx);
+		if(!msg) return;
+		if(msg.ctx.StationID) {
+			_reactive.data.broadCastMsg = msg.ctx.StationName + msg.ctx.Report;
+		}
 	})
 </script>

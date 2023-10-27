@@ -30,15 +30,15 @@
 	const elIFrame = ref<HTMLIFrameElement | null>(null);
 	const elIFrameWindow = ref<Window | null>(null);
 
-	useSubscribe<any>('iframerMessage', (ctx) => {
-		elIFrameWindow.value?.postMessage(ctx,'*');
+	useSubscribe<any>('setIframerMsg', (ctx) => {
+		elIFrameWindow.value?.postMessage(ctx, '*');
 	});
 
 	window.addEventListener('message', (e :MessageEvent) => {
 		if(e.origin === 'http://192.168.1.114:18901') {
 			const msg = JSON.parse(e.data);
 			if(Object.keys(msg).includes('ctid')) {
-				usePublish(`ctid-${msg.ctid}`, msg);
+				usePublish(`getIFramerMsg_${msg.ctid}`, msg);
 			}
 		}
 	});

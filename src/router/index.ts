@@ -1,4 +1,8 @@
 import {
+	useCompStateWatcher
+} from '@/hooks/compController';
+
+import {
 	useSaveRouter
 } from '@/hooks/routerManager';
 
@@ -16,6 +20,7 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
 	useSaveRouter(from ,to);
+	useCompStateWatcher(to);
 })
 
 export default router;

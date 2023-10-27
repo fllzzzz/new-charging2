@@ -31,18 +31,18 @@
 <template>
 	<AppHeader
 		class="fixed-height"
-		v-if="_reactive.state.header"
+		v-if="compStateInvoke.get('AppHeader')"
 	></AppHeader>
 	<component
-		v-if="_reactive.state.footer"
+		v-if="compStateInvoke.get('AppFooter')"
 		:is="footerChanger"
 		class="fixed-height"
 	></component>
-	<AppsmartGuard
-		v-if="_reactive.state.smartGuard"
-	></AppsmartGuard>
+	<AppSmartGuard
+		v-if="compStateInvoke.get('AppSmartGuard')"
+	></AppSmartGuard>
 	<AppHeaderLevel2
-		v-if="_reactive.state.headerL2"
+		v-if="compStateInvoke.get('AppHeaderLevel2')"
 	></AppHeaderLevel2>
 	<RouterView v-slot="{ Component, route }">
 		<KeepAlive>
@@ -58,10 +58,14 @@
 <script setup lang="ts">
 	import AppHeaderLevel2 from '@/components/AppHeaderLevel2.vue';
 	import AppIFramer from '@/components/AppIFramer.vue';
-	import AppsmartGuard from '@/components/AppSmartGuard.vue';
+	import AppSmartGuard from '@/components/AppSmartGuard.vue';
 	import AppFooterInside from '@/components/AppFooterInside.vue';
 	import AppFooterOutside from '@/components/AppFooterOutside.vue';
 	import AppHeader from '@/components/AppHeader.vue';
+
+	import {
+		compStateInvoke
+	} from '@/hooks/compController';
 
 	import {
 		useSubscribe
@@ -90,32 +94,6 @@
 		}
 	});
 
-	useSubscribe<boolean>('AppHeaderState', (ctx, ...args) => {
-		if(ctx === true)
-			_reactive.state.header = true;
-		else if(ctx === false)
-			_reactive.state.header = false;
-	});
-
-	useSubscribe<boolean>('AppHeaderL2State', (ctx, ...args) => {
-		if(ctx === true)
-			_reactive.state.headerL2 = true;
-		else if(ctx === false)
-			_reactive.state.headerL2 = false;
-	});
-
-	useSubscribe<boolean>('AppFooterState', (ctx, ...args) => {
-		if(ctx === true)
-			_reactive.state.footer = true;
-		else if(ctx === false)
-			_reactive.state.footer = false;
-	});
-	useSubscribe<boolean>('AppSmartGuardState', (ctx, ...args) => {
-		if(ctx === true)
-			_reactive.state.smartGuard = true;
-		else if(ctx === false)
-			_reactive.state.smartGuard = false;
-	});
 	useSubscribe<FooterModelType>('AppFooterModel', (ctx, ...args) => {
 		if(!ctx) return;
 		_reactive.state.footerModel = ctx;

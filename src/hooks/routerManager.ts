@@ -20,7 +20,7 @@ const _to = ref<RouteLocationNormalized | undefined>(undefined);
 const anchorPointMapper = new Map<string, AnchorPointContext>();
 
 
-export const useRouteHighLight = (() => {
+export const useRouteHighLight = () => {
 	type Target = {
 		state :number;
 		name :string;
@@ -29,7 +29,6 @@ export const useRouteHighLight = (() => {
 	}
 	
 	const _data = new Map<string, Target[]>();
-	let _fn :((ctx :Target[]) => void);
 
 	watch(_to, (to) => {
 		Hunter<typeof _data>(() => _data, {
@@ -39,7 +38,7 @@ export const useRouteHighLight = (() => {
 				return target.size > 0;
 			}
 		}).then(data => {
-/* 			data.forEach(targetList => {
+			data.forEach(targetList => {
 				const oldTarget = targetList.find(
 					item => item.state === 1
 				);
@@ -56,73 +55,23 @@ export const useRouteHighLight = (() => {
 				[target.imageList[0], target.imageList[1]] =
 					[target.imageList[1], target.imageList[0]];
 				target.state = 1;
-				console.log('callback', targetList);
-			}); */
-
-			for(const i of data) {
-				const oldTarget = i[1].find(
-					item => item.state === 1
-				);
-				if(oldTarget) {
-					[oldTarget.imageList[0], oldTarget.imageList[1]] =
-						[oldTarget.imageList[1], oldTarget.imageList[0]];
-					oldTarget.state = 0;
-				}
-				const target = i[1].find(
-					item => item.name === to?.name
-				);
-				if(!target) {
-					_fn(i[1]);
-					return;
-				}
-				[target.imageList[0], target.imageList[1]] =
-					[target.imageList[1], target.imageList[0]];
-				target.state = 1;
-				_fn(i[1]);
-			}
-		
-/* 			setTimeout(() => {
-				for(const i of data) {
-					const oldTarget = i[1].find(
-						item => item.state === 1
-					);
-					if(oldTarget) {
-						[oldTarget.imageList[0], oldTarget.imageList[1]] =
-							[oldTarget.imageList[1], oldTarget.imageList[0]];
-						oldTarget.state = 0;
-					}
-					const target = i[1].find(
-						item => item.name === to?.name
-					);
-					if(!target) {
-						_data.set(i[0], i[1]);
-						return;
-					}
-					[target.imageList[0], target.imageList[1]] =
-						[target.imageList[1], target.imageList[0]];
-					target.state = 1;
-	
-					_data.set(i[0], i[1]);
-					console.log(i[1],_data);
-				}
-			},1000) */
+			});
 		}).catch(err => {
 			console.log(err);
 		})
-	},{
+	}, {
+		immediate: true,
 		flush: 'post'
 	});
 
 	return (
 		name :string,
 		targetList :Target[],
-		fn :((ctx :Target[]) => void)
 	) => {
-		/* if(_data.get(name)) return; */
-		_fn = fn;
+		if(_data.get(name)) return;
 		_data.set(name, targetList);
 	};
-})();
+};
 
 export const useAnchorPointSetter = (
 	fn :((
