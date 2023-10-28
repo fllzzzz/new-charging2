@@ -23,6 +23,5 @@ export const useChangeModle = (
 	model :'small' | 'middle' | 'full' | 'small-ext'
 	
 ) => {
-	debugger;
 	compMapper.get('middle')
 }

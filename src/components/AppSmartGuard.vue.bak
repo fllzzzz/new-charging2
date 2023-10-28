@@ -1,0 +1,144 @@
+<!-- <style lang="scss" scoped>
+	.smart-guard-container {
+		overflow: hidden;
+		width: 841px;
+		height: 58px;
+		pointer-events: none;
+		box-sizing: border-box;
+		background-color: RGBA(17, 109, 98, 1);
+		display: flex;
+		flex-flow: row nowrap;
+		justify-content: space-around;
+		align-items: center;
+		& > .item {
+			pointer-events: auto;
+			box-sizing: border-box;
+			height: 100%;
+			border: 2px dotted red;
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: center;
+		}
+		& > .item:nth-of-type(1) {
+			width: 189px;
+		}
+		& > .item:nth-of-type(2) {
+			justify-content: flex-start;
+			width: 552px;
+			.graph.dot {
+				width: 5px;
+				height: 5px;
+				background: rgba(0,255,255,0.5);
+				border: 1px solid #00FFFF;
+				border-radius: 50%;
+				margin-right: 8px;
+			}
+			span {
+				font-size: 14px;
+				font-family: Source Han Sans CN;
+				font-weight: 400;
+				color: #FFFFFF;
+				opacity: 0.9;
+				&.time {
+					margin-right: 16px;
+				}
+			}
+		}
+	}
+
+	.is-leave {
+		animation-name: test;
+		animation-duration: 1s;
+		animation-delay: 0;
+		animation-iteration-count: 1;
+		animation-timing-function: ease-in;
+		animation-fill-mode: forwards;
+	}
+
+	.is-enter {
+		animation-name: test;
+		animation-duration: 1s;
+		animation-delay: 0;
+		animation-iteration-count: 1;
+		animation-timing-function: ease-out;
+		animation-fill-mode: forwards;
+	}
+
+	@keyframes test {
+		to {
+			
+		}
+	}
+
+</style>
+
+<template>
+	<div class="smart-guard-container">
+		<div class="item">
+			<el-button
+				@click="leaveClick"
+			></el-button>
+			<el-button
+				@click="enterClick"
+			></el-button>
+		</div>
+		<div class="item">
+			<div class="graph dot"></div>
+			<span
+				class="time"
+			>
+				{{ new Date().toLocaleString() }}
+			</span>
+			<span
+				ref="elMsg"
+				class="content"
+			>
+				{{ _reactive.data.broadCastMsg }}
+			</span>
+		</div>
+	</div>
+</template>
+
+<script setup lang="ts">
+	import {
+		ctid_14521
+	} from '@/types';
+
+	import {
+		useMsgHandler
+	} from '@/hooks/messageManager';
+
+	import {
+		useSubscribe
+	} from '@/hooks/EventEmitter';
+
+	import {
+		ref,
+		reactive,
+		onMounted
+	} from 'vue';
+
+	const elMsg = ref<HTMLSpanElement | null>(null);
+
+	const _reactive = reactive({
+		data: {
+			broadCastMsg: 'default msg'
+		}
+	});
+
+/* 	useSubscribe<ctid_14521>('getIFramerMsg_14521', (ctx) => {
+		const msg = useMsgHandler<ctid_14521>('info', ctx);
+		if(!msg) return;
+		if(msg.ctx.StationID) {
+			_reactive.data.broadCastMsg = msg.ctx.StationName + msg.ctx.Report;
+		}
+	}) */
+
+	const leaveClick = () => {
+		elMsg.value?.classList.add('is-leave');
+	};
+
+	const enterClick = () => {
+		elMsg.value?.classList.add('is-enter');
+	};
+</script> -->
