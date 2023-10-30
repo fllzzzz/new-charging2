@@ -64,6 +64,10 @@
 	import AppHeader from '@/components/AppHeader.vue';
 
 	import {
+		usePublish
+	} from '@/hooks/EventEmitter';
+
+	import {
 		compStateInvoke
 	} from '@/hooks/compController';
 
@@ -112,5 +116,10 @@
 			return AppFooterOutside;
 		else 
 			return null;
+	});
+
+	usePublish('setIframerMsg', {
+		ctid: 14611,
+		username: "admin"
 	});
 </script>

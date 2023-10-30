@@ -85,7 +85,7 @@
 	import {
 		reactive,
 		computed,
-		nextTick
+		onUnmounted
 	} from 'vue';
 
 	const _reatcive = reactive({
@@ -145,4 +145,16 @@
 		_reatcive.data.zIndex = 900;
 		_reatcive.state.videoBoxModel = 3;
 	};
+
+	usePublish('setIframerMsg', {
+		ctid: 12911,
+		state: "open"
+	});
+
+	onUnmounted(() => {
+		usePublish('setIframerMsg', {
+			ctid: 12911,
+			state: "close"
+		});
+	});
 </script>

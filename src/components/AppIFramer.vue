@@ -18,6 +18,10 @@
 
 <script setup lang="ts">
 	import {
+		ctid13511_isSet
+	} from '@/store';
+
+	import {
 		usePublish,
 		useSubscribe
 	} from '@/hooks/EventEmitter';
@@ -31,6 +35,13 @@
 	const elIFrameWindow = ref<Window | null>(null);
 
 	useSubscribe<any>('setIframerMsg', (ctx) => {
+		try {
+			if(ctx.ctid === 13511) {
+				ctid13511_isSet.value = true;
+			}
+		} catch (error) {
+			console.log(error);
+		}
 		elIFrameWindow.value?.postMessage(ctx, '*');
 	});
 

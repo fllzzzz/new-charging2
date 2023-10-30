@@ -45,7 +45,7 @@
 					font-family: PingFang SC;
 					font-weight: 500;
 					color: #FFFFFF;
-					margin-left: 15px;
+					margin-left: 5px;
 				}
 			}
 			& > .box:nth-of-type(2) {
@@ -220,6 +220,15 @@
 </template>
 
 <script setup lang="ts">
+	import type {
+		ctid_13021
+	} from '@/types';
+
+	import {
+		usePublish,
+		useSubscribe
+	} from '@/hooks/EventEmitter';
+
 	import {
 		useInspectListGetter
 	} from '@/hooks/InspectManager';
@@ -252,6 +261,7 @@
 
 	const _reactive = reactive({
 		data: {
+			to3Dflg: 1,
 			btnList: [
 				{
 					id: 1,
@@ -292,14 +302,25 @@
 				return;
 			}else if(props.model === 'maker') {
 				router.back();
-				/* router.push({
-					name: 'overview',
-				}); */
 			}else {
 				return;
 			}
+		}],
+		['next', () => {
+			usePublish('setIframerMsg', {
+				ctid: 13111,
+				number: (_reactive.data.to3Dflg).toString()
+			});
+			_reactive.data.to3Dflg++;
+		}],
+		['preset', () => {
+			/*  */
 		}]
 	]);
+
+	useSubscribe<ctid_13021>('getIFramerMsg_13021', (ctx) => {
+		_reactive.data.inspectStatus.pace = parseInt(ctx.percent);
+	});
 
 	const clickEventHandler = (event :MouseEvent) => {
 		const id = (event.target as HTMLElement).id;

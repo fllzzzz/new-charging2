@@ -193,4 +193,8 @@
 	usePublish('AppSmartGuardState', false);
 	usePublish('AppFooterModel', 'inside');
 	usePublish('AppFooterState', true);
+
+	usePublish('setIframerMsg', {
+		ctid: 12511
+	});
 </script>

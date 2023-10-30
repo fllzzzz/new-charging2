@@ -27,3 +27,20 @@ export type ctid_14521 = {
 export type ctid_12721 = {
 	chargestationid :string
 };
+
+export type ctid_12821 = {
+	cameraId :string;
+	cameraType :string;
+	deviceSerial :string;
+	channelNo :number;
+	tisIOnline :number;
+};
+
+export type ctid_13021 = {
+	surveillancecameraid :string;
+	percent :string;
+	CameraID :string;
+	percent :string;
+	deviceSerial :string;
+	channelNo :number;
+}; 

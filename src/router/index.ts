@@ -3,7 +3,8 @@ import {
 } from '@/hooks/compController';
 
 import {
-	useSaveRouter
+	useSaveRouter,
+	use3DInit
 } from '@/hooks/routerManager';
 
 import routes from './routes';
@@ -21,6 +22,7 @@ const router = createRouter({
 router.beforeEach((to, from) => {
 	useSaveRouter(from ,to);
 	useCompStateWatcher(to);
+	use3DInit(from, to);
 })
 
 export default router;

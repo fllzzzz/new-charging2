@@ -11,7 +11,7 @@
 		}
 		#btn-group {
 			width: 1066px;
-			height: 37px;
+			height: 48px;
 			pointer-events: none;
 			position: absolute;
 			left: 418px;

@@ -108,7 +108,20 @@
 
 <script setup lang="ts">
 	import {
-		usePullMessage
+		useMsgHandler
+	} from '@/hooks/messageManager';
+
+	import type{
+		ctid_14521
+	} from '@/types'; 
+
+	import {
+		useSubscribe
+	} from '@/hooks/EventEmitter';
+
+	import {
+		usePullMessage,
+		usePushMessage
 	} from '@/hooks/messageQueue';
 
 	import {
@@ -131,6 +144,14 @@
 			msg: undefined as undefined | string,
 		}
 	};
+
+	useSubscribe<ctid_14521>('getIFramerMsg_14521', (ctx) => {
+		const msg = useMsgHandler<ctid_14521>('info', ctx);
+		if(!msg) return;
+		if(msg.ctx.StationID) {
+			usePushMessage(msg.ctx.StationName + msg.ctx.Report);
+		}
+	})
 
 	const transitionOnBeforeEnter = () => {
 		_reactive.data.msg = _static.data.msg!;

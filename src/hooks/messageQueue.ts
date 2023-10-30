@@ -1,10 +1,4 @@
-const queue :string[] = [
-	'msg1',
-	'msg2',
-	'msg3',
-	'msg4',
-	'msg5',
-];
+const queue :string[] = [];
 
 export const usePushMessage = (
 	msg :any

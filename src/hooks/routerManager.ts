@@ -1,3 +1,7 @@
+import {
+	usePublish
+} from '@/hooks/EventEmitter';
+
 import Hunter from '@/utils/Hunter';
 
 import type{
@@ -14,6 +18,14 @@ type AnchorPointContext = {
 	type :'name' | 'path',
 	location :string;
 }
+
+const init3DRouteList :string[] = [
+	'overview',
+	'monitor',
+	'inspect',
+	'immediate-controller',
+	'scene-controller'
+];
 
 const _from = ref<RouteLocationNormalized | undefined>(undefined);
 const _to = ref<RouteLocationNormalized | undefined>(undefined);
@@ -114,4 +126,23 @@ export const useSaveRouter = (
 ) => {
 	_from.value = from;
 	_to.value = to;
+};
+
+export const use3DInit = (
+	from :RouteLocationNormalized,
+	to :RouteLocationNormalized
+) => {
+	const fromPath = from.params;
+	const toPath = to.path;
+	for(let i=0; i < init3DRouteList.length; i++) {
+		if(
+			toPath.search(new RegExp(`/${init3DRouteList[i]}`))
+				!== -1
+		) {
+			usePublish('setIframerMsg', {
+				ctid: 13511
+			});
+			return;
+		}
+	}
 };

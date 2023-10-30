@@ -229,10 +229,26 @@
 	import AppConsole from '@/components/AppConsole.vue';
 
 	import {
+		onUnmounted
+	} from 'vue';
+
+	import {
 		usePublish,
 		useSubscribe
 	} from '@/hooks/EventEmitter';
 
 	usePublish('AppFooterModel', 'inside');
 	usePublish('AppFooterState', true);
+
+	usePublish('setIframerMsg', {
+		ctid: 14011,
+		state: "open"
+	});
+
+	onUnmounted(() => {
+		usePublish('setIframerMsg', {
+			ctid: 14011,
+			state: "close"
+		});
+	});
 </script>

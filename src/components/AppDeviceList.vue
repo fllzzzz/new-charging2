@@ -66,6 +66,9 @@
 		flex-flow: row nowrap;
 		justify-content: flex-start;
 		align-items: center;
+		& > * {
+			pointer-events: none;
+		}
 		img {
 			margin-right: 10px;
 			width: 24px;height: 24px;
@@ -76,13 +79,19 @@
 			font-family: Source Han Sans CN;
 			font-weight: 400;
 			color: #DBFFFE;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
-		@for $i from 1 through 5 {
-			@if $i % 2  == 0 {
-				&:nth-of-type(#{$i}) {
-					background: linear-gradient(90deg, rgba(0, 255, 246, 0.5) 0%, transparent 100%);
-				}
-			}
+	}
+
+	.is-active {
+		background: linear-gradient(90deg, rgba(0, 255, 246, 0.5) 0%, transparent 100%);
+	}
+
+	.is-locked {
+		&:hover {
+			cursor:not-allowed;
 		}
 	}
 </style>
@@ -108,7 +117,12 @@
 						v-for="(device,index) in _reactive.data.deviceList"
 						:key="index"
 					>
-						<div class="device">
+						<div class="device"
+							@click="deviceListClickHandler(
+								$event, device
+							)"
+							:class="getLockState(device.state)"
+						>
 							<template
 								v-if="device.state === 0"
 							>
@@ -128,7 +142,20 @@
 
 <script setup lang="ts">
 	import {
-		reactive
+		usePublish
+	} from '@/hooks/EventEmitter';
+
+	import {
+		DeviceInfo
+	} from '@/types';
+
+	import {
+		getDeviceList
+	} from '@/api/default';
+
+	import {
+		reactive,
+		computed
 	} from 'vue';
 
 	const _reactive = reactive({
@@ -138,68 +165,66 @@
 				require<string>('@/assets/images/icon/monitor-2_online.png'),
 				require<string>('@/assets/images/icon/monitor-2_offline.png'),
 			],
-			deviceList: [
-				{
-					name: '摄像头1',
-					deviceSerial: '',
-					channelNo: 0,
-					state: 1
-				},
-				{
-					name: '摄像头2',
-					deviceSerial: '',
-					channelNo: 0,
-					state: 0
-				},
-				{
-					name: '摄像头3',
-					deviceSerial: '',
-					channelNo: 0,
-					state: 1
-				},
-				{
-					name: '摄像头4',
-					deviceSerial: '',
-					channelNo: 0,
-					state: 0
-				},
-				{
-					name: '摄像头5',
-					deviceSerial: '',
-					channelNo: 0,
-					state: 0
-				},
-				{
-					name: '摄像头1',
-					deviceSerial: '',
-					channelNo: 0,
-					state: 1
-				},
-				{
-					name: '摄像头2',
-					deviceSerial: '',
-					channelNo: 0,
-					state: 0
-				},
-				{
-					name: '摄像头3',
-					deviceSerial: '',
-					channelNo: 0,
-					state: 1
-				},
-				{
-					name: '摄像头4',
-					deviceSerial: '',
-					channelNo: 0,
-					state: 0
-				},
-				{
-					name: '摄像头5',
-					deviceSerial: '',
-					channelNo: 0,
-					state: 0
-				},
-			]
+			deviceList: [] as any[]
 		}
+	});
+
+	const deviceListClickHandler = (() => {
+		let _oldTarget :HTMLElement;
+
+		type DeviceInfos = DeviceInfo & {
+			state :number,
+			name :string;
+		}
+
+		function heightLight(el :HTMLElement) {
+			if(_oldTarget) _oldTarget.classList.remove('is-active');
+
+			el.classList.add('is-active');
+			_oldTarget = el;
+		}
+
+		function syncDeviceTo3D(device :DeviceInfos) {
+			usePublish('setIframerMsg', {
+				ctid: 14111,
+				deviceSerial: device.deviceSerial,
+				channelNo: device.channelNo
+			});
+		}
+
+		function locker(state :number, event :MouseEvent) {
+			if(state === 0) {
+				event.preventDefault();
+				return true;
+			}
+			return false;
+		}
+
+		return (
+			event :MouseEvent,
+			deviceInfo :DeviceInfos
+		) => {
+			if(locker(deviceInfo.state, event)) return;
+			heightLight((event.target as HTMLElement));
+			syncDeviceTo3D(deviceInfo)
+		}
+	})();
+
+	const getLockState = computed(() => (state :number) => {
+		if(state === 0) return 'is-locked';
+	});
+
+	getDeviceList(1).then((deviceList :any[]) => {
+		const _arr = deviceList.map(device => {
+			return {
+				id: device.id,
+				name: device.cameraName,
+				deviceSerial: device.deviceSerial,
+				channelNo: device.channelNo,
+				state: device.tisIOnline
+			}
+		});
+
+		_reactive.data.deviceList = _arr;
 	});
 </script>

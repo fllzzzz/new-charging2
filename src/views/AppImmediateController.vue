@@ -484,6 +484,7 @@
 	import {
 		ref,
 		computed,
+		onUnmounted
 	} from 'vue';
 
 	import {
@@ -662,4 +663,16 @@
 	const immedaiteCardClosedHandler = () => {
 		state.value.cardDialogOpen = false;
 	};
+
+	usePublish('setIframerMsg', {
+		ctid: 13911,
+		state: "open"
+	});
+
+	onUnmounted(() => {
+		usePublish('setIframerMsg', {
+			ctid: 13911,
+			state: "close"
+		});
+	});
 </script>

@@ -28,3 +28,12 @@
 
 	pachResizeObserver();
 </script>
+
+<script lang="ts">
+	import {
+		getToken,
+		tokenStorage
+	} from '@/api/default';
+
+	getToken().then(token => tokenStorage.value = token);
+</script>
