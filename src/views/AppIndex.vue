@@ -103,12 +103,6 @@
 		_reactive.state.footerModel = ctx;
 	});
 
-	useSubscribe('ctid-12721', (ctx) => {
-		router.push({
-			name: 'overview'
-		});
-	});
-
 	const footerChanger = computed(() => {
 		if(_reactive.state.footerModel === 'inside')
 			return AppFooterInside;

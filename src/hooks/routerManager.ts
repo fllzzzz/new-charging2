@@ -136,7 +136,7 @@ export const use3DInit = (
 	const toPath = to.path;
 	for(let i=0; i < init3DRouteList.length; i++) {
 		if(
-			toPath.search(new RegExp(`/${init3DRouteList[i]}`))
+			toPath.search(new RegExp(`/${init3DRouteList[i]}/`))
 				!== -1
 		) {
 			usePublish('setIframerMsg', {

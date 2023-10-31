@@ -54,6 +54,10 @@
 
 <script setup lang="ts">
 	import {
+		usePublish
+	} from '@/hooks/EventEmitter';
+
+	import {
 		useRouteHighLight
 	} from '@/hooks/routerManager';
 
@@ -150,6 +154,12 @@
 				path: `inspect/${_target}`
 			});
 			return;
+		}
+
+		if(target?.name === 'overview') {
+			usePublish('setIframerMsg', {
+				ctid: 13511
+			});
 		}
 
 		router.push({
