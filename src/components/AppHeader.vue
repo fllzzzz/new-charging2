@@ -319,12 +319,14 @@
 			});
 		}],
 		['title', (event, ...args) => {
+			
 			router.push({
 				name: 'map',
-			});
-			usePublish('setIframerMsg', {
-				ctid: 10111
-			});
+			}).then(() => {
+				usePublish('setIframerMsg', {
+					ctid: 10111
+				});
+			})
 		}],
 	]);
 

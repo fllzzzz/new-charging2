@@ -47,9 +47,14 @@
 
 	window.addEventListener('message', (e :MessageEvent) => {
 		if(e.origin === 'http://192.168.1.114:18901') {
-			const msg = JSON.parse(e.data);
-			if(Object.keys(msg).includes('ctid')) {
-				usePublish(`getIFramerMsg_${msg.ctid}`, msg);
+			try {
+				if(typeof e.data === 'object') return;
+				const msg = JSON.parse(e.data);
+				if(Object.keys(msg).includes('ctid')) {
+					usePublish(`getIFramerMsg_${msg.ctid}`, msg);
+				}
+			} catch (error) {
+				console.log(error);
 			}
 		}
 	});

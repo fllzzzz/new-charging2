@@ -107,9 +107,12 @@
 	usePublish<boolean>('AppSmartGuardState', true);
 	usePublish<string>('AppFooterModel', 'outside');
 
-	useSubscribe<ctid_12721>('getIFramerMsg_12721', () => {
-		router.push({
-			name: 'overview'
-		});
+	useSubscribe<ctid_12721>('getIFramerMsg_12721', (ctx) => {
+		if(parseInt(ctx.chargestationid) !== -1) {
+			router.push({
+				name: 'overview'
+			});
+		}
+		ctx.chargestationid = '-1';
 	});
 </script>

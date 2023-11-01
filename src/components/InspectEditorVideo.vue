@@ -261,7 +261,7 @@
 
 	const _reactive = reactive({
 		data: {
-			to3Dflg: 1,
+			to3Dflg: -1,
 			btnList: [
 				{
 					id: 1,
@@ -307,14 +307,19 @@
 			}
 		}],
 		['next', () => {
+			_reactive.data.to3Dflg++;
 			usePublish('setIframerMsg', {
 				ctid: 13111,
 				number: (_reactive.data.to3Dflg).toString()
 			});
-			_reactive.data.to3Dflg++;
 		}],
 		['preset', () => {
-			/*  */
+			if(_reactive.data.to3Dflg <= -1) return;
+			_reactive.data.to3Dflg--;
+			usePublish('setIframerMsg', {
+				ctid: 13111,
+				number: (_reactive.data.to3Dflg).toString()
+			});
 		}]
 	]);
 
