@@ -10,12 +10,14 @@
 			width: 100%;
 			background-repeat: no-repeat;
 			background-size: 100% 100%;
+			box-sizing: border-box;
 		}
 		#header {
 			flex: 1;
 		}
 		#body {
 			height: 283px;
+			padding: 5px;
 			background-image: url('@/assets/images/background/videoBox-small-body.png');
 		}
 	}

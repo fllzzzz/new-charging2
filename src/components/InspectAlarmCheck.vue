@@ -256,6 +256,10 @@
 <script setup lang="ts">
 	import MonitorVideoBoxSmall from './MonitorVideoBoxSmall.vue';
 
+	import {
+		usePublish
+	} from '@/hooks/EventEmitter';
+
 	import type {
 		DeviceInfo
 	} from '@/types';
@@ -290,6 +294,11 @@
 	};
 
 	const clickImmConHandler = () => {
+		usePublish('setIframerMsg', {
+			ctid: 14711,
+			chargestationid: '1'
+		});
+
 		router.push({
 			name: 'scene-controller'
 		})

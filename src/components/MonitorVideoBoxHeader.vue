@@ -82,7 +82,6 @@
 <script setup lang="ts">
 	import {
 		useChangeModle,
-		videoBox
 	} from '@/hooks/videoBoxManager';
 
 	import {
@@ -197,9 +196,9 @@
 		const target = _reactive.data.btnList.find(btn => btn.name === id);
 		if (!target) return;
 		if (target.code === undefined) return;
-		usePublish<MonitorVideoBox>('monitorVideoBox',{
+	/* 	usePublish<MonitorVideoBox>('monitorVideoBox',{
 			model: target.code,
-		});
+		}); */
 
 		useChangeModle(modelInovke[target.code] as "small" | "middle" | "full" | "small-ext");
 

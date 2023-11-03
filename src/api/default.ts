@@ -4,6 +4,10 @@ import {
 	ref
 } from 'vue';
 
+import type {
+	DeviceInfo
+} from '@/types';
+
 export const tokenStorage = ref<string | undefined>(undefined);
 
 
@@ -25,6 +29,14 @@ const $default = axios.create({
 	baseURL: 'http://192.168.1.95:16900/api',
 	headers: {
 		'Content-Type': 'application/json'
+	}
+});
+
+const $Ezvis = axios.create({
+	timeout: 10000,
+	baseURL: 'http://192.168.1.114:19028/EZvis',
+	headers: {
+		'Content-Type': 'application/x-www-form-urlencoded'
 	}
 });
 
@@ -54,3 +66,18 @@ export const getDeviceList = async (StationID :number) => {
 	.then(result => result.data)
 };
 
+export const getVideoAddress = async (
+	deviceInfo :DeviceInfo
+) => {
+	return await $Ezvis({
+		method: 'post',
+		data: {
+			Act: 'GetCamera_Adress',
+			protocol: 4,
+			quality: 2,
+			...deviceInfo
+		},
+	}).then(res => res.data)
+	.then(result => JSON.parse(result.Data))
+	.then(result => result.data.url);
+}

@@ -165,6 +165,12 @@
 		background-color: transparent;
 	}
 
+	.is-locked {
+		opacity: 0.3;
+		&:hover {
+			cursor:not-allowed;
+		}
+	}
 </style>
 
 <template>
@@ -210,6 +216,7 @@
 			>
 				<div class="btn" 
 					:id="btn.name"
+					:class="_reactive.data.btnLocker === btn.name ? 'is-locked' : ''"
 				>
 					<img :src="btn.image">
 					<span>{{ btn.showName }}</span>
@@ -238,7 +245,8 @@
 	} from 'vue-router';
 
 	import {
-		reactive
+		reactive,
+		computed
 	} from 'vue';
 
 	import type{
@@ -261,7 +269,8 @@
 
 	const _reactive = reactive({
 		data: {
-			to3Dflg: -1,
+			btnLocker: '',
+			to3Dflg: 0,
 			btnList: [
 				{
 					id: 1,
@@ -314,7 +323,7 @@
 			});
 		}],
 		['preset', () => {
-			if(_reactive.data.to3Dflg <= -1) return;
+			if(_reactive.data.to3Dflg < 1) return;
 			_reactive.data.to3Dflg--;
 			usePublish('setIframerMsg', {
 				ctid: 13111,
@@ -329,6 +338,22 @@
 
 	const clickEventHandler = (event :MouseEvent) => {
 		const id = (event.target as HTMLElement).id;
+
+		if(_reactive.data.to3Dflg === 0) {
+			if(id === 'preset') {
+				_reactive.data.btnLocker = 'preset';
+				event.preventDefault();
+				return;
+			}
+		}else if(_reactive.data.to3Dflg > 0) {
+			if(_reactive.data.inspectStatus.pace === 100)
+				if(id === 'next') {
+					_reactive.data.btnLocker = 'next';
+					event.preventDefault();
+					return;
+				}
+		}
+
 		const fn = clickEventInvoke.get(id);
 		if(!fn) return;
 		fn()

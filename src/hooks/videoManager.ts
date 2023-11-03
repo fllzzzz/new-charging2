@@ -3,10 +3,17 @@ import 'video.js/dist/video-js.css';
 import videojs from "video.js";
 import 'videojs-flvjs-es6';
 
+import { ElLoading } from 'element-plus'
+import 'element-plus/dist/index.css';
+
 import {
 	onMounted,
 	nextTick
 } from 'vue';
+
+const data = {
+	elLoadingInstance: null as any,
+};
 
 export type Option = {
 	autoplay? :boolean | 'any';
@@ -69,6 +76,21 @@ export const usePlayerCreater = async (
 			),
 			function(this :any) {
 				this.addClass('video-js');
+				(this.el_ as HTMLElement).style.backgroundColor = 'transparent';
+
+				this.on('loadstart', () => {
+					data.elLoadingInstance = ElLoading.service({
+						target: this.el_,
+						fullscreen: false,
+						background: 'transparent'
+					})
+				});
+
+				this.on('loadedmetadata', () => {
+					if(data.elLoadingInstance) {
+						data.elLoadingInstance.close()
+					}
+				});
 			}
 		)
 	})
