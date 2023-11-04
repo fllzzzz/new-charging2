@@ -68,7 +68,7 @@ export const getDeviceList = async (StationID :number) => {
 
 export const getVideoAddress = async (
 	deviceInfo :DeviceInfo
-) => {
+) :Promise<string> => {
 	return await $Ezvis({
 		method: 'post',
 		data: {

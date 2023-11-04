@@ -12,7 +12,7 @@ import {
 } from 'vue';
 
 type VideoBox = {
-	type :'small' | 'middle' | 'full' | 'small-ext';
+	type :'small' | 'middle' | 'full' | 'small-ext' | 'close';
 	target :Component | undefined;
 }
 
@@ -29,7 +29,7 @@ const compMapper = new Map<string, Component>([
 ]);
 
 export const useChangeModle = (
-	model :'small' | 'middle' | 'full' | 'small-ext'
+	model :'small' | 'middle' | 'full' | 'small-ext' | 'close'
 	
 ) => videoBox.value = {
 	type: model,

@@ -1,10 +1,13 @@
 import 'video.js/dist/video-js.css';
 
 import videojs from "video.js";
+import Player from 'video.js/dist/types/player';
 import 'videojs-flvjs-es6';
 
 import { ElLoading } from 'element-plus'
 import 'element-plus/dist/index.css';
+
+import Hunter from '@/utils/Hunter';
 
 import {
 	onMounted,
@@ -18,8 +21,9 @@ const data = {
 export type Option = {
 	autoplay? :boolean | 'any';
 	controls? :boolean;
-	children? :string[]
-	flvjs :FlvjsOption;
+	children? :string[];
+	userActions? :UserActions;
+	flvjs? :FlvjsOption;
 };
 
 type FlvjsOption = {
@@ -29,6 +33,10 @@ type FlvjsOption = {
 		withCredentials :boolean;
 	};
 }
+
+type UserActions = {
+	doubleClick :boolean;
+};
 
 const _options :Option = {
 	controls: true,
@@ -63,7 +71,8 @@ async function _getEl(
 
 export const usePlayerCreater = async (
 	id: string,
-	options? :Option
+	options? :Option,
+	fn? :((player :Player) => void)
 ) => {
 	const player = videojs.getPlayer(id);
 	if(player) return player;
@@ -74,15 +83,16 @@ export const usePlayerCreater = async (
 			videojs.mergeOptions(
 				_options, options
 			),
-			function(this :any) {
+			function(this :Player) {
 				this.addClass('video-js');
 				(this.el_ as HTMLElement).style.backgroundColor = 'transparent';
 
 				this.on('loadstart', () => {
 					data.elLoadingInstance = ElLoading.service({
-						target: this.el_,
+						target: this.el_ as HTMLElement,
 						fullscreen: false,
-						background: 'transparent'
+						background: 'transparent',
+						customClass: 'el-loading-container'
 					})
 				});
 
@@ -91,6 +101,8 @@ export const usePlayerCreater = async (
 						data.elLoadingInstance.close()
 					}
 				});
+
+				fn && fn(this);
 			}
 		)
 	})

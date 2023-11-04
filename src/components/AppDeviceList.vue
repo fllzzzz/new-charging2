@@ -142,6 +142,10 @@
 
 <script setup lang="ts">
 	import {
+		useOnlineFilter
+	} from '@/hooks/deviceService';
+
+	import {
 		usePublish
 	} from '@/hooks/EventEmitter';
 
@@ -157,6 +161,8 @@
 		reactive,
 		computed
 	} from 'vue';
+
+	const emits = defineEmits(['select']);
 
 	const _reactive = reactive({
 		data: {
@@ -184,12 +190,17 @@
 			_oldTarget = el;
 		}
 
-		function syncDeviceTo3D(device :DeviceInfos) {
+		function deviceInfoSync(device :DeviceInfos) {
 			usePublish('setIframerMsg', {
 				ctid: 14111,
 				deviceSerial: device.deviceSerial,
 				channelNo: device.channelNo
 			});
+
+			emits('select', {
+				deviceSerial: device.deviceSerial,
+				channelNo: device.channelNo
+			} as DeviceInfo)
 		}
 
 		function locker(state :number, event :MouseEvent) {
@@ -206,7 +217,7 @@
 		) => {
 			if(locker(deviceInfo.state, event)) return;
 			heightLight((event.target as HTMLElement));
-			syncDeviceTo3D(deviceInfo)
+			deviceInfoSync(deviceInfo);
 		}
 	})();
 
@@ -226,5 +237,6 @@
 		});
 
 		_reactive.data.deviceList = _arr;
+		useOnlineFilter(_arr);
 	});
 </script>

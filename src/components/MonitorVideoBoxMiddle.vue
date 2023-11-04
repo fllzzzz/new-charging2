@@ -10,6 +10,7 @@
 			width: 100%;
 			background-repeat: no-repeat;
 			background-size: 100% 100%;
+			box-sizing: border-box;
 		}
 		#header {
 			flex: 1;
@@ -24,9 +25,11 @@
 				height: 100%;
 				background-repeat: no-repeat;
 				background-size: 100% 100%;
+				box-sizing: border-box;
 			}
 			#left {
 				width: 991px;
+				padding: 12px 8px 15px 15px;
 				background-image: url('@/assets/images/background/videoBox-middle-body-left.png');
 			}
 			#right {

@@ -5,7 +5,6 @@
 		position: fixed;
 		top: 0;left: 0;
 		pointer-events: none;
-		z-index: v-bind('_reatcive.data.zIndex');
 		& > .item {
 			position: absolute;
 			pointer-events: auto;
@@ -87,7 +86,8 @@
 	import Hunter from '@/utils/Hunter';
 
 	import {
-		videoBox
+		videoBox,
+		useChangeModle
 	} from '@/hooks/videoBoxManager';
 
 	import {
@@ -139,15 +139,17 @@
 		data: {
 			player: null as null | any,
 			subscribeIndex: undefined as undefined |number,
-			deviceInfo: null as null | DeviceInfo
-		}
+			deviceInfo: null as null | DeviceInfo,
+			videoClickIndex: undefined as undefined | number
+		},
+		temp: [] as any[]
 	};
 
 	const videoBoxCompClassNameMapper = new Map<string, string>([
-		['small', 'monitor-videoBox-small-container'],
-		['middle', 'monitor-videoBox-middle-container'],
-		['full', 'monitor-videoBox-full-container'],
-		['small-ext', 'monitor-videoBox-small-ext-container']
+		['small', '.monitor-videoBox-small-container > #body'],
+		['middle', '.monitor-videoBox-middle-container > #body > #left'],
+		['full', '.monitor-videoBox-full-container'],
+		['small-ext', '.monitor-videoBox-small-ext-container']
 	])
 
 	usePublish('AppHeaderL2State', false);
@@ -165,6 +167,7 @@
 				return false;
 			},
 			(ctx) => {
+				_static.temp[0] = ctx;
 				getVideoAddress({
 					deviceSerial: ctx.deviceSerial,
 					channelNo: ctx.channelNo
@@ -203,8 +206,7 @@
 	});
 
 	const totalClickHandler = () => {
-		_reatcive.data.zIndex = 900;
-		_reatcive.state.videoBoxModel = 3;
+		useChangeModle('full');
 	};
 
 	usePublish('setIframerMsg', {
@@ -215,6 +217,10 @@
 	onUnmounted(() => {
 		if(_static.data.subscribeIndex) {
 			useUnSubscribe('getIFramerMsg_12821', _static.data.subscribeIndex);
+		}
+
+		if(_static.data.player) {
+			_static.data.player.dispose();
 		}
 
 		usePublish('setIframerMsg', {
@@ -228,33 +234,48 @@
 		const className = videoBoxCompClassNameMapper.get(videoBox.value.type);
 		if(!className) return;
 
-		Hunter(() => document.querySelector(`.${className} #body`), {
+		Hunter(() => document.querySelector(className), {
 			cycle: 10,
 			frequency: 100,
 		}).then(el  => {
-			console.log('jx', className, el);
-			setTimeout(() => {
-				_reatcive.state.video = true;
-				_reatcive.data.teleportTarget = `body`;
-			}, 5000);
-			/* _reatcive.data.teleportTarget = el as HTMLElement;
-			_reatcive.state.video = true; */
+			_reatcive.data.teleportTarget = el as HTMLElement;
+			_reatcive.state.video = true;
 		});
 	});
 
-/* 	watch(videoBox, (ctx) => {
-		_reatcive.state.video = false;
-		_reatcive.data.teleportTarget = 'body';
-		setTimeout(() => {
+	watch(videoBox, (ctx) => {
+		if(ctx.type === 'full') {
+			_static.data.deviceInfo = _static.temp[0];
+			_static.data.player && _static.data.player.dispose();
+			_reatcive.state.video = false;
+			_reatcive.data.teleportTarget = 'body';
+			_reatcive.data.videoBoxComp = ctx.target;
+		}else {
+			_reatcive.state.video = false;
+			_reatcive.data.teleportTarget = 'body';
 			_reatcive.data.videoBoxComp = ctx.target;
 			nextTick(() => {
 				const className = videoBoxCompClassNameMapper.get(ctx.type);
 				if(!className) return;
-				nextTick(() => {
-					_reatcive.data.teleportTarget = `.${className} > #body`;
-					_reatcive.state.video = true;
-				});
+					
+					Hunter(() => document.querySelector(className), {
+						cycle: 10,
+						frequency: 100,
+					}).then(el  => {
+						_reatcive.data.teleportTarget = el as HTMLElement;
+						_reatcive.state.video = true;
+
+						if(!_static.data.deviceInfo) return;
+						getVideoAddress(_static.data.deviceInfo).then(url => {
+							_static.data.player.src({
+								type: "video/flv",
+								src: url
+							});
+						}).catch(err => {
+							console.log(err);
+						})
+					});
 			});
-		},100)
-	}) */
+		}
+	})
 </script>

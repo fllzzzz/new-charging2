@@ -9,6 +9,7 @@
 		justify-content: flex-start;
 		align-items: center;
 		& > .item {
+			box-sizing: border-box;
 			width: 1883px;
 			&:first-child {
 				margin-top: 100px;
@@ -88,12 +89,17 @@
 					height: 100%;
 					background-repeat: no-repeat;
 					background-size: 100% 100%;
+					box-sizing: border-box;
 					@for $i from 1 to 3 {
 						@if $i == 1 {
 							&:nth-of-type(#{$i}) {
 								height: 947px;
 								width: 1526px;
 								background-image: url('@/assets/images/background/videoBox-full-body-left.png');
+								display: flex;
+								flex-flow: row wrap;
+								justify-content: space-between;
+								align-items: flex-start;
 							}
 						}
 						@if $i == 2 {
@@ -133,6 +139,37 @@
 			}
 		}
 	}
+
+	.video-player-box {
+		width: 763px;
+		height: 474px;
+		background-repeat: no-repeat;
+		background-size: 100% 100%;
+		background-image: url('@/assets/images/background/video-box1.png');
+		padding: 8px 6px 8px 8px;
+		z-index: 10;
+		:deep(video) {
+			width: 100%;
+			height: 100%;
+			object-fit: fill;
+			position: unset;
+		}
+	}
+
+	:deep(.is-active) {
+		width: 99%;
+		height: 99%;
+		position: absolute;
+		top: 50%;left: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 10;
+		box-sizing: border-box;
+		box-shadow: inset 0px 0px 20px 0px #00FFFF;
+	}
+
+	:deep(.el-loading-container) {
+		pointer-events: none;
+	}
 </style>
 
 <template>
@@ -164,10 +201,21 @@
 			</div>
 		</div>
 		<div class="item">
-			<div class="box"></div>
+			<div class="box">
+				<template
+					v-for="id, index in _reactive.data.playerList"
+					:key="index"
+				>
+					<video class="my-players"
+						:id="id"
+					></video>
+				</template>
+			</div>
 			<div class="box">
 				<div class="block">
-					<AppDeviceList></AppDeviceList>
+					<AppDeviceList
+						@select="deviceListSelector"
+					></AppDeviceList>
 				</div>
 				<div class="block">
 					<AppCloudController></AppCloudController>
@@ -180,6 +228,24 @@
 <script setup lang="ts">
 	import AppCloudController from './AppCloudController.vue';
 	import AppDeviceList from './AppDeviceList.vue';
+
+	import Hunter from '@/utils/Hunter';
+
+	import {
+		useChangeModle
+	} from '@/hooks/videoBoxManager';
+
+	import {
+		usePlayerCreater
+	} from '@/hooks/videoManager';
+
+	import {
+		getVideoAddress
+	} from '@/api/default';
+
+	import {
+		usePoolGetter
+	} from '@/hooks/deviceService';
 
 	import {
 		useCompStateChanger
@@ -194,13 +260,26 @@
 	} from 'vue';
 
 	import {
-		MonitorVideoBox
+		MonitorVideoBox,
+		DeviceInfo
 	} from '@/types';
+
+	type DeviceContext = DeviceInfo & {
+		id :number;
+		name :string;
+		state :number;
+	};
 
 	const emits = defineEmits(['close']);
 
 	const _reactive = reactive({
 		data: {
+			playerList: [
+				'my-player-1',
+				'my-player-2',
+				'my-player-3',
+				'my-player-4',
+			],
 			btnList: [
 				{
 					id :1,
@@ -242,10 +321,117 @@
 		}
 	});
 
+	const _static = {
+		data: {
+			deviceList: [] as DeviceContext[],
+			playerList: [] as any[],
+			videoClickIndex: undefined as undefined | number
+		}
+	};
+
 	usePublish('monitorTotalBtnState', false);
 
 	useCompStateChanger('AppSmartGuard', false);
 	useCompStateChanger('AppFooter', false);
+
+	const deviceListSelector = (device :DeviceInfo) => {
+		if(_static.data.videoClickIndex) {
+			if(!_static.data.playerList[_static.data.videoClickIndex!]) return;
+			getVideoAddress(device).then(url => {
+				_static.data.playerList[_static.data.videoClickIndex!].src({
+					type: "video/flv",
+					src: url
+				});
+			}).catch(err => console.log(err))
+		}else {
+			if(!_static.data.playerList[0]) return;
+			getVideoAddress(device).then(url => {
+				_static.data.playerList[0].src({
+					type: "video/flv",
+					src: url
+				});
+			}).catch(err => console.log(err))
+		}
+	};
+
+	const videoClickHandler = (event :MouseEvent) => {
+		const id = (event.target as HTMLElement).id;
+		const index = _reactive.data.playerList.findIndex(item => {
+			if(item + '_flvjs_api' === id) return true;
+		});
+		if(
+			index > -1 &&
+			index !== _static.data.videoClickIndex
+		) {
+			_static.data.videoClickIndex = index;
+		} else {
+			_static.data.videoClickIndex = undefined;
+		}
+		const pEl = (event.target as HTMLElement).parentElement?.parentElement;
+		if(!pEl) return;
+		for(let i=0; i<pEl.children.length; i++) {
+			if(event.target === pEl.children[i].children[0]) {
+				pEl.children[i].children.namedItem('modal-shadow')!.classList.add('is-active');
+			}else {
+				pEl.children[i].children.namedItem('modal-shadow')!.classList.remove('is-active');
+			}
+		}
+	};
+
+	Hunter(() => usePoolGetter<DeviceContext[]>('onlineList'), {
+		frequency: 200,
+		cycle: 50
+	}).then(deviceList => {
+		_static.data.deviceList = deviceList;
+		const _arr = deviceList.map(device => {
+			return {
+				deviceSerial: device.deviceSerial,
+				channelNo: device.channelNo
+			} as DeviceInfo
+		});
+
+		getAllVideoAddress(_arr).then(urlList => {
+			_reactive.data.playerList.forEach((elVideoId, index) => {
+				if(! urlList[index]) return;
+				usePlayerCreater(elVideoId,{
+					userActions: {
+						doubleClick: false
+					}
+				},(player) => {
+					player.on('click', videoClickHandler);
+					player.addClass('video-player-box');
+					const elModalShadow = document.createElement('div', {
+							is: 'custom-element',
+					});
+					elModalShadow.id = 'modal-shadow'
+					player.el().appendChild(elModalShadow);
+				}).then(player => {
+					_static.data.playerList.push(player);
+					player.src({
+						type: "video/flv",
+						src: urlList[index]!
+					});
+				})
+			});
+		}).catch(err => console.log(err))
+	}).catch(err => console.log(err))
+
+	const getAllVideoAddress = async (
+		deviceList :DeviceInfo[]
+	) => {
+		const _arr :Promise<string>[]= [];
+
+		deviceList.forEach(device => {
+			_arr.push(getVideoAddress(device));
+		});
+
+		return await Promise.allSettled(_arr).then(list => {
+			return list.map(item => {
+				if(item.status === 'rejected') return null;
+				return item.value;
+			})
+		});
+	};
 
 	const clickEventInovke = new Map<string[], ((
 		...args :any[]
@@ -277,17 +463,13 @@
 
 			switch(id) {
 				case 'to-small':
-					usePublish<MonitorVideoBox>('monitorVideoBox', {
-						model: 1
-					});
+					useChangeModle('small');
 					usePublish('monitorTotalBtnState', true);
 					usePublish('AppFooterModel', 'inside');
 					useCompStateChanger('AppFooter', true);
 					break;
 				case 'to-middle':
-					usePublish<MonitorVideoBox>('monitorVideoBox', {
-						model: 2
-					});
+					useChangeModle('middle');
 					usePublish('monitorTotalBtnState', true);
 					usePublish('AppFooterModel', 'inside');
 					useCompStateChanger('AppFooter', true);
@@ -313,9 +495,7 @@
 	};
 
 	const closeHandler = () => {
-		usePublish('monitorVideoBox', {
-			model: 0
-		})
+		useChangeModle('close');
 		useCompStateChanger('AppSmartGuard', true);
 		usePublish('AppFooterModel', 'inside');
 		useCompStateChanger('AppFooter', true);

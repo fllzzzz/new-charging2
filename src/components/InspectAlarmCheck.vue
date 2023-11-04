@@ -289,6 +289,8 @@
 		}
 	});
 
+	usePublish('AppFooterModel', 'inside');
+
 	const closeHandler = () => {
 		emits('close');
 	};
