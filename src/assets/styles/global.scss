@@ -10,3 +10,7 @@
 	font-family: 'YouSheBiaoTiHei';
 	src: url('@/assets/fonts/YouSheBiaoTiHei.ttf');
 }
+
+.disable_pointer-event {
+	pointer-events: none;
+}

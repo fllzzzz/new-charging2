@@ -21,6 +21,7 @@ declare module 'vue' {
     AppSmartGuard: typeof import('./src/components/AppSmartGuard.vue')['default']
     BasePagination: typeof import('./src/components/BasePagination.vue')['default']
     BaseScrollbar: typeof import('./src/components/BaseScrollbar.vue')['default']
+    BaseTeleportVideo: typeof import('./src/components/BaseTeleportVideo.vue')['default']
     ElBadge: typeof import('element-plus/es')['ElBadge']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']

@@ -18,12 +18,20 @@
 				margin-top: 16px;
 			}
 			#video {
+				position: relative;
 				width: 290px;
 				height: 163px;
 				margin-bottom: 23px;
 				background-repeat: no-repeat;
 				background-size: 100% 100%;
 				background-image: url('@/assets/images/background/video-box.png');
+				img {
+					width: 22px;
+					height: 22px;
+					position: absolute;
+					top: 4px;right: 4px;
+					z-index: 100;
+				}
 			}
 			#controller {
 				width: 100%;
@@ -54,6 +62,9 @@
 				}
 			}
 		}
+		:deep(.telep-src_custom) {
+			padding: 8px;
+		}
 </style>
 
 <template>
@@ -61,7 +72,13 @@
 		<div class="item" id="search">
 			<AppDeviceList></AppDeviceList>
 		</div>
-		<div class="item" id="video"></div>
+		<div class="item" id="video"
+			v-if="_reatcive.state.video"
+		>
+			<img 
+				@click="() => telepTargetChanger()"
+				src="@/assets/images/icon/close.png">
+		</div>
 		<div class="item" id="controller">
 			<div id="title">
 				<div class="graph line"></div>
@@ -69,10 +86,44 @@
 			</div>
 			<AppRingController></AppRingController>
 		</div>
+		<BaseTeleportVideo
+			:telep-target="_reatcive.data.telepTarget"
+			class-name="telep-src_custom"
+		>
+		</BaseTeleportVideo>
 	</div>
+	<slot :fn="videoBoxChanger"></slot>
 </template>
 
 <script setup lang="ts">
+	import BaseTeleportVideo from './BaseTeleportVideo.vue';
 	import AppRingController from '@/components/AppRingController.vue';
 	import AppDeviceList from '@/components/AppDeviceList.vue';
+
+	import {
+		reactive
+	} from 'vue';
+
+	const emits = defineEmits(['videoModelChange']);
+
+	const _reatcive = reactive({
+		data: {
+			telepTarget: 
+				'.console-container > .item#video',
+		},
+		state: {
+			video: true
+		}
+	});
+
+	const telepTargetChanger = () => {
+		_reatcive.data.telepTarget = '#big-video-box';
+		_reatcive.state.video = false;
+		emits('videoModelChange', 'big');
+	};
+
+	const videoBoxChanger = () => {
+		_reatcive.state.video = true;
+		_reatcive.data.telepTarget = '.console-container > .item#video';
+	};
 </script>

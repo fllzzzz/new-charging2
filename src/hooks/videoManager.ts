@@ -87,7 +87,7 @@ export const usePlayerCreater = async (
 				this.addClass('video-js');
 				(this.el_ as HTMLElement).style.backgroundColor = 'transparent';
 
-				this.on('loadstart', () => {
+/* 				this.on('loadstart', () => {
 					data.elLoadingInstance = ElLoading.service({
 						target: this.el_ as HTMLElement,
 						fullscreen: false,
@@ -100,7 +100,14 @@ export const usePlayerCreater = async (
 					if(data.elLoadingInstance) {
 						data.elLoadingInstance.close()
 					}
-				});
+				}); */
+
+				data.elLoadingInstance = ElLoading.service({
+					target: this.el_ as HTMLElement,
+					fullscreen: false,
+					background: 'transparent',
+					customClass: 'el-loading-container disable_pointer-event'
+				})
 
 				fn && fn(this);
 			}

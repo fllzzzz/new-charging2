@@ -43,10 +43,18 @@
 	.is-small {
 		top: 129px;
 		right: 27px;
+		:deep(#body) {
+			padding: 10px;
+			box-sizing: border-box;
+		}
 	}
 	.is-middle {
 		top: 220px;
 		right: 300px;
+		:deep(#body > #left) {
+			padding: 10px;
+			box-sizing: border-box;
+		}
 	}
 
 	#my-player {
@@ -69,6 +77,8 @@
 			class="item video-target"
 			:is="_reatcive.data.videoBoxComp"
 			:class="boxClassNameSetter"
+			@enter-mulit="enterMulitHandler"
+			@enter-signel="enterSignelHandler"
 		></component>
 		<Teleport
 			:to="_reatcive.data.teleportTarget"
@@ -82,6 +92,7 @@
 </template>
 
 <script setup lang="ts">
+
 	import diff from '@/utils/diff';
 	import Hunter from '@/utils/Hunter';
 
@@ -148,13 +159,14 @@
 	const videoBoxCompClassNameMapper = new Map<string, string>([
 		['small', '.monitor-videoBox-small-container > #body'],
 		['middle', '.monitor-videoBox-middle-container > #body > #left'],
-		['full', '.monitor-videoBox-full-container'],
+		['full', '.monitor-videoBox-full-container > .item:nth-of-type(2) > .box:nth-of-type(1)'],
 		['small-ext', '.monitor-videoBox-small-ext-container']
 	])
 
 	usePublish('AppHeaderL2State', false);
 	usePublish('AppFooterModel', 'inside');
 	usePublish('AppFooterState', true);
+	useChangeModle('small');
 
 	_static.data.subscribeIndex = useSubscribe<ctid_12821>('getIFramerMsg_12821', ctx => {
 		diff<ctid_12821>(
@@ -196,6 +208,19 @@
 	useSubscribe<boolean>('monitorTotalBtnState', (ctx) => {
 		_reatcive.state.totalBtn = ctx;
 	})
+
+	const enterMulitHandler = () => {
+		_static.data.player && _static.data.player.dispose();
+		_reatcive.state.video = false;
+		_reatcive.data.teleportTarget = 'body';
+	};
+
+	const enterSignelHandler = (
+		fn :((deviceInfo :DeviceInfo) => void)
+	) => {
+		if(! _static.data.deviceInfo) return;
+		fn(_static.data.deviceInfo);
+	};
 
 	const boxClassNameSetter = computed(() => {
 		if(videoBox.value.type === 'small')
@@ -246,10 +271,20 @@
 	watch(videoBox, (ctx) => {
 		if(ctx.type === 'full') {
 			_static.data.deviceInfo = _static.temp[0];
-			_static.data.player && _static.data.player.dispose();
 			_reatcive.state.video = false;
 			_reatcive.data.teleportTarget = 'body';
 			_reatcive.data.videoBoxComp = ctx.target;
+			nextTick(() => {
+				const className = videoBoxCompClassNameMapper.get(ctx.type);
+				if(!className) return;
+					Hunter(() => document.querySelector(className), {
+						cycle: 10,
+						frequency: 100,
+					}).then(el  => {
+						_reatcive.data.teleportTarget = el as HTMLElement;
+						_reatcive.state.video = true;
+					});
+			});
 		}else {
 			_reatcive.state.video = false;
 			_reatcive.data.teleportTarget = 'body';
@@ -266,6 +301,13 @@
 						_reatcive.state.video = true;
 
 						if(!_static.data.deviceInfo) return;
+						
+						if(!_static.data.player) {
+							usePlayerCreater('my-player').then(player => {
+								_static.data.player = player;
+							});
+						}
+
 						getVideoAddress(_static.data.deviceInfo).then(url => {
 							_static.data.player.src({
 								type: "video/flv",

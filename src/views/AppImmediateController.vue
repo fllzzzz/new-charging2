@@ -306,6 +306,17 @@
 			top: 98px;
 		}
 	}
+
+	#big-video-box {
+		pointer-events: auto;
+		width: 1200px;
+		height: 600px;
+		border: 4px dotted red;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
 </style>
 
 <template>
@@ -442,8 +453,18 @@
 			</div>
 		</div>
 		<div class="item" id="left-box">
-			<AppConsole></AppConsole>
+			<AppConsole
+				@videoModelChange="videoBoxChanger"
+			>
+				<template #default="{ fn }">
+					{{ _static.data.appConsoleSlot_fn = fn }}
+				</template>
+			</AppConsole>
 		</div>
+		<div id="big-video-box"
+			@click="videoBoxToSmall"
+			v-if="state.videoModel === 'big'"
+		></div>
 		<template v-if="state.cardDialogOpen">
 			<ImmedaiteControllerCard
 				:dialogOpen="state.cardDialogOpen"
@@ -493,6 +514,13 @@
 
 	const router = useRouter();
 	
+	
+	const _static = {
+		data: {
+			appConsoleSlot_fn: null as null | (() => void)
+		}
+	};
+
 	const dataBase = ref({
 		rootStyle: {
 			'--pace-width': 0
@@ -515,7 +543,8 @@
 		monitorDeviceListshow: true,
 		upsizeVideoPlayerShow: false,
 		headerControllershow: false,
-		handleStepClickStateList:[0,0,0,0,0,0,0]
+		handleStepClickStateList:[0,0,0,0,0,0,0],
+		videoModel: 'small' as 'small' | 'big'
 	});
 
 	const loopTimer = ref({
@@ -534,6 +563,18 @@
 
 	usePublish('AppFooterModel', 'inside');
 	usePublish('AppFooterState', true);
+
+	const videoBoxChanger = (
+		model :'small' | 'big'
+	) => {
+		state.value.videoModel = model;
+	};
+
+	const videoBoxToSmall = () => {
+		state.value.videoModel = 'small';
+		_static.data.appConsoleSlot_fn &&
+			_static.data.appConsoleSlot_fn();
+	};
 
 	const getRootStyle = computed(() => {
 		return dataBase.value.rootStyle;

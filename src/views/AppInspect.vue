@@ -5,6 +5,30 @@
 		position: fixed;
 		bottom: 0;
 	}
+	.is-small {
+		position: fixed;
+		top: 129px;
+		right: 27px;
+		:deep(#body) {
+			padding: 10px;
+			box-sizing: border-box;
+		}
+	}
+	.is-middle {
+		position: fixed;
+		top: 220px;
+		right: 300px;
+		:deep(#body > #left) {
+			padding: 10px;
+			box-sizing: border-box;
+		}
+	}
+
+	:deep(#my-player) {
+		width: 100%;
+		height: 100%;
+		object-fit: fill;
+	}
 </style>
 
 <template>
@@ -12,10 +36,40 @@
 		<InspectEditorVideo
 			model="maker"
 		></InspectEditorVideo>
+		<component
+			class="video-target"
+			:is="_reatcive.data.videoBoxComp"
+			:class="boxClassNameSetter"
+		></component>
+		<Teleport
+			:to="_reatcive.data.teleportTarget"
+		>
+			<video
+				id="my-player"
+				v-show="_reatcive.state.video"
+			></video>
+		</Teleport>
 	</div>
 </template>
 
 <script setup lang="ts">
+	import type {
+		Component
+	} from 'vue';
+
+	import {
+		reactive,
+		computed,
+		onMounted,
+		watch,
+		nextTick
+	} from 'vue';
+
+	import {
+		videoBox,
+		useChangeModle
+	} from '@/hooks/videoBoxManager';
+
 	import {
 		ctid13511_isSet
 	} from '@/store';
@@ -29,8 +83,75 @@
 		useSubscribe
 	} from '@/hooks/EventEmitter';
 
-	usePublish('AppFooterState', false);
+	const _reatcive = reactive({
+		data: {
+			teleportTarget: 'body' as string | HTMLElement,
+			videoBoxComp: undefined as undefined | Component
+		},
+		state: {
+			video: false
+		}
+	});
 
+	const videoBoxCompClassNameMapper = new Map<string, string>([
+		['small', '#body'],
+		['middle', '#body > #left'],
+	])
+
+	useChangeModle('small');
+
+	const boxClassNameSetter = computed(() => {
+		if(videoBox.value.type === 'small')
+			return 'is-small'
+		if(videoBox.value.type === 'middle')
+			return 'is-middle'
+		return '';
+	});
+
+	onMounted(() => {
+		_reatcive.data.videoBoxComp = videoBox.value.target;
+		const cssSelectVar = videoBoxCompClassNameMapper.get(videoBox.value.type);
+		if(!cssSelectVar) return;
+
+		Hunter(() => document.querySelector(`.video-target > ${cssSelectVar}`), {
+			cycle: 10,
+			frequency: 100,
+		}).then(el  => {
+			_reatcive.data.teleportTarget = el as HTMLElement;
+			_reatcive.state.video = true;
+		});
+	});
+
+	watch(videoBox, (ctx) => {
+		_reatcive.state.video = false;
+		_reatcive.data.teleportTarget = 'body';
+		_reatcive.data.videoBoxComp = ctx.target;
+		nextTick(() => {
+			const cssSelectVar = videoBoxCompClassNameMapper.get(ctx.type);
+			if(!cssSelectVar) return;
+					
+			Hunter(() => document.querySelector(`.video-target > ${cssSelectVar}`), {
+				cycle: 10,
+				frequency: 100,
+			}).then(el  => {
+				console.log('jx', el);
+				_reatcive.data.teleportTarget = el as HTMLElement;
+				_reatcive.state.video = true;
+			})
+		});
+	})
+
+
+
+
+
+
+
+
+
+
+
+	usePublish('AppFooterState', false);
 	Hunter(() => ctid13511_isSet, {
 		cycle: 25,
 		frequency: 20,

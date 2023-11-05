@@ -81,6 +81,10 @@
 
 <script setup lang="ts">
 	import {
+		useRoute
+	} from 'vue-router';
+
+	import {
 		useChangeModle,
 	} from '@/hooks/videoBoxManager';
 
@@ -196,9 +200,6 @@
 		const target = _reactive.data.btnList.find(btn => btn.name === id);
 		if (!target) return;
 		if (target.code === undefined) return;
-	/* 	usePublish<MonitorVideoBox>('monitorVideoBox',{
-			model: target.code,
-		}); */
 
 		useChangeModle(modelInovke[target.code] as "small" | "middle" | "full" | "small-ext");
 
@@ -216,6 +217,24 @@
 		}).catch(err => {
 			console.log(err);
 		})
+	};
+
+	const headerBtnStateWatcher = () => {
+		const {name} = useRoute();
+
+		const target = _reactive.data.btnList.find(
+			btn => btn.name === 'fullScreen'
+		);
+		if(!target) return;
+
+		switch(name) {
+			case 'monitor':
+				target.state = 1;
+				break;
+			default:
+				target.state = 0;
+				break;
+		}
 	};
 
 	onMounted(() => {
@@ -241,6 +260,8 @@
 				});
 			});
 		}
+
+		headerBtnStateWatcher()
 	});
 
 	onBeforeUnmount(() => {

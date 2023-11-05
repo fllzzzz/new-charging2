@@ -97,9 +97,7 @@
 								width: 1526px;
 								background-image: url('@/assets/images/background/videoBox-full-body-left.png');
 								display: flex;
-								flex-flow: row wrap;
-								justify-content: space-between;
-								align-items: flex-start;
+								flex-direction: row;
 							}
 						}
 						@if $i == 2 {
@@ -170,6 +168,19 @@
 	:deep(.el-loading-container) {
 		pointer-events: none;
 	}
+
+	.is-signel {
+		padding: 10px;
+		flex-wrap: nowrap;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.is-mulit {
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: flex-start;
+	}
 </style>
 
 <template>
@@ -201,14 +212,18 @@
 			</div>
 		</div>
 		<div class="item">
-			<div class="box">
-				<template
-					v-for="id, index in _reactive.data.playerList"
-					:key="index"
+			<div class="box"
+				:class="getLeftBoxClassName"
+			>
+				<template 
+					v-if="_reactive.state.model === 'mulit'"
 				>
-					<video class="my-players"
-						:id="id"
-					></video>
+					<template
+						v-for="id, index in _reactive.data.playerList"
+						:key="index"
+					>
+						<video :id="id"></video>
+					</template>
 				</template>
 			</div>
 			<div class="box">
@@ -256,7 +271,9 @@
 	} from '@/hooks/EventEmitter';
 
 	import {
-		reactive
+		reactive,
+		computed,
+		nextTick
 	} from 'vue';
 
 	import {
@@ -270,7 +287,7 @@
 		state :number;
 	};
 
-	const emits = defineEmits(['close']);
+	const emits = defineEmits(['close', 'enter-mulit', 'enter-signel']);
 
 	const _reactive = reactive({
 		data: {
@@ -318,6 +335,9 @@
 					]
 				},
 			] 
+		},
+		state: {
+			model: 'signel' as 'signel' | 'mulit',
 		}
 	});
 
@@ -333,6 +353,12 @@
 
 	useCompStateChanger('AppSmartGuard', false);
 	useCompStateChanger('AppFooter', false);
+
+	const getLeftBoxClassName = computed(() => {
+		if(_reactive.state.model === 'signel') return 'is-signel';
+		if(_reactive.state.model === 'mulit') return 'is-mulit';
+		return '';
+	});
 
 	const deviceListSelector = (device :DeviceInfo) => {
 		if(_static.data.videoClickIndex) {
@@ -354,6 +380,23 @@
 		}
 	};
 
+	const getAllVideoAddress = async (
+		deviceList :DeviceInfo[]
+	) => {
+		const _arr :Promise<string>[]= [];
+
+		deviceList.forEach(device => {
+			_arr.push(getVideoAddress(device));
+		});
+
+		return await Promise.allSettled(_arr).then(list => {
+			return list.map(item => {
+				if(item.status === 'rejected') return null;
+				return item.value;
+			})
+		});
+	};
+	
 	const videoClickHandler = (event :MouseEvent) => {
 		const id = (event.target as HTMLElement).id;
 		const index = _reactive.data.playerList.findIndex(item => {
@@ -378,59 +421,44 @@
 		}
 	};
 
-	Hunter(() => usePoolGetter<DeviceContext[]>('onlineList'), {
-		frequency: 200,
-		cycle: 50
-	}).then(deviceList => {
-		_static.data.deviceList = deviceList;
-		const _arr = deviceList.map(device => {
-			return {
-				deviceSerial: device.deviceSerial,
-				channelNo: device.channelNo
-			} as DeviceInfo
-		});
-
-		getAllVideoAddress(_arr).then(urlList => {
-			_reactive.data.playerList.forEach((elVideoId, index) => {
-				if(! urlList[index]) return;
-				usePlayerCreater(elVideoId,{
-					userActions: {
-						doubleClick: false
-					}
-				},(player) => {
-					player.on('click', videoClickHandler);
-					player.addClass('video-player-box');
-					const elModalShadow = document.createElement('div', {
-							is: 'custom-element',
-					});
-					elModalShadow.id = 'modal-shadow'
-					player.el().appendChild(elModalShadow);
-				}).then(player => {
-					_static.data.playerList.push(player);
-					player.src({
-						type: "video/flv",
-						src: urlList[index]!
-					});
-				})
+	const mulitModelHandler = () => {
+		Hunter(() => usePoolGetter<DeviceContext[]>('onlineList'), {
+			frequency: 200,
+			cycle: 50
+		}).then(deviceList => {
+			_static.data.deviceList = deviceList;
+			const _arr = deviceList.map(device => {
+				return {
+					deviceSerial: device.deviceSerial,
+					channelNo: device.channelNo
+				} as DeviceInfo
 			});
+
+			getAllVideoAddress(_arr).then(urlList => {
+				_reactive.data.playerList.forEach((elVideoId, index) => {
+					if(! urlList[index]) return;
+					usePlayerCreater(elVideoId,{
+						userActions: {
+							doubleClick: false
+						}
+					},(player) => {
+						player.on('click', videoClickHandler);
+						player.addClass('video-player-box');
+						const elModalShadow = document.createElement('div', {
+								is: 'custom-element',
+						});
+						elModalShadow.id = 'modal-shadow'
+						player.el().appendChild(elModalShadow);
+					}).then(player => {
+						_static.data.playerList.push(player);
+						player.src({
+							type: "video/flv",
+							src: urlList[index]!
+						});
+					})
+				});
+			}).catch(err => console.log(err))
 		}).catch(err => console.log(err))
-	}).catch(err => console.log(err))
-
-	const getAllVideoAddress = async (
-		deviceList :DeviceInfo[]
-	) => {
-		const _arr :Promise<string>[]= [];
-
-		deviceList.forEach(device => {
-			_arr.push(getVideoAddress(device));
-		});
-
-		return await Promise.allSettled(_arr).then(list => {
-			return list.map(item => {
-				if(item.status === 'rejected') return null;
-				return item.value;
-			})
-		});
 	};
 
 	const clickEventInovke = new Map<string[], ((
@@ -475,10 +503,33 @@
 					useCompStateChanger('AppFooter', true);
 					break;
 				case 'to-mulit':
-					/*  */
+					_static.data.playerList.forEach(
+						player => player.dispose()
+					)
+					emits('enter-mulit')
+					_reactive.state.model = 'mulit';
+					nextTick(() => {
+						mulitModelHandler();
+					});
 					break;
 				case 'to-signel':
-					/*  */
+					_static.data.playerList.forEach(
+						player => player.dispose()
+					)
+					emits('enter-signel',(
+						deviceInfo :DeviceInfo
+					) => {
+						_reactive.state.model = 'signel';
+						getVideoAddress(deviceInfo).then(url => {
+							usePlayerCreater('my-player').then(player => {
+								_static.data.playerList.push(player);
+								player.src({
+									type: "video/flv",
+									src: url
+								});
+							});
+						}).catch(err => console.log(err))
+					});
 					break;
 			}
 		}]
