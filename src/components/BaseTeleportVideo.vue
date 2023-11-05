@@ -167,14 +167,14 @@
 	});
 
 	watch(() => props.telepTarget, (newValue, oldValue) => {
-		if(newValue !== oldValue)
-			telepTargetChanger(newValue);
+		if(newValue === oldValue) return;
+		telepTargetChanger(newValue);
 	}, {
 		immediate: true
 	})
 
 	watch(() => props.deviceInfo, (newValue, oldValue) => {
-		if(newValue !== oldValue)
-			playerSrcChanger(newValue);
+		if(newValue === oldValue) return;
+		playerSrcChanger(newValue);
 	});
 </script>
