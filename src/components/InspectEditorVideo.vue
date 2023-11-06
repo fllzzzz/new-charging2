@@ -227,6 +227,8 @@
 </template>
 
 <script setup lang="ts">
+	import InspectService from '@/hooks/inspectService';
+
 	import type {
 		ctid_13021
 	} from '@/types';
@@ -301,6 +303,14 @@
 		}
 	});
 
+	const inspectService = new InspectService({
+		deviceInfo: {
+			deviceSerial: '12346',
+			channelNo: 2
+		},
+		keyWords: ['1']
+	});
+
 	const clickEventInvoke = new Map<string, ((
 		event?: MouseEvent,
 		...args :any[]
@@ -316,6 +326,7 @@
 			}
 		}],
 		['next', () => {
+			inspectService.LocalSynchronizer();
 			_reactive.data.to3Dflg++;
 			usePublish('setIframerMsg', {
 				ctid: 13111,

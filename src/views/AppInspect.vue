@@ -148,8 +148,6 @@
 
 
 
-
-
 	usePublish('AppFooterState', false);
 	Hunter(() => ctid13511_isSet, {
 		cycle: 25,

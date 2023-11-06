@@ -237,9 +237,7 @@
 			</div>
 		</div>
 		<div class="item" id="video">
-			<MonitorVideoBoxSmall
-				v-if="_reactive.state.videoBox"
-			></MonitorVideoBoxSmall>
+			
 		</div>
 		<div class="item" id="option-btn-group">
 			<div class="btn">
@@ -254,8 +252,6 @@
 </template>
 
 <script setup lang="ts">
-	import MonitorVideoBoxSmall from './MonitorVideoBoxSmall.vue';
-
 	import {
 		usePublish
 	} from '@/hooks/EventEmitter';

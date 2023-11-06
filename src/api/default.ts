@@ -183,3 +183,22 @@ export const getInspectVideoReport = (
 	})
 	.then(inspectVideoReportList => inspectVideoReportList[0])
 };
+
+export const getInspectAlarmList = (
+	stationId :number
+) => {
+	return $default({
+		method: 'post',
+		url: '/report_list/GetReportList',
+		data: {
+			'station_id': stationId
+		}
+	})
+	.then(res => res.data)
+	.then(result => result.data as any[])
+	.then(list => {
+		return list.map(item => {
+			return pullFormat<InspectHistory>(item)
+		});
+	});
+};

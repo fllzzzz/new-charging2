@@ -117,16 +117,16 @@
 			:class="boxClassNameSetter"
 		>
 		</component>
-		<!-- <BaseTeleportVideo
+		<BaseTeleportVideo
 			:telep-target="_reactive.data.telepTarget"
-		></BaseTeleportVideo> -->
+		></BaseTeleportVideo>
 	</div>
 </template>
 
 <script setup lang="ts">
 	import BaseTeleportVideo from '@/components/BaseTeleportVideo.vue';
 	import InspectReportHandle from '@/components/InspectReportHandle.vue';
-	/* import InspectAlarmCheck from '@/components/InspectAlarmCheck.vue'; */
+	import InspectAlarmCheck from '@/components/InspectAlarmCheck.vue';
 	import InspectReportDigital from '@/components/InspectReportDigital.vue';
 	import InspectReportVideo from '@/components/InspectReportVideo.vue';
 	import screenManager from '@/hooks/ScreenManager';
@@ -251,7 +251,6 @@
 						width: 320
 					},
 				],
-				rowList: [] as TableRow[]
 			},
 			warnModel: {
 				columnList: [
@@ -380,7 +379,7 @@
 			_reactive.data.reportModel = InspectReportDigital;
 			_reactive.data.boxClassName = 'report-container';
 		}else if(args[0] === 'alarmCheck'){
-			/* _reactive.data.reportModel = InspectAlarmCheck; */
+			_reactive.data.reportModel = InspectAlarmCheck;
 			_reactive.data.boxClassName = 'alarm-card-container';
 		}else if(args[0] === 'handleReport'){
 			_reactive.data.reportModel = InspectReportHandle;
@@ -436,6 +435,7 @@
 	});
 
 	watch(() => videoBox.value.type, (type) => {
+		if(type === 'close') return;
 		const u = telepTargetInovke.get(videoBox.value.type);
 		const cssVar = `.telep-target ${u}`;
 		_reactive.data.telepTarget = cssVar;

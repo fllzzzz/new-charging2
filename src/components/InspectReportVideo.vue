@@ -286,6 +286,8 @@
 </template>
 
 <script setup lang="ts">
+	import InspectService from '@/hooks/inspectService';
+
 	import {
 		useInspectReportMaker
 	} from '@/hooks/InspectManager';
@@ -334,6 +336,10 @@
 			reportList: [] as ReportList[],
 		}
 	});
+
+	InspectService.fn = (msg) => {
+		console.log('jx', 'InspectService.fn()', msg);
+	};
 
 	const optionsHandler = (
 		name :string
