@@ -2,10 +2,6 @@ import {
 	DeviceInfo
 } from '@/types';
 
-import {
-
-} from '@/api/default';
-
 type Message = {
 	deviceInfo :DeviceInfo;
 	keyWords :string[];

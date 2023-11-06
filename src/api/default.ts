@@ -27,7 +27,7 @@ type StationInfo = {
 	[key :string] :any;
 };
 
-type InspectVideoReport = {
+export type InspectVideoReport = {
 	cameraList :DeviceInfo[];
 	picList :string[];
 	unnormalReportContent: string[][];
