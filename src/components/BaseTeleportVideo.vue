@@ -60,7 +60,7 @@
 	const props = defineProps({
 		telepTarget: {
 			type: String,
-			required: true
+			required: false
 		},
 		className: {
 			type: String,
@@ -68,8 +68,7 @@
 		},
 		deviceInfo: {
 			type: Object as PropType<DeviceInfo>,
-			required: false,
-			default: null
+			required: false
 		}
 	});
 
@@ -167,6 +166,7 @@
 	});
 
 	watch(() => props.telepTarget, (newValue, oldValue) => {
+		if(! newValue) return;
 		if(newValue === oldValue) return;
 		telepTargetChanger(newValue);
 	}, {
@@ -174,6 +174,7 @@
 	})
 
 	watch(() => props.deviceInfo, (newValue, oldValue) => {
+		if(! newValue) return;
 		if(newValue === oldValue) return;
 		playerSrcChanger(newValue);
 	});

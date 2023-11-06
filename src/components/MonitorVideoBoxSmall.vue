@@ -42,10 +42,4 @@
 	import {
 		reactive
 	} from 'vue';
-
-	const _reactive = reactive({
-		data: {
-		
-		}
-	});
 </script>

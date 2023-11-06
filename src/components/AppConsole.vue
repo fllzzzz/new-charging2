@@ -4,23 +4,25 @@
 			background-repeat: no-repeat;
 			background-size: 100% 100%;
 			background-image: url('@/assets/images/background/immCon.png');
-			display: flex;
-			flex-flow: column nowrap;
-			justify-content: flex-start;
-			align-items: center;
+			position: relative;
 			& > .item {
 				box-sizing: border-box;
+				position: absolute;
 			}
 			#search {
 				width: 267px;
 				height: 306px;
 				margin-bottom: 36px;
 				margin-top: 16px;
+				top: 16px;
+				left: 14px;
 			}
 			#video {
 				position: relative;
 				width: 290px;
 				height: 163px;
+				top: 358px;
+				left: 5px;
 				margin-bottom: 23px;
 				background-repeat: no-repeat;
 				background-size: 100% 100%;
@@ -36,6 +38,8 @@
 			#controller {
 				width: 100%;
 				height: 223px;
+				top: 544px;
+				left: 14px;
 				display: flex;
 				flex-flow: column nowrap;
 				justify-content: space-between;
@@ -77,7 +81,7 @@
 		>
 			<img 
 				@click="() => telepTargetChanger()"
-				src="@/assets/images/icon/close.png">
+				src="@/assets/images/icon/size-up.png">
 		</div>
 		<div class="item" id="controller">
 			<div id="title">

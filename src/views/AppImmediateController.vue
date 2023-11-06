@@ -308,14 +308,30 @@
 	}
 
 	#big-video-box {
-		pointer-events: auto;
-		width: 1200px;
-		height: 600px;
-		border: 4px dotted red;
+		pointer-events: none;
+		width: 1240px;
+		height: 715px;
+		border: 1px solid #00FFFF;
+		border-radius: 0px 0px 8px 0px;
 		position: fixed;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
+		position: relative;
+		img {
+			z-index: 100;
+			pointer-events: auto;
+			position: absolute;
+			width: 24px;
+			height: 24px;
+			top: 5px;
+			&:first-child {
+				right: 40px;
+			}
+			&:nth-of-type(2) {
+				right: 5px;
+			}
+		}
 	}
 </style>
 
@@ -462,9 +478,15 @@
 			</AppConsole>
 		</div>
 		<div id="big-video-box"
-			@click="videoBoxToSmall"
 			v-if="state.videoModel === 'big'"
-		></div>
+		>
+			<img 
+				@click="() => videoBoxToSmall()"
+				src="@/assets/images/icon/size-down.png">
+			<img 
+				@click="() => videoBoxToSmall()"
+				src="@/assets/images/icon/close.png">
+		</div>
 		<template v-if="state.cardDialogOpen">
 			<ImmedaiteControllerCard
 				:dialogOpen="state.cardDialogOpen"
@@ -487,7 +509,7 @@
 					<span class="description">{{ dataBase.currentTime }}</span>
 					<span class="description">2区6号充电桩发生火灾！</span>
 				</div>
-				<div class="box btn" id="close" @click="closeIconClickHandler"></div>
+				<div class="box btn" id="close" @click="closeIconClickHandler"></div>	
 			</div>
 		</template>
 	</div>

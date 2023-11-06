@@ -6,7 +6,7 @@
 	}
 	:deep(.table-header) {
 		th.el-table__cell {
-			height: calc(50 * v-bind('screenManager.currentRatio.value[1]') * 1px);
+			height: calc(48 * v-bind('screenManager.currentRatio.value[1]') * 1px);
 			background: rgba(11,77,98,0.90);
 			border-left: 1px solid #042630;
 			border-bottom: 0;
@@ -19,7 +19,7 @@
 	:deep(.table-row) {
 		--el-table-row-hover-bg-color: none;
 		td.el-table__cell {
-			height: calc(48 * v-bind('screenManager.currentRatio.value[1]') * 1px);
+			height: calc(46 * v-bind('screenManager.currentRatio.value[1]') * 1px);
 			border-bottom: 0;
 			font-size: 14px;
 			font-family: PingFang SC;
@@ -87,7 +87,8 @@
 								<div class="btn-group"
 									@click="optionsClickHandler(
 										$event,
-										row.inspectType
+										row.inspectType,
+										row.reportID
 									)"
 								>
 									<template 
@@ -102,6 +103,16 @@
 									</template>
 								</div>
 							</template>
+						</template>
+					</el-table-column>
+				</template>
+				<template v-else-if="column.prop === 'inspectResult'">
+					<el-table-column
+						:width="column.width * screenManager.currentRatio.value[0]"
+						align="center"
+						>
+						<template #default="{row}">
+							{{ `本次任务需巡检${row.inspectResult[0]}个，异常${row.inspectResult[1]}个`}}
 						</template>
 					</el-table-column>
 				</template>

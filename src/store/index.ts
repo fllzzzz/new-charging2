@@ -3,3 +3,4 @@ import {
 } from 'vue';
 
 export const ctid13511_isSet = ref(false);
+export const inspectReportId = ref<number | undefined>(undefined);

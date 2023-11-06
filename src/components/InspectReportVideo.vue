@@ -65,7 +65,7 @@
 				height: 465px;
 				.block {
 					width: 544px;
-					height: 146px;
+					height: 160px;
 					box-sizing: border-box;
 					margin-bottom: 20px;
 					&:last-child {
@@ -137,10 +137,14 @@
 								}
 								&:nth-of-type(2) {
 									flex: 1;
+									display: unset;
 									margin-top: 10px;
 									margin-bottom: 6px;
 									span {
 										line-height: unset;
+										&.is-error {
+											color: red;
+										}
 									}
 								}
 								&:nth-of-type(3) {
@@ -183,6 +187,25 @@
 			}
 		}
 	}
+
+	.is-small {
+		position: fixed;
+		top: 129px;
+		left: 27px;
+		:deep(#body) {
+			padding: 10px;
+			box-sizing: border-box;
+		}
+	}
+	.is-middle {
+		position: fixed;
+		top: 220px;
+		left: 100px;
+		:deep(#body > #left) {
+			padding: 10px;
+			box-sizing: border-box;
+		}
+	}
 </style>
 
 <template>
@@ -221,14 +244,30 @@
 												v-for="btn in _reactive.data.btnList"
 												:key="btn.id"
 											>
-												<img :src="btn.image" :id="btn.name">	
+												<img :src="btn.image" :id="btn.name"
+													@click="() => optionsHandler(btn.name)"
+												>	
 											</template>
 										</div>
 									</div>
 									<div class="row">
-										<span>
-											充电枪无未归位，充电桩无外观损坏，充电桩无生锈，车位无异物，地面无积水，充电桩无高温风险，充电站无水浸风险，充电站无火灾风险
-										</span>
+										<template
+											v-for="content,index in contentGetter(item.keyWord)"
+											:key="index"
+										>
+											<span 
+												:class="content.state === 1 ? 'is-error' : ''"
+												id="main-text"
+											>
+												<template
+													v-if="content.length -1  === index">
+													{{ content.data + '。' }}
+												</template>
+												<template v-else>
+													{{ content.data + ' , ' }}
+												</template>
+											</span>
+										</template>
 									</div>
 									<div class="row">
 										<span>其他： {{ item.keyWord[item.keyWord.length - 1] }}</span>
@@ -247,15 +286,36 @@
 </template>
 
 <script setup lang="ts">
+	import {
+		useInspectReportMaker
+	} from '@/hooks/InspectManager';
+
+	import {
+		getInspectVideoReport
+	} from '@/api/default';
+
+	import {
+		inspectReportId
+	} from '@/store';
+
 	import type {
 		DeviceInfo
 	} from '@/types';
 
 	import {
-		reactive
+		reactive,
+		onMounted,
 	} from 'vue';
 
-	const emits = defineEmits(['close']);
+	type ReportList = {
+		id :number,
+		deviceInfo :DeviceInfo,
+		title :string,
+		image :string;
+		keyWord :string[];
+	};
+
+	const emits = defineEmits(['close', 'monitor', 'editor']);
 
 	const _reactive = reactive({
 		data: {
@@ -271,33 +331,51 @@
 					image: require<string>('@/assets/images/icon/editor.png')
 				},
 			],
-			reportList: [
-				{
-					id: 1,
-					deviceInfo: {} as DeviceInfo,
-					title: 'default01',
-					image: require<string>('@/assets/images/background/test-1.png'),
-					keyWord: ['key1', 'key2', 'key3'] as string[]
-				},
-				{
-					id: 2,
-					deviceInfo: {} as DeviceInfo,
-					title: 'default02',
-					image: require<string>('@/assets/images/background/test-1.png'),
-					keyWord: ['key1', 'key2', 'key3'] as string[]
-				},
-				{
-					id: 3,
-					deviceInfo: {} as DeviceInfo,
-					title: 'default03',
-					image: require<string>('@/assets/images/background/test-1.png'),
-					keyWord: ['key1', 'key2', 'key3'] as string[]
-				},
-			],
+			reportList: [] as ReportList[],
 		}
 	});
+
+	const optionsHandler = (
+		name :string
+	) => {
+		if(name === 'monitor') emits('monitor');
+		if(name === 'editor') emits('editor');
+	};
 
 	const closeHandler = () => {
 		emits('close');
 	};
+
+	const contentGetter = (
+		list :string[]
+	) => {
+		const u = useInspectReportMaker(list.slice(0, list.length));
+		return u.map(item => {
+			return {
+				length: u.length,
+				...item
+			}
+		})
+	};
+	
+	const Init = () => {
+		if(! inspectReportId.value) return;
+		return getInspectVideoReport(1697709299).then(result => {
+			return result.cameraList.map<ReportList>((device, index) => {
+				return {
+					id: index,
+					deviceInfo: device,
+					title: device.deviceSerial + '@' + device.channelNo,
+					image: result.picList[index],
+					keyWord: result.unnormalReportContent[index]
+				}
+			})
+		});
+	}; 
+
+	onMounted(() => {
+		Init()?.then(result => {
+			_reactive.data.reportList = result;
+		})
+	});
 </script>

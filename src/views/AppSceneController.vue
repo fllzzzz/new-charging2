@@ -145,6 +145,33 @@
 			top: 98px;
 		}
 	}
+
+	#big-video-box {
+		pointer-events: none;
+		width: 1240px;
+		height: 715px;
+		border: 1px solid #00FFFF;
+		border-radius: 0px 0px 8px 0px;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		position: relative;
+		img {
+			z-index: 100;
+			pointer-events: auto;
+			position: absolute;
+			width: 24px;
+			height: 24px;
+			top: 5px;
+			&:first-child {
+				right: 40px;
+			}
+			&:nth-of-type(2) {
+				right: 5px;
+			}
+		}
+	}
 </style>
 
 <template>
@@ -220,7 +247,23 @@
 			<span>15276500709</span>
 		</div>
 		<div class="item" id="left-box">
-			<AppConsole></AppConsole>
+			<AppConsole
+				@videoModelChange="videoBoxChanger"
+			>
+				<template #default="{ fn }">
+					{{ _static.data.appConsoleSlot_fn = fn }}
+				</template>
+			</AppConsole>
+		</div>
+		<div id="big-video-box"
+			v-if="_reactive.state.videoModel === 'big'"
+		>
+			<img 
+				@click="() => videoBoxToSmall()"
+				src="@/assets/images/icon/size-down.png">
+			<img 
+				@click="() => videoBoxToSmall()"
+				src="@/assets/images/icon/close.png">
 		</div>
 	</div>
 </template>
@@ -229,13 +272,38 @@
 	import AppConsole from '@/components/AppConsole.vue';
 
 	import {
-		onUnmounted
+		onUnmounted,
+		reactive
 	} from 'vue';
 
 	import {
 		usePublish,
 		useSubscribe
 	} from '@/hooks/EventEmitter';
+
+	const _reactive = reactive({
+		state: {
+			videoModel: 'small' as 'small' | 'big'
+		}
+	});
+
+	const _static = {
+		data: {
+			appConsoleSlot_fn: null as null | (() => void)
+		}
+	};
+
+	const videoBoxChanger = (
+		model :'small' | 'big'
+	) => {
+		_reactive.state.videoModel = model;
+	};
+
+	const videoBoxToSmall = () => {
+		_reactive.state.videoModel = 'small';
+		_static.data.appConsoleSlot_fn &&
+			_static.data.appConsoleSlot_fn();
+	};
 
 	usePublish('AppFooterModel', 'inside');
 	usePublish('AppFooterState', true);

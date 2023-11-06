@@ -135,6 +135,7 @@
 	});
 
 	enum modelInovke {
+		'close' = 0,
 		'small' = 1,
 		'middle' = 2,
 		'full' = 3
@@ -201,7 +202,7 @@
 		if (!target) return;
 		if (target.code === undefined) return;
 
-		useChangeModle(modelInovke[target.code] as "small" | "middle" | "full" | "small-ext");
+		useChangeModle(modelInovke[target.code] as "small" | "middle" | "full" | "small-ext" | "close");
 
 		hunter(() => _static.data.deviceInfo, {
 			cycle: 10,

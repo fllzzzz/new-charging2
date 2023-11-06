@@ -134,7 +134,6 @@
 				cycle: 10,
 				frequency: 100,
 			}).then(el  => {
-				console.log('jx', el);
 				_reatcive.data.teleportTarget = el as HTMLElement;
 				_reatcive.state.video = true;
 			})
