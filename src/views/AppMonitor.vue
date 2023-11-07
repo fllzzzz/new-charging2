@@ -75,23 +75,23 @@
 		</div>
 		<component
 			class="item video-target"
-			:is="_reatcive.data.videoBoxComp"
+			:is="videoBox.target"
 			:class="boxClassNameSetter"
 			@enter-mulit="enterMulitHandler"
 			@enter-signel="enterSignelHandler"
+			@enter-small="enterSmallHandler"
+			@enter-middle="enterMiddleHandler"
 		></component>
-		<Teleport
-			:to="_reatcive.data.teleportTarget"
-		>
-			<video
-				id="my-player"
-				v-show="_reatcive.state.video"
-			></video>
-		</Teleport>
+		<BaseTeleportVideo
+			v-if="_reatcive.state.telepVideo"
+			:telep-target="_reatcive.data.teleportTarget"
+			:device-info="_reatcive.data.deviceInfo"
+		></BaseTeleportVideo>
 	</div>
 </template>
 
 <script setup lang="ts">
+	import BaseTeleportVideo from '@/components/BaseTeleportVideo.vue';
 
 	import diff from '@/utils/diff';
 	import Hunter from '@/utils/Hunter';
@@ -128,7 +128,7 @@
 		watch,
 		reactive,
 		computed,
-		onUnmounted,
+		onBeforeUnmount,
 		nextTick,
 		onMounted
 	} from 'vue';
@@ -136,13 +136,15 @@
 	const _reatcive = reactive({
 		data: {
 			zIndex: 1100,
-			teleportTarget: 'body' as string | HTMLElement,
-			videoBoxComp: undefined as undefined | Component
+			teleportTarget: undefined as string | undefined,
+			videoBoxComp: undefined as undefined | Component,
+			deviceInfo: undefined as undefined | DeviceInfo
 		},
 		state: {
 			videoBoxModel: 1, // 0: close 1: small, 2: middle, 3: full, 
 			totalBtn: true,
-			video: false
+			video: false,
+			telepVideo: true,
 		}
 	});
 
@@ -168,6 +170,31 @@
 	usePublish('AppFooterState', true);
 	useChangeModle('small');
 
+	const enterMulitHandler = () => {
+		_reatcive.state.telepVideo = false;
+	};
+
+	const enterSignelHandler = () => {
+		_reatcive.state.telepVideo = true;
+		_reatcive.data.teleportTarget =
+			videoBoxCompClassNameMapper.get(videoBox.value.type);
+		_reatcive.data.deviceInfo = _static.temp[0];
+	};
+
+	const enterSmallHandler = () => {
+		_reatcive.state.telepVideo = true;
+		_reatcive.data.teleportTarget =
+			videoBoxCompClassNameMapper.get(videoBox.value.type);
+		_reatcive.data.deviceInfo = _static.temp[0];
+	};
+
+	const enterMiddleHandler = () => {
+		_reatcive.state.telepVideo = true;
+		_reatcive.data.teleportTarget =
+			videoBoxCompClassNameMapper.get(videoBox.value.type);
+		_reatcive.data.deviceInfo = _static.temp[0];
+	};
+
 	_static.data.subscribeIndex = useSubscribe<ctid_12821>('getIFramerMsg_12821', ctx => {
 		diff<ctid_12821>(
 			'ctid_12821', ctx,
@@ -179,27 +206,19 @@
 				return false;
 			},
 			(ctx) => {
+				console.log('jx@ctx2', ctx, videoBox.value.type);
 				_static.temp[0] = ctx;
-				getVideoAddress({
-					deviceSerial: ctx.deviceSerial,
-					channelNo: ctx.channelNo
-				}).then(url => {
-					if(_static.data.player) {
-						_static.data.player.src({
-							type: "video/flv",
-							src: url
-						});
-					}else {
-						usePlayerCreater('my-player').then(player => {
-							_static.data.player = player;
-							player.src({
-								type: "video/flv",
-								src: url
-							});
-						});
-					}
-				}).catch(err => {
-					console.log(err);
+				if(videoBox.value.type !== 'small')
+					useChangeModle('small');
+
+				nextTick(() => {
+					const u = videoBoxCompClassNameMapper.get(videoBox.value.type);
+					console.log('jx',9999999999);
+					console.log('jx@tt',_reatcive.data.teleportTarget);
+					_reatcive.data.teleportTarget = 
+					videoBoxCompClassNameMapper.get(videoBox.value.type);
+
+					_reatcive.data.deviceInfo = ctx;
 				});
 			}
 		);
@@ -209,17 +228,13 @@
 		_reatcive.state.totalBtn = ctx;
 	})
 
-	const enterMulitHandler = () => {
-		_static.data.player && _static.data.player.dispose();
-		_reatcive.state.video = false;
-		_reatcive.data.teleportTarget = 'body';
-	};
+	usePublish('setIframerMsg', {
+		ctid: 12911,
+		state: "open"
+	});
 
-	const enterSignelHandler = (
-		fn :((deviceInfo :DeviceInfo) => void)
-	) => {
-		if(! _static.data.deviceInfo) return;
-		fn(_static.data.deviceInfo);
+	const totalClickHandler = () => {
+		useChangeModle('full');
 	};
 
 	const boxClassNameSetter = computed(() => {
@@ -230,19 +245,8 @@
 		return '';
 	});
 
-	const totalClickHandler = () => {
-		useChangeModle('full');
-	};
-
-	usePublish('setIframerMsg', {
-		ctid: 12911,
-		state: "open"
-	});
-
-	onUnmounted(() => {
-		if(_static.data.subscribeIndex) {
-			useUnSubscribe('getIFramerMsg_12821', _static.data.subscribeIndex);
-		}
+	onBeforeUnmount(() => {
+		_reatcive.data.teleportTarget = undefined;
 
 		if(_static.data.player) {
 			_static.data.player.dispose();
@@ -254,70 +258,12 @@
 		});
 	});
 
-	onMounted(() => {
-		_reatcive.data.videoBoxComp = videoBox.value.target;
-		const className = videoBoxCompClassNameMapper.get(videoBox.value.type);
-		if(!className) return;
-
-		Hunter(() => document.querySelector(className), {
-			cycle: 10,
-			frequency: 100,
-		}).then(el  => {
-			_reatcive.data.teleportTarget = el as HTMLElement;
-			_reatcive.state.video = true;
-		});
-	});
-
-	watch(videoBox, (ctx) => {
-		if(ctx.type === 'full') {
-			_static.data.deviceInfo = _static.temp[0];
-			_reatcive.state.video = false;
-			_reatcive.data.teleportTarget = 'body';
-			_reatcive.data.videoBoxComp = ctx.target;
-			nextTick(() => {
-				const className = videoBoxCompClassNameMapper.get(ctx.type);
-				if(!className) return;
-					Hunter(() => document.querySelector(className), {
-						cycle: 10,
-						frequency: 100,
-					}).then(el  => {
-						_reatcive.data.teleportTarget = el as HTMLElement;
-						_reatcive.state.video = true;
-					});
-			});
-		}else {
-			_reatcive.state.video = false;
-			_reatcive.data.teleportTarget = 'body';
-			_reatcive.data.videoBoxComp = ctx.target;
-			nextTick(() => {
-				const className = videoBoxCompClassNameMapper.get(ctx.type);
-				if(!className) return;
-					
-					Hunter(() => document.querySelector(className), {
-						cycle: 10,
-						frequency: 100,
-					}).then(el  => {
-						_reatcive.data.teleportTarget = el as HTMLElement;
-						_reatcive.state.video = true;
-
-						if(!_static.data.deviceInfo) return;
-						
-						if(!_static.data.player) {
-							usePlayerCreater('my-player').then(player => {
-								_static.data.player = player;
-							});
-						}
-
-						getVideoAddress(_static.data.deviceInfo).then(url => {
-							_static.data.player.src({
-								type: "video/flv",
-								src: url
-							});
-						}).catch(err => {
-							console.log(err);
-						})
-					});
-			});
+	watch(() => videoBox.value.type, type => {
+		if(type === 'close') {
+			_reatcive.state.telepVideo = true;
 		}
+
+		_reatcive.data.teleportTarget =
+			videoBoxCompClassNameMapper.get(type);
 	})
 </script>

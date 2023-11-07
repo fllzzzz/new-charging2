@@ -154,7 +154,7 @@
 		}
 	}
 
-	:deep(.is-active) {
+	:deep(.is-shadow) {
 		width: 99%;
 		height: 99%;
 		position: absolute;
@@ -222,7 +222,7 @@
 						v-for="id, index in _reactive.data.playerList"
 						:key="index"
 					>
-						<video :id="id"></video>
+						<video :id="id" crossOrigin="anonymous"></video>
 					</template>
 				</template>
 			</div>
@@ -273,7 +273,8 @@
 	import {
 		reactive,
 		computed,
-		nextTick
+		nextTick,
+		onBeforeUnmount
 	} from 'vue';
 
 	import {
@@ -287,7 +288,13 @@
 		state :number;
 	};
 
-	const emits = defineEmits(['close', 'enter-mulit', 'enter-signel']);
+	const emits = defineEmits([
+		'close',
+		'enter-mulit',
+		'enter-signel',
+		'enter-small',
+		'enter-middle'
+	]);
 
 	const _reactive = reactive({
 		data: {
@@ -414,9 +421,9 @@
 		if(!pEl) return;
 		for(let i=0; i<pEl.children.length; i++) {
 			if(event.target === pEl.children[i].children[0]) {
-				pEl.children[i].children.namedItem('modal-shadow')!.classList.add('is-active');
+				pEl.children[i].children.namedItem('modal-shadow')!.classList.add('is-shadow');
 			}else {
-				pEl.children[i].children.namedItem('modal-shadow')!.classList.remove('is-active');
+				pEl.children[i].children.namedItem('modal-shadow')!.classList.remove('is-shadow');
 			}
 		}
 	};
@@ -495,12 +502,14 @@
 					usePublish('monitorTotalBtnState', true);
 					usePublish('AppFooterModel', 'inside');
 					useCompStateChanger('AppFooter', true);
+					emits('enter-small');
 					break;
 				case 'to-middle':
 					useChangeModle('middle');
 					usePublish('monitorTotalBtnState', true);
 					usePublish('AppFooterModel', 'inside');
 					useCompStateChanger('AppFooter', true);
+					emits('enter-middle');
 					break;
 				case 'to-mulit':
 					_static.data.playerList.forEach(
@@ -552,4 +561,12 @@
 		useCompStateChanger('AppFooter', true);
 		usePublish('monitorTotalBtnState', true);
 	};
+
+	onBeforeUnmount(() => {
+		_static.data.deviceList.length =0;
+		_static.data.videoClickIndex = undefined;
+		_static.data.playerList.forEach(player => {
+			player.dispose();
+		})
+	});
 </script>

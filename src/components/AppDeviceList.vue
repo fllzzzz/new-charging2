@@ -85,11 +85,11 @@
 		}
 	}
 
-	.is-active {
+	:deep(.is-active) {
 		background: linear-gradient(90deg, rgba(0, 255, 246, 0.5) 0%, transparent 100%);
 	}
 
-	.is-locked {
+	:deep(.is-locked) {
 		&:hover {
 			cursor:not-allowed;
 		}

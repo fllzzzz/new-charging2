@@ -61,7 +61,7 @@ const $default = axios.create({
 
 const $Ezvis = axios.create({
 	timeout: 10000,
-	baseURL: 'http://192.168.1.114:19028/EZvis',
+	baseURL: 'http://192.168.1.95:19028/EZvis',
 	headers: {
 		'Content-Type': 'application/x-www-form-urlencoded'
 	}

@@ -7,16 +7,12 @@ import 'videojs-flvjs-es6';
 import { ElLoading } from 'element-plus'
 import 'element-plus/dist/index.css';
 
-import Hunter from '@/utils/Hunter';
-
 import {
 	onMounted,
 	nextTick
 } from 'vue';
 
-const data = {
-	elLoadingInstance: null as any,
-};
+const playerLoadingMapper = new Map<string, any>();
 
 export type Option = {
 	autoplay? :boolean | 'any';
@@ -35,15 +31,20 @@ type FlvjsOption = {
 }
 
 type UserActions = {
-	doubleClick :boolean;
+	doubleClick? :boolean;
+	click? :boolean;
 };
 
 const _options :Option = {
 	controls: true,
+	autoplay: 'any',
+	userActions: {
+		click: false
+	},
 	children: ['MediaLoader'],
 	flvjs: {
 		mediaDataSource: {
-			isLive: true,
+			isLive: false,
 			cors: true,
 			withCredentials: false,
 		}
@@ -87,27 +88,23 @@ export const usePlayerCreater = async (
 				this.addClass('video-js');
 				(this.el_ as HTMLElement).style.backgroundColor = 'transparent';
 
-/* 				this.on('loadstart', () => {
-					data.elLoadingInstance = ElLoading.service({
-						target: this.el_ as HTMLElement,
-						fullscreen: false,
-						background: 'transparent',
-						customClass: 'el-loading-container'
-					})
+				this.on('loadstart', () => {
+					playerLoadingMapper.set(
+						this.id_,
+						ElLoading.service({
+							target: this.el_ as HTMLElement,
+							fullscreen: false,
+							background: 'transparent',
+							customClass: 'el-loading-container disable_pointer-event'
+						})
+					)
 				});
 
 				this.on('loadedmetadata', () => {
-					if(data.elLoadingInstance) {
-						data.elLoadingInstance.close()
-					}
-				}); */
-
-				data.elLoadingInstance = ElLoading.service({
-					target: this.el_ as HTMLElement,
-					fullscreen: false,
-					background: 'transparent',
-					customClass: 'el-loading-container disable_pointer-event'
-				})
+					const loadInstance = playerLoadingMapper.get(this.id_);
+					if(! loadInstance) return;
+					loadInstance.close();
+				});
 
 				fn && fn(this);
 			}

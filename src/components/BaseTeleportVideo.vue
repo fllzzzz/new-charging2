@@ -134,9 +134,11 @@
 		deviceInfo :DeviceInfo
 	) => {
 		getVideoAddress(deviceInfo).then(url => {
+			console.log('jx', url);
 			if(! _static.data.player) return;
 			_static.data.player.src({
-				type: "video/flv",url
+				type: "video/flv",
+				src: url
 			});
 		})
 	};
@@ -166,7 +168,9 @@
 	});
 
 	watch(() => props.telepTarget, (newValue, oldValue) => {
+		console.log('jx', newValue, oldValue);
 		if(! newValue) return;
+
 		if(newValue === oldValue) return;
 		telepTargetChanger(newValue);
 	}, {
