@@ -286,8 +286,6 @@
 </template>
 
 <script setup lang="ts">
-	import InspectService from '@/hooks/inspectService';
-
 	import {
 		useInspectReportMaker
 	} from '@/hooks/InspectManager';

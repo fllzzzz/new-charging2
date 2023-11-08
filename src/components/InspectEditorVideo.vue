@@ -227,8 +227,6 @@
 </template>
 
 <script setup lang="ts">
-	import InspectService from '@/hooks/inspectService';
-
 	import type {
 		ctid_13021
 	} from '@/types';
