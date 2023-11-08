@@ -43,7 +43,8 @@
 	} from '@/types';
 
 	import type {
-		PropType
+		PropType,
+		WatchStopHandle
 	} from 'vue';
 
 	import {
@@ -83,7 +84,8 @@
 
 	const _static = {
 		data: {
-			player: null as null | Player
+			player: null as null | Player,
+			watcherList: [] as WatchStopHandle[]
 		}
 	};
 
@@ -134,7 +136,6 @@
 		deviceInfo :DeviceInfo
 	) => {
 		getVideoAddress(deviceInfo).then(url => {
-			console.log('jx', url);
 			if(! _static.data.player) return;
 			_static.data.player.src({
 				type: "video/flv",
@@ -163,23 +164,30 @@
 	});
 
 	onBeforeUnmount(() => {
+		console.log('jx','comp telep unmount');
 		_static.data.player &&
 			_static.data.player.dispose();
+			_static.data.watcherList.forEach(watcher => {
+				watcher();
+			})
 	});
 
-	watch(() => props.telepTarget, (newValue, oldValue) => {
-		console.log('jx', newValue, oldValue);
-		if(! newValue) return;
+	_static.data.watcherList.push(
+		watch(() => props.telepTarget, (newValue, oldValue) => {
+			if(! newValue) return;
 
-		if(newValue === oldValue) return;
-		telepTargetChanger(newValue);
-	}, {
-		immediate: true
-	})
+			if(newValue === oldValue) return;
+			telepTargetChanger(newValue);
+		}, {
+			immediate: true
+		})
+	);
 
-	watch(() => props.deviceInfo, (newValue, oldValue) => {
-		if(! newValue) return;
-		if(newValue === oldValue) return;
-		playerSrcChanger(newValue);
-	});
+	_static.data.watcherList.push(
+		watch(() => props.deviceInfo, (newValue, oldValue) => {
+			if(! newValue) return;
+			if(newValue === oldValue) return;
+			playerSrcChanger(newValue);
+		})
+	);
 </script>

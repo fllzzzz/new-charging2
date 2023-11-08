@@ -168,16 +168,17 @@
 	usePublish('AppHeaderL2State', false);
 	usePublish('AppFooterModel', 'inside');
 	usePublish('AppFooterState', true);
-	useChangeModle('small');
+	useChangeModle('close');
 
 	const enterMulitHandler = () => {
 		_reatcive.state.telepVideo = false;
+		_reatcive.data.teleportTarget = 'body';
 	};
 
 	const enterSignelHandler = () => {
-		_reatcive.state.telepVideo = true;
 		_reatcive.data.teleportTarget =
 			videoBoxCompClassNameMapper.get(videoBox.value.type);
+			_reatcive.state.telepVideo = true;
 		_reatcive.data.deviceInfo = _static.temp[0];
 	};
 
@@ -206,20 +207,14 @@
 				return false;
 			},
 			(ctx) => {
-				console.log('jx@ctx2', ctx, videoBox.value.type);
 				_static.temp[0] = ctx;
 				if(videoBox.value.type !== 'small')
 					useChangeModle('small');
 
-				nextTick(() => {
-					const u = videoBoxCompClassNameMapper.get(videoBox.value.type);
-					console.log('jx',9999999999);
-					console.log('jx@tt',_reatcive.data.teleportTarget);
-					_reatcive.data.teleportTarget = 
-					videoBoxCompClassNameMapper.get(videoBox.value.type);
-
-					_reatcive.data.deviceInfo = ctx;
-				});
+				_reatcive.data.teleportTarget = videoBoxCompClassNameMapper.get(
+					videoBox.value.type
+				);
+				_reatcive.data.deviceInfo = ctx;
 			}
 		);
 	});

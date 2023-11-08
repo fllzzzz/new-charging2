@@ -139,7 +139,7 @@
 	}
 
 	.video-player-box {
-		width: 763px;
+		width: 50%;
 		height: 474px;
 		background-repeat: no-repeat;
 		background-size: 100% 100%;
@@ -222,7 +222,7 @@
 						v-for="id, index in _reactive.data.playerList"
 						:key="index"
 					>
-						<video :id="id" crossOrigin="anonymous"></video>
+						<video :id="id"></video>
 					</template>
 				</template>
 			</div>
@@ -514,9 +514,10 @@
 				case 'to-mulit':
 					_static.data.playerList.forEach(
 						player => player.dispose()
-					)
-					emits('enter-mulit')
+					);
+					_static.data.playerList.length = 0;
 					_reactive.state.model = 'mulit';
+					emits('enter-mulit')
 					nextTick(() => {
 						mulitModelHandler();
 					});
@@ -524,21 +525,10 @@
 				case 'to-signel':
 					_static.data.playerList.forEach(
 						player => player.dispose()
-					)
-					emits('enter-signel',(
-						deviceInfo :DeviceInfo
-					) => {
-						_reactive.state.model = 'signel';
-						getVideoAddress(deviceInfo).then(url => {
-							usePlayerCreater('my-player').then(player => {
-								_static.data.playerList.push(player);
-								player.src({
-									type: "video/flv",
-									src: url
-								});
-							});
-						}).catch(err => console.log(err))
-					});
+					);
+					_static.data.playerList.length = 0;
+					_reactive.state.model = 'signel';
+					emits('enter-signel');
 					break;
 			}
 		}]

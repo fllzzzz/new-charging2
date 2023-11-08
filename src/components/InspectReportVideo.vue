@@ -337,10 +337,6 @@
 		}
 	});
 
-	InspectService.fn = (msg) => {
-		console.log('jx', 'InspectService.fn()', msg);
-	};
-
 	const optionsHandler = (
 		name :string
 	) => {
