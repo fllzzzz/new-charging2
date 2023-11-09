@@ -164,7 +164,6 @@
 	});
 
 	onBeforeUnmount(() => {
-		console.log('jx','comp telep unmount');
 		_static.data.player &&
 			_static.data.player.dispose();
 			_static.data.watcherList.forEach(watcher => {

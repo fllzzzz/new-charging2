@@ -34,8 +34,6 @@ export type InspectVideoReport = {
 	[key :string] :any;
 };
 
-
-
 export const tokenStorage = ref<string | undefined>(undefined);
 
 enum directions {
@@ -67,6 +65,12 @@ const $Ezvis = axios.create({
 	}
 });
 
+const firstLetterToUpperCase = (str :string) => {
+	const firstLetter = str[0];
+	const _str = str.slice(1,str.length);
+	return firstLetter.toLocaleUpperCase().concat(_str);
+};
+
 const pullFormat = <T=any>(data :object) => {
 	const objArr = Object.entries(data);
 	objArr.forEach(row => {
@@ -79,6 +83,20 @@ const pullFormat = <T=any>(data :object) => {
 		}
 	});
 	return Object.fromEntries(objArr) as T;
+};
+
+const pushFormat = (
+	data :any
+) => {
+	const _u = Object.entries(data);
+	_u.forEach(row => {
+		if(typeof row[1] === 'object' &&
+			row[1] !== null
+		) {
+			row[1] = JSON.stringify(row[1]);
+		}
+	});
+	return Object.fromEntries(_u);
 };
 
 export const getToken = async () => {
@@ -124,6 +142,19 @@ export const getVideoAddress = async (
 	}).then(res => res.data)
 	.then(result => JSON.parse(result.Data))
 	.then(result => result.data.url);
+}
+
+export const getDeviceCapture = async (
+	deviceInfo :DeviceInfo
+) :Promise<string> => {
+	return await $Ezvis({
+		method: 'post',
+		data: {
+			Act: 'DeviceCapture',
+			...deviceInfo
+		},
+	}).then(res => res.data)
+	.then(result => result.Data)
 }
 
 export const getInspectHistoryList = (
@@ -184,21 +215,54 @@ export const getInspectVideoReport = (
 	.then(inspectVideoReportList => inspectVideoReportList[0])
 };
 
-export const getInspectAlarmList = (
-	stationId :number
+export const setInspectHistory = (
+	data :any
 ) => {
+	const _u = Object.entries(data);
+	for(let i=0; i<_u.length; i++) {
+		_u[i][0] = firstLetterToUpperCase(_u[i][0]);
+	}
+
+	data = Object.fromEntries(_u);
+	data = pushFormat(data);
+
 	return $default({
 		method: 'post',
-		url: '/report_list/GetReportList',
-		data: {
-			'station_id': stationId
+		url: '/report_list/Add',
+		data: JSON.stringify({
+			mainData: {...data},
+			detailData: null,
+			delKeys: null
+		}),
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: 'Bearer ' + tokenStorage.value
 		}
-	})
-	.then(res => res.data)
-	.then(result => result.data as any[])
-	.then(list => {
-		return list.map(item => {
-			return pullFormat<InspectHistory>(item)
-		});
-	});
+	}).then(result => console.log(result))
+};
+
+export const updateInspectHistory = (
+	data :any
+) => {
+	const _u = Object.entries(data);
+	for(let i=0; i<_u.length; i++) {
+		_u[i][0] = firstLetterToUpperCase(_u[i][0]);
+	}
+
+	data = Object.fromEntries(_u);
+	data = pushFormat(data);
+
+	return $default({
+		method: 'post',
+		url: '/report_list/Update',
+		data: JSON.stringify({
+			mainData: {...data},
+			detailData: null,
+			delKeys: null
+		}),
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: 'Bearer ' + tokenStorage.value
+		}
+	}).then(result => console.log(result))
 };

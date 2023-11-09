@@ -227,8 +227,15 @@
 </template>
 
 <script setup lang="ts">
+	import InspectHistoryService from '@/hooks/inspectHistoryService';
+
+	import {
+		getDeviceCapture
+	} from '@/api/default';
+
 	import type {
-		ctid_13021
+		ctid_13021,
+		DeviceInfo
 	} from '@/types';
 
 	import {
@@ -241,7 +248,8 @@
 	} from '@/hooks/InspectManager';
 
 	import {
-		useRouter
+		useRouter,
+		useRoute
 	} from 'vue-router';
 
 	import {
@@ -259,12 +267,23 @@
 			type: String as PropType<Model>,
 			required: false,
 			default: undefined
-		}
+		},
+		reportId: {
+			type: Number,
+			required: false,
+			default: undefined
+		},
+		deviceInfo: {
+			type: Object as PropType<DeviceInfo>,
+			required: false,
+			default: null
+		},
 	});
 
 	const emits = defineEmits(['destory']);
 
 	const router = useRouter();
+	const route = useRoute();
 
 	const _reactive = reactive({
 		data: {
@@ -300,6 +319,52 @@
 		}
 	});
 
+	const _static = {
+		data: {
+			deviceInfo: {} as DeviceInfo
+		}
+	};
+
+	const configInit = () => ({
+		reportID: (function(id) {
+			if(id) return id;
+			return Date.now();
+		})(props.reportId),
+		type: (function(path) {
+			if(! path) return '';
+			const isVideo = path.search(new RegExp('video$'));
+			const isDigital = path.search(new RegExp('digital$'));
+
+			if(isVideo !== -1 ) return '视频巡检';
+			if(isDigital !== -1) return '数字巡检';
+			return '';
+		})(route.path),
+	});
+
+	const configCreate = async (
+		keyWords :string[]
+	) => ({
+		deviceInfo: (function() {
+			if(props.deviceInfo) return props.deviceInfo;
+			if(_static.data.deviceInfo) return _static.data.deviceInfo;
+			return {
+				deviceSerial: '',
+				channelNo: -1
+			} as DeviceInfo
+		})(),
+		image: await (async function() {
+			if(props.deviceInfo)
+				return await getDeviceCapture(props.deviceInfo);
+			if(_static.data.deviceInfo)
+				return await getDeviceCapture(_static.data.deviceInfo);
+			return '';
+		})(),
+		keyWords,
+		result: [0,0],
+		stationId: 1,
+		...configInit()
+	});
+
 	const clickEventInvoke = new Map<string, ((
 		event?: MouseEvent,
 		...args :any[]
@@ -320,6 +385,15 @@
 				ctid: 13111,
 				number: (_reactive.data.to3Dflg).toString()
 			});
+			configCreate(
+					_reactive.data.cheeckBoxGroupData
+			).then(config => {
+				if(props.model === 'editor')
+				console.log('jx', config);
+					InspectHistoryService.update(1, config);
+				if(props.model === 'maker')
+					InspectHistoryService.push(config);
+			});
 		}],
 		['preset', () => {
 			if(_reactive.data.to3Dflg < 1) return;
@@ -332,6 +406,8 @@
 	]);
 
 	useSubscribe<ctid_13021>('getIFramerMsg_13021', (ctx) => {
+		_static.data.deviceInfo.channelNo = ctx.channelNo;
+		_static.data.deviceInfo.deviceSerial = ctx.deviceSerial;
 		_reactive.data.inspectStatus.pace = parseInt(ctx.percent);
 	});
 

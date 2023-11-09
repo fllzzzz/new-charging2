@@ -43,6 +43,14 @@ export const useInspectListGetter = () => {
 	return arr;
 };
 
+export const useInspectListGetterReverse = () => {
+	let arr :string[] = [];
+	for(const i of inspectContentInvokeMap) {
+		arr = arr.concat(i[0]);
+	}
+	return arr;
+};
+
 export const useInspectHistoryContentMaker = (targetList :string[]) => {
 	return invokeMapFinder(
 		inspectContentInvokeMap,

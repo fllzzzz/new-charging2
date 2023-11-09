@@ -206,6 +206,15 @@
 			box-sizing: border-box;
 		}
 	}
+
+	.editor-box {
+		pointer-events: auto;
+		position: fixed;
+		bottom: 10px;
+		left: 0;
+		width: 100vw;
+		height: 91px;
+	}
 </style>
 
 <template>
@@ -245,7 +254,7 @@
 												:key="btn.id"
 											>
 												<img :src="btn.image" :id="btn.name"
-													@click="() => optionsHandler(btn.name)"
+													@click="() => optionsHandler(btn.name, item)"
 												>	
 											</template>
 										</div>
@@ -282,10 +291,20 @@
 				<span>下载报告</span>
 			</div>
 		</div>
+		<InspectEditorVideo
+			v-if="_reactive.state.editorBox"
+			class="editor-box"
+			model='editor'
+			:device-info="_reactive.data.device"
+			:report-id="inspectReportId"
+			@destory="_reactive.state.editorBox = false"
+		></InspectEditorVideo>
 	</div>
 </template>
 
 <script setup lang="ts">
+	import InspectEditorVideo from './InspectEditorVideo.vue';
+
 	import {
 		useInspectReportMaker
 	} from '@/hooks/InspectManager';
@@ -318,7 +337,11 @@
 	const emits = defineEmits(['close', 'monitor', 'editor']);
 
 	const _reactive = reactive({
+		state: {
+			editorBox: false
+		},
 		data: {
+			device: {} as DeviceInfo,
 			btnList: [
 				{
 					id: 1,
@@ -336,10 +359,14 @@
 	});
 
 	const optionsHandler = (
-		name :string
+		name :string,
+		...args :any[]
 	) => {
 		if(name === 'monitor') emits('monitor');
-		if(name === 'editor') emits('editor');
+		if(name === 'editor') {
+			_reactive.state.editorBox = true;
+			_reactive.data.device = (args[0] as ReportList).deviceInfo;
+		}
 	};
 
 	const closeHandler = () => {
@@ -360,7 +387,7 @@
 	
 	const Init = () => {
 		if(! inspectReportId.value) return;
-		return getInspectVideoReport(1697709299).then(result => {
+		return getInspectVideoReport(inspectReportId.value).then(result => {
 			return result.cameraList.map<ReportList>((device, index) => {
 				return {
 					id: index,

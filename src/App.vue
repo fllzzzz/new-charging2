@@ -24,7 +24,7 @@
 <script setup lang="ts">
 	import {
 		getToken,
-		tokenStorage
+		tokenStorage,
 	} from '@/api/default';
 
 	import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
