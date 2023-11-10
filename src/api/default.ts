@@ -155,16 +155,19 @@ export const getDeviceCapture = async (
 		},
 	}).then(res => res.data)
 	.then(result => result.Data)
+	.catch(() => '');
 }
 
 export const getInspectHistoryList = (
-	stationId :number
+	stationId :number,
+	pageId :number
 ) => {
 	return $default({
 		method: 'post',
 		url: '/report_list/GetReportList',
 		data: {
-			'station_id': stationId
+			'station_id': stationId,
+			page: pageId
 		}
 	})
 	.then(res => res.data)
@@ -265,4 +268,15 @@ export const updateInspectHistory = (
 			Authorization: 'Bearer ' + tokenStorage.value
 		}
 	}).then(result => console.log(result))
+};
+
+export const getInspectTotalNum = (
+	model :'history' | 'alarm'
+) => {
+	return $default({
+		method: 'post',
+		url: '/report_list/GetCount',
+	})
+	.then(res => res.data)
+	.then(result => (result.data as number))
 };

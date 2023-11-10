@@ -253,7 +253,11 @@
 	} from 'vue-router';
 
 	import {
-		reactive
+		reactive,
+		onMounted,
+		watch,
+		onBeforeUnmount,
+nextTick
 	} from 'vue';
 
 	import type{
@@ -280,7 +284,9 @@
 		},
 	});
 
-	const emits = defineEmits(['destory']);
+	const emits = defineEmits(['destory',
+		'open-report','close-report'
+	]);
 
 	const router = useRouter();
 	const route = useRoute();
@@ -389,11 +395,11 @@
 					_reactive.data.cheeckBoxGroupData
 			).then(config => {
 				if(props.model === 'editor')
-				console.log('jx', config);
 					InspectHistoryService.update(1, config);
 				if(props.model === 'maker')
 					InspectHistoryService.push(config);
 			});
+			_reactive.data.cheeckBoxGroupData.length = 0;
 		}],
 		['preset', () => {
 			if(_reactive.data.to3Dflg < 1) return;
@@ -402,6 +408,7 @@
 				ctid: 13111,
 				number: (_reactive.data.to3Dflg).toString()
 			});
+			_reactive.data.cheeckBoxGroupData.length = 0;
 		}]
 	]);
 
@@ -411,26 +418,43 @@
 		_reactive.data.inspectStatus.pace = parseInt(ctx.percent);
 	});
 
+	watch(() => _reactive.data.inspectStatus.pace, (flg) => {
+		if(_reactive.data.to3Dflg === 0) {
+			_reactive.data.btnLocker = 'preset';
+		}else if(flg === 100){
+			const target = _reactive.data.btnList.find(item => {
+				return item.name === 'next'
+			});
+			if(! target) return;
+			target.showName = '巡检报告';
+			const el = document.getElementById(target.name);
+			if(!el ) return;
+			el.onclick = function(e) {
+				emits('open-report')
+				e.preventDefault();
+				e.stopPropagation();
+			}
+		}else {
+			_reactive.data.btnLocker = '';
+		}
+	}, {
+		immediate: true,
+	})
+
 	const clickEventHandler = (event :MouseEvent) => {
 		const id = (event.target as HTMLElement).id;
-
-		if(_reactive.data.to3Dflg === 0) {
-			if(id === 'preset') {
-				_reactive.data.btnLocker = 'preset';
-				event.preventDefault();
-				return;
-			}
-		}else if(_reactive.data.to3Dflg > 0) {
-			if(_reactive.data.inspectStatus.pace === 100)
-				if(id === 'next') {
-					_reactive.data.btnLocker = 'next';
-					event.preventDefault();
-					return;
-				}
-		}
 
 		const fn = clickEventInvoke.get(id);
 		if(!fn) return;
 		fn()
 	};
+
+	onMounted(() => {
+		InspectHistoryService.init();
+	});
+
+	onBeforeUnmount(() => {
+		_reactive.data.inspectStatus.pace = 0;
+		_reactive.data.cheeckBoxGroupData.length = 0;
+	})
 </script>

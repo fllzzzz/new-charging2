@@ -80,6 +80,9 @@
 						box-sizing: border-box;
 						&:nth-of-type(1) {
 							width: 250px;
+							display: flex;
+							justify-content: center;
+							align-items: center;
 							img {
 								width: 100%;height: 100%;
 								object-fit: fill;
@@ -215,6 +218,10 @@
 		width: 100vw;
 		height: 91px;
 	}
+
+	.load-failed {
+		color: red;
+	}
 </style>
 
 <template>
@@ -240,7 +247,16 @@
 						>
 							<div class="block">
 								<div class="district">
-									<img :src="item.image">
+									<template
+										v-if="item.image"
+									>
+										<img :src="item.image">
+									</template>
+									<template v-else>
+										<span
+											class="load-failed"
+										>加载失败</span>
+									</template>
 								</div>
 								<div class="district">
 									<div class="row">
@@ -254,6 +270,7 @@
 												:key="btn.id"
 											>
 												<img :src="btn.image" :id="btn.name"
+													v-if="! (btn.name === 'editor' && props.dispableEditor)"
 													@click="() => optionsHandler(btn.name, item)"
 												>	
 											</template>
@@ -306,6 +323,15 @@
 	import InspectEditorVideo from './InspectEditorVideo.vue';
 
 	import {
+		useRoute
+	} from 'vue-router';
+
+	import {
+		useReportUpdater,
+		useReportMaker
+	} from '@/store/videoReport';
+
+	import {
 		useInspectReportMaker
 	} from '@/hooks/InspectManager';
 
@@ -324,6 +350,7 @@
 	import {
 		reactive,
 		onMounted,
+		watch
 	} from 'vue';
 
 	type ReportList = {
@@ -333,6 +360,16 @@
 		image :string;
 		keyWord :string[];
 	};
+
+	const props = defineProps({
+		dispableEditor: {
+			type: Boolean,
+			required: false,
+			default: false
+		}
+	});
+
+	const route = useRoute();
 
 	const emits = defineEmits(['close', 'monitor', 'editor']);
 
@@ -398,11 +435,29 @@
 				}
 			})
 		});
-	}; 
+	};
+
+	useReportUpdater((ctx) => {
+		const target = _reactive.data.reportList.find(item => {
+			if(
+				item.deviceInfo.channelNo === ctx.device.channelNo &&
+				item.deviceInfo.deviceSerial === ctx.device.deviceSerial
+			) return true;
+		});
+		if(! target) return;
+		target.keyWord = ctx.keyWords;
+	});
 
 	onMounted(() => {
-		Init()?.then(result => {
-			_reactive.data.reportList = result;
-		})
+		const {path} = route;
+		if(path.search(new RegExp('(video)|(digital)')) !== -1) {
+			useReportMaker((ctx) => {
+				_reactive.data.reportList = ctx;
+			});
+		}else {
+			Init()?.then(result => {
+				_reactive.data.reportList = result;
+			})
+		}
 	});
 </script>

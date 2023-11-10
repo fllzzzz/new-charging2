@@ -103,6 +103,7 @@
 		></InspectTable>
 		<BasePagination
 			class="base-pagination-container"
+			@page-change="pageChanger"
 		></BasePagination>
 		<component
 			:is="_reactive.data.reportModel"
@@ -393,10 +394,13 @@
 		_reactive.data.reportModel = null;
 	};
 
-	const getHistoryModelData = () => {
+	const getHistoryModelData = (
+		stationId = 1,
+		pageId = 1,
+	) => {
 		return Promise.all([
-			getInspectHistoryList(1),
-			getStationInfo(1)
+			getInspectHistoryList(stationId, pageId),
+			getStationInfo(stationId)
 		]).then(dataList => {
 			return dataList[0].map<TableRow>((item, index) => ({
 				id: index + 1,
@@ -408,6 +412,14 @@
 				reportID: item.reportID,
 				options: ['查看报告', '下载报告'],
 			}));
+		});
+	};
+
+	const pageChanger = (index :number) => {
+		getHistoryModelData(1, index).then(result => {
+			_reactive.data.tableData.columnList = 
+				_static.data.historyModel.columnList;
+			_reactive.data.tableData.rowList = result;
 		});
 	};
 

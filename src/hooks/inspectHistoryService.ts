@@ -1,4 +1,9 @@
 import {
+	useReportUpdater,
+	useReportMaker
+} from '@/store/videoReport';
+
+import {
 	getInspectHistoryList,
 	getInspectVideoReport,
 	setInspectHistory,
@@ -53,7 +58,7 @@ export default class InspectHistoryService {
 	protected static async generateInspectList(
 		listPageNum :number,
 	) {
-		const historyList = await getInspectHistoryList(listPageNum);
+		const historyList = await getInspectHistoryList(listPageNum, 1);
 		const reportList = await Promise.allSettled(
 			historyList.map(item => item.reportID).map(
 				id => getInspectVideoReport(id)
@@ -81,6 +86,20 @@ export default class InspectHistoryService {
 		})
 	}
 
+	public static init() {
+		this.reqData = {
+			stationID: -1,
+			ReportTime: '',
+			reportContent: [],
+			type: '',
+			reportID: -1,
+			result: [],
+			cameraList: [],
+			picList: [],
+			unnormalReportContent: []
+		};
+	}
+
 	public static push(
 		params :Param
 	) {
@@ -94,6 +113,17 @@ export default class InspectHistoryService {
 		this.reqData.unnormalReportContent.push(params.keyWords);
 		this.reqData.reportID = params.reportID ? params.reportID : Date.now();
 	
+		const _u = this.reqData.cameraList.map((device, index) => {
+			return {
+				id: index,
+				deviceInfo: device,
+				title: device.deviceSerial + '@' + device.channelNo,
+				image: this.reqData.picList[index],
+				keyWord: this.reqData.unnormalReportContent[index],
+			}
+		});
+		useReportMaker(undefined, _u);
+
 		setInspectHistory(this.reqData);
 	}
 
@@ -124,6 +154,10 @@ export default class InspectHistoryService {
 
 		target.result = [target.unnormalReportContent.length, alarmList.length];
 	
+		useReportUpdater(undefined, {
+			device: params.deviceInfo,
+			keyWords: params.keyWords
+		})
 		updateInspectHistory(target);
 	}
 }

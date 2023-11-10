@@ -29,12 +29,19 @@
 		height: 100%;
 		object-fit: fill;
 	}
+
+	.report-container {
+		position: fixed;
+		top: 100px;
+		right: 30px;
+	}
 </style>
 
 <template>
 	<div class="inspect-container">
 		<InspectEditorVideo
 			model="maker"
+			@open-report="openReportHandler"
 		></InspectEditorVideo>
 		<component
 			class="video-target"
@@ -49,10 +56,17 @@
 				v-show="_reatcive.state.video"
 			></video>
 		</Teleport>
+		<InspectReportVideo
+			class="report-container"
+			:dispable-editor="true"
+			v-if="_reatcive.state.report"
+		></InspectReportVideo>
 	</div>
 </template>
 
 <script setup lang="ts">
+	import InspectReportVideo from '@/components/InspectReportVideo.vue';
+
 	import type {
 		Component
 	} from 'vue';
@@ -89,7 +103,8 @@
 			videoBoxComp: undefined as undefined | Component
 		},
 		state: {
-			video: false
+			video: false,
+			report: false
 		}
 	});
 
@@ -107,6 +122,11 @@
 			return 'is-middle'
 		return '';
 	});
+
+	const openReportHandler = () => {
+		useChangeModle('close');
+		_reatcive.state.report = true;
+	};
 
 	onMounted(() => {
 		_reatcive.data.videoBoxComp = videoBox.value.target;

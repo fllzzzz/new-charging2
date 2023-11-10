@@ -111,9 +111,9 @@
 						:width="column.width * screenManager.currentRatio.value[0]"
 						align="center"
 						>
-						<!-- <template #default="{row}">
+						<template #default="{row}">
 							{{ `本次任务需巡检${row.inspectResult[0]}个，异常${row.inspectResult[1]}个`}}
-						</template> -->
+						</template>
 					</el-table-column>
 				</template>
 				<template v-else>

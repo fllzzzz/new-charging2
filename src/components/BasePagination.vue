@@ -83,16 +83,45 @@
 		<el-pagination
 			background
 			layout="total, prev, pager, next, jumper"
-			:total="1000"
-			:page-count="6"
-			:pager-count="5"
+			:total="_reatcive.data.totle"
+			:page-count="_reatcive.data.pageCount"
+			:pager-count="_reatcive.data.pagerCount"
 			prev-text="上一页"
 			next-text="下一页"
+			@current-change="pageChanger"
 		>
 		</el-pagination>
 	</div>
 </template>
 
 <script setup lang="ts">
+	import {
+		getInspectTotalNum
+	} from '@/api/default';
 
+	import {
+		reactive,
+		onMounted
+	} from 'vue';
+
+	const emits = defineEmits([
+		'page-change'
+	]);
+
+	const _reatcive = reactive({
+		data: {
+			totle: -1,
+			pageCount: -1,
+			pagerCount: 5
+		}
+	});
+
+	getInspectTotalNum('history').then(result => {
+		_reatcive.data.totle = result;
+		_reatcive.data.pageCount = result / 15 ;
+	})
+
+	const pageChanger = (index :number) => {
+		emits('page-change', index);
+	}
 </script>
