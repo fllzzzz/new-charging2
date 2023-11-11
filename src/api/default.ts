@@ -16,6 +16,15 @@ type InspectHistory = {
 	result :number[];
 };
 
+type InspectAlarm = {
+	alarmID :string;
+	alarmContent :string[];
+	cameraName :string;
+	alarmTime :string;
+	type :string[];
+	status: string;
+};
+
 type StationInfo = {
 	id :number;
 	stationID :number;
@@ -153,6 +162,7 @@ export const getDeviceCapture = async (
 			Act: 'DeviceCapture',
 			...deviceInfo
 		},
+		timeout: 3000,
 	}).then(res => res.data)
 	.then(result => result.Data)
 	.catch(() => '');
@@ -175,6 +185,27 @@ export const getInspectHistoryList = (
 	.then(list => {
 		return list.map(item => {
 			return pullFormat<InspectHistory>(item)
+		});
+	});
+};
+
+export const getInspectAlarmList = (
+	stationId :number,
+	pageId :number
+) => {
+	return $default({
+		method: 'post',
+		url: '/alarm_list/GetAlarmList',
+		data: {
+			'station_id': stationId,
+			page: pageId
+		}
+	})
+	.then(res => res.data)
+	.then(result => result.data as any[])
+	.then(list => {
+		return list.map(item => {
+			return pullFormat<InspectAlarm>(item)
 		});
 	});
 };
@@ -273,10 +304,31 @@ export const updateInspectHistory = (
 export const getInspectTotalNum = (
 	model :'history' | 'alarm'
 ) => {
+	if(model === 'history')
+		return $default({
+			method: 'post',
+			url: '/report_list/GetCount',
+		})
+		.then(res => res.data)
+		.then(result => (result.data as number));
+	if(model === 'alarm')
+		return $default({
+			method: 'post',
+			url: '/alarm_list/GetCount',
+		})
+		.then(res => res.data)
+		.then(result => (result.data as number));
+};
+
+export const getAlarmReportImage = (
+	id: string
+) => {
 	return $default({
 		method: 'post',
-		url: '/report_list/GetCount',
+		url: '/alarm_list/GetAlarmPic',
+		timeout: 3000
 	})
 	.then(res => res.data)
-	.then(result => (result.data as number))
+	.then(result => result.data as any[])
+	.then(data => data[0].picList as string)
 };

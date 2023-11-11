@@ -314,7 +314,9 @@
 			model='editor'
 			:device-info="_reactive.data.device"
 			:report-id="inspectReportId"
-			@destory="_reactive.state.editorBox = false"
+			:btn-state="_reactive.data.reportBtnState"
+			@destory="editorDestoryHandler"
+			@editor-change="editorChanger"
 		></InspectEditorVideo>
 	</div>
 </template>
@@ -378,6 +380,10 @@
 			editorBox: false
 		},
 		data: {
+			reportBtnState: {
+				next: 0,
+				preset: 0
+			},
 			device: {} as DeviceInfo,
 			btnList: [
 				{
@@ -395,6 +401,125 @@
 		}
 	});
 
+	const editorDestoryHandler = () => {
+		_reactive.state.editorBox = false;
+		_reactive.data.reportBtnState.next = 1;
+		_reactive.data.reportBtnState.preset = 1;
+	};
+
+	const editorNextHandler = (() => {
+		/* let _device :DeviceInfo | undefined; */
+
+		const _device = new Proxy({
+			d: undefined as undefined | DeviceInfo
+		}, {
+			get(target, p, receiver) {
+				const index = _reactive.data.reportList.findIndex(item => {
+					if(
+						target.d?.channelNo === item.deviceInfo.channelNo &&
+						target.d?.deviceSerial === item.deviceInfo.deviceSerial
+					) return true;
+				})
+
+				if(index === 0) {
+					_reactive.data.reportBtnState.next = 1;
+					_reactive.data.reportBtnState.preset = 0;
+				}else if (index === _reactive.data.reportList.length - 1) {
+					_reactive.data.reportBtnState.next = 0;
+					_reactive.data.reportBtnState.preset = 1;
+				}else {
+					_reactive.data.reportBtnState.next = 1;
+					_reactive.data.reportBtnState.preset = 1;
+				}
+				return Reflect.get(target, p, receiver);
+			},
+			set(target, p, newValue, receiver) {
+				Reflect.set(target, p, newValue);
+
+				const index = _reactive.data.reportList.findIndex(item => {
+					if(
+						target.d?.channelNo === item.deviceInfo.channelNo &&
+						target.d?.deviceSerial === item.deviceInfo.deviceSerial
+					) return true;
+				})
+				
+				if(index === 0) {
+					_reactive.data.reportBtnState.next = 1;
+					_reactive.data.reportBtnState.preset = 0;
+				}else if (index === _reactive.data.reportList.length - 1) {
+					_reactive.data.reportBtnState.next = 0;
+					_reactive.data.reportBtnState.preset = 1;
+				}else {
+					_reactive.data.reportBtnState.next = 1;
+					_reactive.data.reportBtnState.preset = 1;
+				}
+
+				return true;
+			},
+		});
+
+		function finder(
+			device :DeviceInfo | undefined
+		) :number | undefined {
+			if(! device) return;
+			const index = _reactive.data.reportList.findIndex(item => {
+				if(
+					item.deviceInfo.channelNo === device.channelNo &&
+					item.deviceInfo.deviceSerial === device.deviceSerial
+				) return true;
+			});
+
+			if(
+				(index && index === -1) ||
+				(! index && index !== 0) 
+			) return;
+
+			return index;
+		}
+
+		function next(
+			index :number | undefined
+		) :DeviceInfo | undefined {
+			if(! index && index !== 0) return;
+			if(index + 1 < _reactive.data.reportList.length) {
+				_device.d = _reactive.data.reportList[index + 1].deviceInfo;
+				return _reactive.data.reportList[index + 1].deviceInfo;
+			}
+			return undefined;
+		}
+
+		function preset(
+			index :number | undefined
+		) :DeviceInfo | undefined {
+			if(! index && index !== 0) return;
+			if(index - 1 >= 0) {
+				_device.d = _reactive.data.reportList[index - 1].deviceInfo;
+				return _reactive.data.reportList[index - 1].deviceInfo;
+			}
+			return undefined;
+		}
+
+		return (
+			model :'next' | 'preset' | 'push',
+			device? :DeviceInfo
+		) => {
+			switch(model){
+				case 'next':
+					return next(finder(_device.d));
+				case 'preset':
+					return preset(finder(_device.d));
+				case 'push':
+					_device.d = device;
+			}
+		};
+	})();
+
+	const editorChanger = (model :'next' | 'preset') => {
+		const u = editorNextHandler(model);
+		if(! u) return;
+		_reactive.data.device = u;
+	};
+
 	const optionsHandler = (
 		name :string,
 		...args :any[]
@@ -403,6 +528,7 @@
 		if(name === 'editor') {
 			_reactive.state.editorBox = true;
 			_reactive.data.device = (args[0] as ReportList).deviceInfo;
+			editorNextHandler('push', (args[0] as ReportList).deviceInfo);
 		}
 	};
 

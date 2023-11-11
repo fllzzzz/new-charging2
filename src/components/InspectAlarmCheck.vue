@@ -265,12 +265,24 @@
 	} from 'vue-router';
 
 	import {
-		reactive
+		reactive,
+		onMounted
+	} from 'vue';
+
+	import type {
+		PropType
 	} from 'vue';
 
 	const router = useRouter();
 
 	const emits = defineEmits(['close']);
+
+	const props = defineProps({
+		data: {
+			type: Object as PropType<typeof _reactive.data>,
+			required: false,
+		}
+	});
 
 	const _reactive = reactive({
 		state: {
@@ -311,4 +323,12 @@
 			_el = (event.target as HTMLElement);
 		}
 	})();
+
+	const init = () => {
+		if(props.data && Object.keys(props.data).length > 0) _reactive.data = props.data;
+	};
+
+	onMounted(() => {
+		init();
+	});
 </script>

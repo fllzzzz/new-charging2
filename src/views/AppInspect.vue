@@ -42,6 +42,7 @@
 		<InspectEditorVideo
 			model="maker"
 			@open-report="openReportHandler"
+			@close-report="closeReportHandler"
 		></InspectEditorVideo>
 		<component
 			class="video-target"
@@ -59,6 +60,7 @@
 		<InspectReportVideo
 			class="report-container"
 			:dispable-editor="true"
+			@close="closeReportHandler"
 			v-if="_reatcive.state.report"
 		></InspectReportVideo>
 	</div>
@@ -126,6 +128,10 @@
 	const openReportHandler = () => {
 		useChangeModle('close');
 		_reatcive.state.report = true;
+	};
+
+	const closeReportHandler = () => {
+		_reatcive.state.report = false;
 	};
 
 	onMounted(() => {

@@ -96,18 +96,21 @@
 			class="inspect-filter-container"
 		></InspectDateFilter>
 		<InspectTable
+			v-if="_reactive.state.table"
 			class="inspect-table-container"
 			:column-list="_reactive.data.tableData.columnList"
 			:row-list="_reactive.data.tableData.rowList"
 			@open-report="openReportHandler"
 		></InspectTable>
 		<BasePagination
+			:modle="_reactive.data.model"
 			class="base-pagination-container"
 			@page-change="pageChanger"
 		></BasePagination>
 		<component
 			:is="_reactive.data.reportModel"
 			:class="_reactive.data.boxClassName"
+			:data="_reactive.data.alarmReportData"
 			@close="reportCloseHandler"
 			@monitor="monitorHandler"
 		></component>
@@ -146,7 +149,8 @@
 
 	import {
 		getStationInfo,
-		getInspectHistoryList
+		getInspectHistoryList,
+		getInspectAlarmList
 	} from '@/api/default';
 
 	import {
@@ -182,13 +186,21 @@
 		inspectResult :number[];
 		options? :string[];
 		reportID? :number;
+	} | {
+		id :number;
+		stationName :string;
+		alarmContent :string[];
+		monitorName :string;
+		alarmTime :string;
+		alarmType :string[];
+		handleStatus :string;
+		options :string[];
 	};
 
 	const props = defineProps({
 		model: {
 			type: String,
-			required: false,
-			default: undefined
+			required: true
 		}
 	});
 
@@ -200,7 +212,16 @@
 	]);
 
 	const _reactive = reactive({
+		state: {
+			table: false
+		},
 		data: {
+			alarmReportData: {} as any,
+			model: computed(() => {
+				if(props.model === 'history') return props.model  as 'history' | 'alarm';
+				if(props.model === 'warn') return 'alarm' as  'history' | 'alarm';
+				return 'history' as  'history' | 'alarm';
+			}),
 			telepTarget: undefined as undefined | string,
 			boxClassName: undefined as undefined | string,
 			title: undefined as undefined | string,
@@ -295,18 +316,6 @@
 						prop: 'options',
 						width: 344
 					},
-				],
-				rowList: [
-					{
-						id: 1,
-						stationName: '站名称',
-						alarmContent: ['充电枪未归位', '充电桩外观损坏', '充电桩生锈'],
-						monitorName: '1号充电桩东北角',
-						alarmTime: '2023/5/16 14:29：32',
-						alarmType: '充电桩问题',
-						handleStatus: '未处理',
-						options: ['告警查看', '已处理', '处置报告']
-					}
 				]
 			}
 		}
@@ -377,6 +386,7 @@
 			_reactive.data.reportModel = InspectReportVideo;
 			_reactive.data.boxClassName = 'report-container';
 		}else if(args[0] === '数字巡检') {
+			_reactive.data.alarmReportData = args[1]();
 			_reactive.data.reportModel = InspectReportDigital;
 			_reactive.data.boxClassName = 'report-container';
 		}else if(args[0] === 'alarmCheck'){
@@ -415,12 +425,39 @@
 		});
 	};
 
-	const pageChanger = (index :number) => {
-		getHistoryModelData(1, index).then(result => {
-			_reactive.data.tableData.columnList = 
-				_static.data.historyModel.columnList;
-			_reactive.data.tableData.rowList = result;
+	const getAlarmModelData = (
+		stationId = 1,
+		pageId = 1,
+	) => {
+		return Promise.all([
+			getInspectAlarmList(stationId, pageId),
+			getStationInfo(stationId)
+		]).then(dataList => {
+			return dataList[0].map<TableRow>((item, index) => ({
+				id: index + 1,
+				stationName: dataList[1][0].stationName,
+				alarmContent: dataList[0][index].alarmContent,
+				monitorName: dataList[0][index].cameraName,
+				alarmTime: dataList[0][index].alarmTime,
+				alarmType: dataList[0][index].type,
+				handleStatus: dataList[0][index].status,
+				options: ['告警查看', '已处理', '处置报告']
+			}));
 		});
+	};
+
+	const pageChanger = (index :number) => {
+		if(_reactive.data.model === 'history') {
+			getHistoryModelData(1, index).then(result => {
+				_reactive.data.tableData.rowList = result;
+			});
+		}
+
+		if(_reactive.data.model === 'alarm') {
+			getAlarmModelData(1, index).then(result => {
+				_reactive.data.tableData.rowList = result;
+			});
+		}
 	};
 
 	onMounted(() => {
@@ -428,6 +465,7 @@
 	});
 
 	watch(() => props.model, (model) => {
+		_reactive.state.table = false;
 		if(!model) return;
 		_reactive.data.title = modelInovke.get(model)?.title;
 		if(model === 'history') {
@@ -435,13 +473,16 @@
 				_reactive.data.tableData.columnList = 
 					_static.data.historyModel.columnList;
 				_reactive.data.tableData.rowList = result;
+				_reactive.state.table = true;
 			});
-		}/* else if(model === 'warn') {
-			_reactive.data.tableData.columnList = 
-				_static.data.warnModel.columnList;
-			_reactive.data.tableData.rowList = 
-				_static.data.warnModel.rowList;
-		} */
+		}else if(model === 'warn') {
+			getAlarmModelData().then(result => {
+				_reactive.data.tableData.columnList = 
+					_static.data.warnModel.columnList;
+				_reactive.data.tableData.rowList = result;
+				_reactive.state.table = true;
+			});
+		}
 	}, {
 		immediate: true,
 	});

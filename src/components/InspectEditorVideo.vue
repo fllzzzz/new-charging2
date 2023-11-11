@@ -175,14 +175,19 @@
 
 <template>
 	<div class="inspect-editor-box">
-		<div class="item">
-			<div class="box">
-				<span> {{ _reactive.data.inspectStatus.pace }} </span>
-				<span>%</span>
-			</div>
-			<div class="box">
-				<span> {{ _reactive.data.inspectStatus.status }} </span>
-			</div>
+		<div class="item"
+		>
+			<template
+				v-if="props.model === 'maker'"
+			>
+				<div class="box">
+					<span> {{ _reactive.data.inspectStatus.pace }} </span>
+					<span>%</span>
+				</div>
+				<div class="box">
+					<span> {{ _reactive.data.inspectStatus.status }} </span>
+				</div>
+			</template>
 		</div>
 		<div class="item">
 			<div class="row">
@@ -257,14 +262,26 @@
 		onMounted,
 		watch,
 		onBeforeUnmount,
-nextTick
 	} from 'vue';
 
 	import type{
 		PropType
 	} from 'vue';
+import { el } from 'element-plus/es/locale';
 
 	type Model = 'maker' | 'editor' ;
+	type ReportList = {
+		id :number,
+		deviceInfo :DeviceInfo,
+		title :string,
+		image :string;
+		keyWord :string[];
+	}[];
+
+	type BtnState = {
+		next :number;
+		preset :number;
+	};
 
 	const props = defineProps({
 		model: {
@@ -282,10 +299,21 @@ nextTick
 			required: false,
 			default: null
 		},
+		reportList: {
+			type: Array as PropType<ReportList>,
+			required: false,
+			default: null
+		},
+		btnState: {
+			type: Object as PropType<BtnState> ,
+			required: false,
+			default: null
+		}
 	});
 
 	const emits = defineEmits(['destory',
-		'open-report','close-report'
+		'open-report','close-report',
+		'editor-change'
 	]);
 
 	const router = useRouter();
@@ -328,6 +356,9 @@ nextTick
 	const _static = {
 		data: {
 			deviceInfo: {} as DeviceInfo
+		},
+		state: {
+			report: false
 		}
 	};
 
@@ -350,9 +381,18 @@ nextTick
 	const configCreate = async (
 		keyWords :string[]
 	) => ({
+		keyWords: (function(u) {
+			return Array.from(u);
+		})(keyWords),
 		deviceInfo: (function() {
-			if(props.deviceInfo) return props.deviceInfo;
-			if(_static.data.deviceInfo) return _static.data.deviceInfo;
+			if(props.deviceInfo)
+				return Object.fromEntries(
+					Object.entries(props.deviceInfo)
+				) as typeof props.deviceInfo;
+			if(_static.data.deviceInfo)
+				return Object.fromEntries(
+					Object.entries(_static.data.deviceInfo)
+				) as typeof _static.data.deviceInfo;
 			return {
 				deviceSerial: '',
 				channelNo: -1
@@ -360,12 +400,13 @@ nextTick
 		})(),
 		image: await (async function() {
 			if(props.deviceInfo)
+				return '';
+			if(props.deviceInfo)
 				return await getDeviceCapture(props.deviceInfo);
 			if(_static.data.deviceInfo)
 				return await getDeviceCapture(_static.data.deviceInfo);
 			return '';
 		})(),
-		keyWords,
 		result: [0,0],
 		stationId: 1,
 		...configInit()
@@ -386,29 +427,53 @@ nextTick
 			}
 		}],
 		['next', () => {
-			_reactive.data.to3Dflg++;
-			usePublish('setIframerMsg', {
-				ctid: 13111,
-				number: (_reactive.data.to3Dflg).toString()
-			});
-			configCreate(
+			if(props.model === 'editor') {
+				console.log('jx@next');
+				configCreate(
 					_reactive.data.cheeckBoxGroupData
-			).then(config => {
-				if(props.model === 'editor')
+				).then(config => {
 					InspectHistoryService.update(1, config);
-				if(props.model === 'maker')
+					_reactive.data.cheeckBoxGroupData.length = 0;
+				});
+				setTimeout(() => {
+					emits('editor-change', 'next');
+				}, 500)
+			}else if(props.model === 'maker') {
+				_reactive.data.btnLocker = 'next';
+				configCreate(
+						_reactive.data.cheeckBoxGroupData
+				).then(config => {
 					InspectHistoryService.push(config);
-			});
-			_reactive.data.cheeckBoxGroupData.length = 0;
+					_reactive.data.btnLocker = '';
+					_reactive.data.cheeckBoxGroupData.length = 0;
+					_reactive.data.to3Dflg++;
+					usePublish('setIframerMsg', {
+						ctid: 13111,
+						number: (_reactive.data.to3Dflg).toString()
+					});
+				});
+			}
 		}],
 		['preset', () => {
-			if(_reactive.data.to3Dflg < 1) return;
-			_reactive.data.to3Dflg--;
-			usePublish('setIframerMsg', {
-				ctid: 13111,
-				number: (_reactive.data.to3Dflg).toString()
-			});
-			_reactive.data.cheeckBoxGroupData.length = 0;
+			if(props.model === 'editor') {
+				configCreate(
+					_reactive.data.cheeckBoxGroupData
+				).then(config => {
+					InspectHistoryService.update(1, config);
+					_reactive.data.cheeckBoxGroupData.length = 0;
+				});
+				setTimeout(() => {
+					emits('editor-change', 'preset');
+				}, 500)
+			}else if(props.model === 'maker') {
+				if(_reactive.data.to3Dflg < 1) return;
+				_reactive.data.to3Dflg--;
+				usePublish('setIframerMsg', {
+					ctid: 13111,
+					number: (_reactive.data.to3Dflg).toString()
+				});
+				_reactive.data.cheeckBoxGroupData.length = 0;
+			}
 		}]
 	]);
 
@@ -418,7 +483,9 @@ nextTick
 		_reactive.data.inspectStatus.pace = parseInt(ctx.percent);
 	});
 
+	let flg1 = 0;
 	watch(() => _reactive.data.inspectStatus.pace, (flg) => {
+		if(props.model === 'editor') return;
 		if(_reactive.data.to3Dflg === 0) {
 			_reactive.data.btnLocker = 'preset';
 		}else if(flg === 100){
@@ -430,15 +497,69 @@ nextTick
 			const el = document.getElementById(target.name);
 			if(!el ) return;
 			el.onclick = function(e) {
-				emits('open-report')
-				e.preventDefault();
-				e.stopPropagation();
+				if(flg1 === 0) {
+					configCreate(
+						_reactive.data.cheeckBoxGroupData
+					).then(config => {
+						InspectHistoryService.push(config);
+						emits('open-report')
+						_static.state.report = true;
+					});
+					_reactive.data.cheeckBoxGroupData.length = 0;
+					e.preventDefault();
+					e.stopPropagation();
+					flg1 = 1;
+				}else {
+					if(_static.state.report) {
+						emits('close-report');
+						_static.state.report = ! _static.state.report;
+					}else {
+						emits('open-report');
+						_static.state.report = ! _static.state.report;
+					}
+					e.preventDefault();
+					e.stopPropagation();
+				}
 			}
 		}else {
 			_reactive.data.btnLocker = '';
 		}
 	}, {
 		immediate: true,
+	})
+
+
+	let flg2 = 0;
+	const onecClickEvent = (event :MouseEvent) => {
+			if(flg2) {
+				_reactive.data.btnLocker = 'next';
+				event.preventDefault();
+				event.stopPropagation();
+				return;
+			}
+			flg2 = 1;
+		};
+
+	watch(props.btnState, (btn) => {
+		if(props.model === 'maker') return;
+		if(btn.next === 0) {
+			const elNext = document.getElementById('next');
+			if(! elNext) return;
+			elNext.addEventListener('click', onecClickEvent);
+			return;
+		}else if(btn.preset === 0) {
+			_reactive.data.btnLocker = 'preset';
+			return;
+		}else {
+			_reactive.data.btnLocker = '';
+			const elNext = document.getElementById('next');
+			if(! elNext) return;
+			elNext.removeEventListener('click', onecClickEvent);
+			flg2 = 0;
+		}
+	}, {
+		immediate: true,
+		deep: true,
 	})
 
 	const clickEventHandler = (event :MouseEvent) => {
@@ -456,5 +577,6 @@ nextTick
 	onBeforeUnmount(() => {
 		_reactive.data.inspectStatus.pace = 0;
 		_reactive.data.cheeckBoxGroupData.length = 0;
+		_reactive.data.btnLocker = '';
 	})
 </script>

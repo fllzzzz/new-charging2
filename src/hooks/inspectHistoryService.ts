@@ -40,8 +40,15 @@ type Param = {
 	result :number[];
 };
 
+type PresetUpdate = {
+	device :DeviceInfo,
+	image :string;
+	keyWords :string[];
+};
+
 export default class InspectHistoryService {
 	protected constructor() {/*  */}
+	protected static lock = 1;
 
 	protected static reqData :Data = {
 		stationID: -1,
@@ -103,6 +110,31 @@ export default class InspectHistoryService {
 	public static push(
 		params :Param
 	) {
+
+		if(this.reqData.cameraList.length > 0) {
+			const targetIndex = this.reqData.cameraList.findIndex(device => {
+				if(
+					device.channelNo === params.deviceInfo.channelNo &&
+					device.deviceSerial === params.deviceInfo.deviceSerial
+				) return true;
+			})
+			if( (! targetIndex && targetIndex !== 0) || (targetIndex && targetIndex === -1) ) {
+				this.lock = 0;
+			}
+
+			if(this.lock === 1) {
+				this.reqData.cameraList[targetIndex] = params.deviceInfo;
+				this.reqData.picList[targetIndex] = params.image;
+				this.reqData.unnormalReportContent[targetIndex] = params.keyWords
+
+				return;
+			} 
+		}else {
+			this.lock = 0;
+		}
+
+		if(this.lock === 1) return;
+
 		this.reqData.stationID = params.stationId;
 		this.reqData.type = params.type;
 		this.reqData.result = params.result;
@@ -125,6 +157,8 @@ export default class InspectHistoryService {
 		useReportMaker(undefined, _u);
 
 		setInspectHistory(this.reqData);
+
+		this.lock = 1;
 	}
 
 	public static async update (

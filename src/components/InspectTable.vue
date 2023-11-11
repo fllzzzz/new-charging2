@@ -131,7 +131,12 @@
 </template>
 
 <script setup lang="ts">
+	import {
+		getAlarmReportImage
+	} from '@/api/default';
+
 	import screenManager from '@/hooks/ScreenManager';
+	import { DeviceInfo } from '@/types';
 
 	import type {
 		PropType
@@ -152,6 +157,15 @@
 	type RowListType = {
 		[key :string] :any;
 	}[];
+
+	type InspectAlarm = {
+		alarmID :string;
+		alarmContent :string[];
+		cameraName :string;
+		alarmTime :string;
+		type :string[];
+		status: string;
+	};
 
 	const emits = defineEmits(['openReport']);
 
@@ -193,7 +207,21 @@
 	const optionsClickHandler = (event :MouseEvent, ...args :any[]) => {
 		const id = (event.target as HTMLElement).id;
 		if(id === '查看报告') emits('openReport', ...args);
-		if(id === '告警查看') emits('openReport', 'alarmCheck');
+		if(id === '告警查看') emits('openReport', 'alarmCheck', async () => {
+			const id = args[1] as string;
+			const target = _reactive.data.rowList.find(item => {
+				return (item.alarmID as string) = id;
+			}) as  InspectAlarm;
+			return {
+				time: target.alarmTime,
+				device: {
+					deviceSerial: target.cameraName.split('@')[0],
+					channelNo: parseInt(target.cameraName.split(' ')[1]),
+				} as DeviceInfo,
+				content: target.alarmContent,
+				image: await getAlarmReportImage(target.alarmID),
+			};
+		});
 		if(id === '处置报告') emits('openReport', 'handleReport');
 	};
 
@@ -208,6 +236,7 @@
 	});
 
 	watch(() => props, (props) => {
+		console.log('jx', props);
 		if(props.rowList) {
 			const rowListLength = props.rowList.length;
 			if( rowListLength < props.rowNumber) {

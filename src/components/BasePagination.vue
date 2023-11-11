@@ -101,12 +101,25 @@
 
 	import {
 		reactive,
-		onMounted
+		watch
 	} from 'vue';
+
+	import type {
+		PropType
+	} from 'vue';
+
+	type Model = 'history' | 'alarm';
 
 	const emits = defineEmits([
 		'page-change'
 	]);
+
+	const props = defineProps({
+		modle: {
+			type: [String, String] as PropType<Model>,
+			required: true
+		}
+	});
 
 	const _reatcive = reactive({
 		data: {
@@ -116,12 +129,16 @@
 		}
 	});
 
-	getInspectTotalNum('history').then(result => {
-		_reatcive.data.totle = result;
-		_reatcive.data.pageCount = result / 15 ;
-	})
-
 	const pageChanger = (index :number) => {
 		emits('page-change', index);
 	}
+
+	watch(() => props.modle, (model) => {
+		getInspectTotalNum(model)?.then(result => {
+			_reatcive.data.totle = result;
+			_reatcive.data.pageCount = Math.ceil(result / 15) ;
+		})
+	}, {
+		immediate: true
+	});
 </script>
