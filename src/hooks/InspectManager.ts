@@ -17,6 +17,23 @@ const inspectReportInvokeMap = new Map<string, string[]>([
 	['充电站' ,['水浸风险','火灾风险']],
 ]);
 
+export const useAlarmTypeMaker = (
+	data :string[]
+) :string[] => {
+	const result :string[] = [];
+
+	inspectContentInvokeMap.forEach((v, k) => {
+		for(let i = 0; i < data.length; i++) {
+			if(v.includes(data[i])) {
+				result.push(k);
+				return;
+			}
+		}
+	});
+
+	return result;
+};
+
 const invokeMapFinder = (
 	invokeMap :Map<string, string[]>,
 	targetList :string[]

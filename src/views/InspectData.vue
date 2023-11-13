@@ -116,13 +116,14 @@
 		></component>
 		<component
 			:is="videoBox.target"
-			v-if="videoBox.type !== 'close'"
+			
 			class="telep-target"
 			:class="boxClassNameSetter"
 		>
 		</component>
 		<BaseTeleportVideo
 			:telep-target="_reactive.data.telepTarget"
+			:device-info="_reactive.data.device"
 		></BaseTeleportVideo>
 	</div>
 </template>
@@ -172,6 +173,7 @@
 		computed,
 		onMounted
 	} from 'vue';
+import { DeviceInfo } from '@/types';
 
 	type ModelInovkeType = {
 		title :string;
@@ -216,6 +218,7 @@
 			table: false
 		},
 		data: {
+			device: {} as DeviceInfo,
 			alarmReportData: {} as any,
 			model: computed(() => {
 				if(props.model === 'history') return props.model  as 'history' | 'alarm';
@@ -338,11 +341,14 @@
 		return '';
 	});
 
-	const monitorHandler = () => {
+	const monitorHandler = (
+		device :DeviceInfo
+	) => {
 		useChangeModle('small');
 		const u = telepTargetInovke.get(videoBox.value.type);
 		const cssVar = `.telep-target ${u}`;
 		_reactive.data.telepTarget = cssVar;
+		_reactive.data.device = device;
 	};
 
 	useAnchorPointSetter(from => {
@@ -488,7 +494,10 @@
 	});
 
 	watch(() => videoBox.value.type, (type) => {
-		if(type === 'close') return;
+		if(type === 'close') {
+			_reactive.data.telepTarget = 'body';
+			return;
+		}
 		const u = telepTargetInovke.get(videoBox.value.type);
 		const cssVar = `.telep-target ${u}`;
 		_reactive.data.telepTarget = cssVar;

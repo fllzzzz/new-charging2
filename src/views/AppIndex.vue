@@ -50,9 +50,9 @@
 		</KeepAlive>
 		<component :is="Component" v-if="! route.meta.KeepAlive"></component>
 	</RouterView>
-<!-- 	<AppIFramer
+	<AppIFramer
 		class=""
-	></AppIFramer> -->
+	></AppIFramer>
 </template>
 
 <script setup lang="ts">

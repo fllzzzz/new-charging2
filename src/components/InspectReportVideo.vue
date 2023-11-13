@@ -524,7 +524,7 @@
 		name :string,
 		...args :any[]
 	) => {
-		if(name === 'monitor') emits('monitor');
+		if(name === 'monitor') emits('monitor', (args[0] as ReportList).deviceInfo);
 		if(name === 'editor') {
 			_reactive.state.editorBox = true;
 			_reactive.data.device = (args[0] as ReportList).deviceInfo;

@@ -153,7 +153,7 @@
 
 
 			_static.data.player = player;
-			if(! props.deviceInfo) return;
+			if(! props.deviceInfo || Object.keys(props.deviceInfo).length === 0) return;
 			playerSrcChanger(props.deviceInfo);
 		});
 	};

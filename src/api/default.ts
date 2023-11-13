@@ -321,7 +321,7 @@ export const getInspectTotalNum = (
 };
 
 export const getAlarmReportImage = (
-	id: string
+	id: number
 ) => {
 	return $default({
 		method: 'post',

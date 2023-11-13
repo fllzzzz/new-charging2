@@ -111,8 +111,11 @@
 						:width="column.width * screenManager.currentRatio.value[0]"
 						align="center"
 						>
-						<template #default="{row}">
-							{{ `本次任务需巡检${row.inspectResult[0]}个，异常${row.inspectResult[1]}个`}}
+						<template #default="{row}"
+						>
+							<template v-if="row.id">
+								{{ `本次任务需巡检${row.inspectResult[0]}个，异常${row.inspectResult[1]}个`}}
+							</template>
 						</template>
 					</el-table-column>
 				</template>
@@ -236,7 +239,6 @@
 	});
 
 	watch(() => props, (props) => {
-		console.log('jx', props);
 		if(props.rowList) {
 			const rowListLength = props.rowList.length;
 			if( rowListLength < props.rowNumber) {

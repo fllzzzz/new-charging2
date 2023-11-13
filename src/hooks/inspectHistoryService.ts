@@ -49,6 +49,7 @@ type PresetUpdate = {
 export default class InspectHistoryService {
 	protected constructor() {/*  */}
 	protected static lock = 1;
+	protected static resultFlg = [0 ,0];
 
 	protected static reqData :Data = {
 		stationID: -1,
@@ -105,6 +106,8 @@ export default class InspectHistoryService {
 			picList: [],
 			unnormalReportContent: []
 		};
+
+		this.resultFlg = [0 ,0];
 	}
 
 	public static push(
@@ -135,9 +138,12 @@ export default class InspectHistoryService {
 
 		if(this.lock === 1) return;
 
+		this.resultFlg[0]++;
+		if(params.keyWords.length > 0) this.resultFlg[1]++;
+		this.reqData.result = this.resultFlg;
+
 		this.reqData.stationID = params.stationId;
 		this.reqData.type = params.type;
-		this.reqData.result = params.result;
 		this.reqData.picList.push(params.image);
 		this.reqData.reportContent = useInspectListGetterReverse();
 		this.reqData.ReportTime = new Date().toLocaleString();

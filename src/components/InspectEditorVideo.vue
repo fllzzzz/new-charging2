@@ -213,7 +213,7 @@
 			</div>
 		</div>
 		<div class="item"
-			@click="clickEventHandler"
+			@click.capture="clickEventHandler"
 		>
 			<template
 				v-for="btn in _reactive.data.btnList"
@@ -262,6 +262,7 @@
 		onMounted,
 		watch,
 		onBeforeUnmount,
+nextTick,
 	} from 'vue';
 
 	import type{
@@ -355,14 +356,14 @@ import { el } from 'element-plus/es/locale';
 
 	const _static = {
 		data: {
-			deviceInfo: {} as DeviceInfo
+			deviceInfo: {} as DeviceInfo,
 		},
 		state: {
 			report: false
 		}
 	};
 
-	const configInit = () => ({
+	const configInit = (() => ({
 		reportID: (function(id) {
 			if(id) return id;
 			return Date.now();
@@ -376,7 +377,7 @@ import { el } from 'element-plus/es/locale';
 			if(isDigital !== -1) return '数字巡检';
 			return '';
 		})(route.path),
-	});
+	}))();
 
 	const configCreate = async (
 		keyWords :string[]
@@ -409,7 +410,7 @@ import { el } from 'element-plus/es/locale';
 		})(),
 		result: [0,0],
 		stationId: 1,
-		...configInit()
+		...configInit
 	});
 
 	const clickEventInvoke = new Map<string, ((
@@ -427,8 +428,8 @@ import { el } from 'element-plus/es/locale';
 			}
 		}],
 		['next', () => {
+			if(_reactive.data.btnLocker === 'next') return;
 			if(props.model === 'editor') {
-				console.log('jx@next');
 				configCreate(
 					_reactive.data.cheeckBoxGroupData
 				).then(config => {
@@ -455,6 +456,7 @@ import { el } from 'element-plus/es/locale';
 			}
 		}],
 		['preset', () => {
+			if(_reactive.data.btnLocker === 'preset') return;
 			if(props.model === 'editor') {
 				configCreate(
 					_reactive.data.cheeckBoxGroupData
@@ -529,33 +531,28 @@ import { el } from 'element-plus/es/locale';
 	})
 
 
-	let flg2 = 0;
 	const onecClickEvent = (event :MouseEvent) => {
-			if(flg2) {
-				_reactive.data.btnLocker = 'next';
-				event.preventDefault();
-				event.stopPropagation();
-				return;
-			}
-			flg2 = 1;
-		};
+		_reactive.data.btnLocker = 'next';
+		event.preventDefault();
+		event.stopPropagation();
+		return;
+	};
 
 	watch(props.btnState, (btn) => {
 		if(props.model === 'maker') return;
 		if(btn.next === 0) {
-			const elNext = document.getElementById('next');
-			if(! elNext) return;
-			elNext.addEventListener('click', onecClickEvent);
-			return;
+			nextTick(() => {
+				const elNext = document.getElementById('next');
+				if(! elNext) return;
+				elNext.addEventListener('click', onecClickEvent);
+			});
 		}else if(btn.preset === 0) {
 			_reactive.data.btnLocker = 'preset';
-			return;
 		}else {
 			_reactive.data.btnLocker = '';
 			const elNext = document.getElementById('next');
 			if(! elNext) return;
 			elNext.removeEventListener('click', onecClickEvent);
-			flg2 = 0;
 		}
 	}, {
 		immediate: true,
