@@ -129,6 +129,8 @@
 </template>
 
 <script setup lang="ts">
+	import InspectAlarmService from '@/hooks/InspectAlarmService';
+
 	import BaseTeleportVideo from '@/components/BaseTeleportVideo.vue';
 	import InspectReportHandle from '@/components/InspectReportHandle.vue';
 	import InspectAlarmCheck from '@/components/InspectAlarmCheck.vue';
@@ -207,6 +209,9 @@ import { DeviceInfo } from '@/types';
 	});
 
 	const router = useRouter();
+	const insAlarmService = new InspectAlarmService({
+		StationID: 1
+	});
 
 	const telepTargetInovke = new Map<string, string>([
 		['small', '> #body'],
@@ -218,6 +223,7 @@ import { DeviceInfo } from '@/types';
 			table: false
 		},
 		data: {
+			alarmId: undefined as number | undefined,
 			device: {} as DeviceInfo,
 			alarmReportData: {} as any,
 			model: computed(() => {
@@ -392,10 +398,10 @@ import { DeviceInfo } from '@/types';
 			_reactive.data.reportModel = InspectReportVideo;
 			_reactive.data.boxClassName = 'report-container';
 		}else if(args[0] === '数字巡检') {
-			_reactive.data.alarmReportData = args[1]();
 			_reactive.data.reportModel = InspectReportDigital;
 			_reactive.data.boxClassName = 'report-container';
 		}else if(args[0] === 'alarmCheck'){
+			_reactive.data.alarmId = args[1];
 			_reactive.data.reportModel = InspectAlarmCheck;
 			_reactive.data.boxClassName = 'alarm-card-container';
 		}else if(args[0] === 'handleReport'){
@@ -443,8 +449,8 @@ import { DeviceInfo } from '@/types';
 				id: index + 1,
 				stationName: dataList[1][0].stationName,
 				alarmContent: dataList[0][index].alarmContent,
-				monitorName: dataList[0][index].cameraName,
-				alarmTime: dataList[0][index].alarmTime,
+				monitorName: '',
+				alarmTime: dataList[0][index].time,
 				alarmType: dataList[0][index].type,
 				handleStatus: dataList[0][index].status,
 				options: ['告警查看', '已处理', '处置报告']
@@ -482,7 +488,7 @@ import { DeviceInfo } from '@/types';
 				_reactive.state.table = true;
 			});
 		}else if(model === 'warn') {
-			getAlarmModelData().then(result => {
+			insAlarmService.pull(1).then(result => {
 				_reactive.data.tableData.columnList = 
 					_static.data.warnModel.columnList;
 				_reactive.data.tableData.rowList = result;

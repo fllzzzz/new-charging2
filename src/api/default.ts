@@ -17,12 +17,13 @@ type InspectHistory = {
 };
 
 type InspectAlarm = {
-	alarmID :string;
+	stationID :number;
+	alarmID :number;
 	alarmContent :string[];
-	cameraName :string;
-	alarmTime :string;
+	device :DeviceInfo;
+	time :string;
 	type :string[];
-	status: string;
+	status :string;
 };
 
 type StationInfo = {
@@ -275,6 +276,32 @@ export const setInspectHistory = (
 	}).then(result => console.log(result))
 };
 
+export const setInspectAlarm = (
+	data :any
+) => {
+	const _u = Object.entries(data);
+	for(let i=0; i<_u.length; i++) {
+		_u[i][0] = firstLetterToUpperCase(_u[i][0]);
+	}
+
+	data = Object.fromEntries(_u);
+	data = pushFormat(data);
+
+	return $default({
+		method: 'post',
+		url: '/alarm_list/Add',
+		data: JSON.stringify({
+			mainData: {...data},
+			detailData: null,
+			delKeys: null
+		}),
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: 'Bearer ' + tokenStorage.value
+		}
+	}).then(result => console.log(result))
+};
+
 export const updateInspectHistory = (
 	data :any
 ) => {
@@ -326,9 +353,33 @@ export const getAlarmReportImage = (
 	return $default({
 		method: 'post',
 		url: '/alarm_list/GetAlarmPic',
+		data: {
+			'alarm_id': id
+		},
 		timeout: 3000
 	})
 	.then(res => res.data)
 	.then(result => result.data as any[])
-	.then(data => data[0].picList as string)
+	.then(data => data[0].image as string)
+};
+
+
+export const getDeviceName = (
+	params : DeviceInfo & {
+		stationId :number;
+	}
+) => {
+	return $default({
+		method: 'post',
+		url: '/alarm_list/GetAlarmPic',
+		data: {
+			'station_id': params.stationId,
+			deviceSerial: params.deviceSerial,
+			channelNo: params.channelNo
+		},
+		timeout: 3000
+	})
+	.then(res => res.data)
+	.then(result => result.data as any[])
+	.then(data => data[0].cameraName as string)
 };

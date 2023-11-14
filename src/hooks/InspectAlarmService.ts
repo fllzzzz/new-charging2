@@ -1,6 +1,9 @@
 import {
 	getInspectAlarmList,
-	getAlarmReportImage
+	getAlarmReportImage,
+	setInspectAlarm,
+	getStationInfo,
+	getDeviceName
 } from '@/api/default';
 
 import {
@@ -8,132 +11,150 @@ import {
 	useInspectReportMaker
 } from '@/hooks/InspectManager';
 
-import { DeviceInfo } from "@/types";
+import {
+	DeviceInfo
+} from "@/types";
 
-type Data = {
-	stationId :number;
-	alarmID: number;
-	time :string;
-	alarmType :string[];
+type Inbound = {
+	StationID :number;
+    AlarmID :number;
+	ReportID :number;
+    Device :DeviceInfo
+    Time :string;
+    Type :string[];
+    Status :string;
+    AlarmContent :string[];
+    Image :string;
+};
+
+type OutBound = {
+	id :number;
+	alarmId :number;
+	stationName :string;
 	alarmContent :string[];
-	device :DeviceInfo;
-	status :string;
+	monitorName :string;
+	alarmTime :string;
+	alarmType :string[];
+	handleStatus :string;
+	options :string[];
+	device :DeviceInfo
+};
+
+type Detail = {
+	deviceInfo :DeviceInfo;
+	time :string;
+	name :string;
+	alarmList :string[];
 	image :string;
-};
-
-type Storage = {
-	alarmID: number;
-	device :DeviceInfo,
-	time :string,
-	name :string,
-	alarmList :string[],
-};
-
-type Push = {
-	device :DeviceInfo;
-	status :string;
-	image :string;
-	dataList :string[];
-};
-
-type Pull = {
-	stationId :number;
-	pageNum :number;
-};
-
-type Details = {
-	device :DeviceInfo,
-	time :string,
-	name :string,
-	alarmList :string[],
-	image :string
 };
 
 export default class InspectAlarmService {
-	protected storage :Storage[] = [];
-	protected data :Data = {
-		stationId: -1,
-		alarmID: -1,
-		time: '',
-		alarmType: [],
-		alarmContent: [],
-		device: {
-			deviceSerial: '',
-			channelNo: -1
-		},
-		status: '',
-		image: ''
-	}
+	protected inbound :Inbound;
+	protected static store :Map<string, any> = new Map();
 
 	constructor(
-		params :Pick<Data, 'stationId' | 'alarmID'>
+		params :Pick<Inbound, 'StationID'>
 	) {
-		this.data.stationId = params.stationId;
-		this.data.alarmID = params.alarmID;
+		this.inbound = {
+			StationID: params.StationID,
+			AlarmID: -1,
+			ReportID: -1,
+			Device: {} as DeviceInfo,
+			Time: '',
+			Type: [],
+			Status: '',
+			AlarmContent: [],
+			Image: ''
+		};
 	}
 
-	protected setTime () {
-		this.data.time = new Date().toLocaleString();
+	public push(
+		params :Omit<Inbound, 'StationID'>
+	) :void {
+		this.inbound = this.autoAssign(params) as Inbound;
+
+		setInspectAlarm(this.inbound);
 	}
 
-	protected async storager<T>(
-		data :T,
-		fn: ((data :T) => void)
-	) {
-		await fn(data);
-	}
+	public async pull(
+		pageNum :number
+	) /* :Promise<OutBound[]> */ {
+		const result = await Promise.allSettled([
+			getInspectAlarmList(
+				this.inbound.StationID, pageNum
+			),
+			getStationInfo(this.inbound.StationID)
+		]).then( pending => {
+			return pending.map(item => {
+				if(item.status === 'rejected') return null;
+				return item.value;
+			})
+		})
+/* 		.then(dataList => {
+			return dataList[0].map<OutBound>((item, index) => ({
+				id: index + 1,
+				stationName: dataList[1][0].stationName,
+				alarmContent: dataList[0][index].alarmContent,
+				monitorName: await getDeviceName({
+					stationId: this.inbound.StationID,
+					...item.
+				}),
+				alarmTime: dataList[0][index].time,
+				alarmType: dataList[0][index].type,
+				handleStatus: dataList[0][index].status,
+				options: ['告警查看', '已处理', '处置报告'],
+				alarmId: dataList[0][index].alarmID,
+				device: dataList[0][index].device
+			}));
+		}); */
 
-	push(
-		params :Push
-	) {
-		this.setTime();
-		this.data.device = params.device;
-		this.data.status = params.status;
-		this.data.image = params.image;
-		this.data.alarmType = useAlarmTypeMaker(params.dataList);
-		this.data.alarmContent =
-			useInspectReportMaker(params.dataList)
-			.filter(item => item.state === 1)
-			.map(item => item.data);
-
-	}
-
-	async pull(
-		params :Pull 
-	) {
-		const result = await getInspectAlarmList(
-			params.stationId,
-			params.pageNum
-		);
-
-		this.storager<typeof result>(result, (result) => {
-			this.storage = result.map(item => {
-				return {
-
-				} as Storage
+		this.stoarger<typeof result>(result, (result) => {
+			return new Promise(() => {
+				InspectAlarmService.store.set('outbound', result);
 			})
 		});
 
-		return result;
+		/* return result; */
 	}
 
-	async getDetails(
+	public async getDetails(
 		id :number
-	) {
-		const image = await getAlarmReportImage(id);
+	) :Promise<Detail | undefined> {
+		const list :OutBound[] | undefined = InspectAlarmService.store.get('outbound');
+		if(! list || (list && list.length === 0)) return;
 
-		const target = this.storage.find(item => {
-			if(item.alarmID === id) return true;
-		});
-
-		if(! target) return undefined;
+		const target = list.find(item => {
+			if(item.alarmId === id) return true;
+		});	
+		if(! target) return;
 
 		return {
-			image,
-			device: target.device,
-			time: target.time,
-			name: target.name,
-			alarmList: target.alarmList,
-		} as Details;
+			deviceInfo: target.device,
+			time: target.alarmTime,
+			name: target.monitorName,
+			alarmList: target.alarmContent,
+			image: await getAlarmReportImage(id)
+		} as Detail
+	}
+
+	protected autoAssign(
+		target :any,
+	) {
+		const _u = Object.entries(this.inbound).map(item0 => {
+			Object.entries(target).forEach(item1 => {
+				if(item1[0] === item0[0]) {
+					item0[1] = item1[1] as typeof item0[1];
+				}
+			});
+			return item0;
+		});
+		return Object.fromEntries(_u);
+	}
+
+	protected async stoarger<T>(
+		data :T,
+		fn :((ctx :T) => Promise<void>)
+	) {
+		await fn(data);
 	}
 }

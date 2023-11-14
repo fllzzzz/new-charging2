@@ -252,6 +252,8 @@
 </template>
 
 <script setup lang="ts">
+	import InspectAlarmService from '@/hooks/InspectAlarmService';
+
 	import {
 		usePublish
 	} from '@/hooks/EventEmitter';
@@ -274,6 +276,7 @@
 	} from 'vue';
 
 	const router = useRouter();
+	const inspAlarmSvc = new InspectAlarmService({StationID: 1})
 
 	const emits = defineEmits(['close']);
 
@@ -327,6 +330,11 @@
 	const init = () => {
 		if(props.data && Object.keys(props.data).length > 0) _reactive.data = props.data;
 	};
+	
+
+	inspAlarmSvc.getDetails(1697709315).then(result => {
+		console.log('jx', result);
+	});
 
 	onMounted(() => {
 		init();

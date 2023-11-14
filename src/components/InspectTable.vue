@@ -88,7 +88,8 @@
 									@click="optionsClickHandler(
 										$event,
 										row.inspectType,
-										row.reportID
+										row.reportID,
+										row.alarmId
 									)"
 								>
 									<template 
@@ -210,21 +211,7 @@
 	const optionsClickHandler = (event :MouseEvent, ...args :any[]) => {
 		const id = (event.target as HTMLElement).id;
 		if(id === '查看报告') emits('openReport', ...args);
-		if(id === '告警查看') emits('openReport', 'alarmCheck', async () => {
-			const id = args[1] as string;
-			const target = _reactive.data.rowList.find(item => {
-				return (item.alarmID as string) = id;
-			}) as  InspectAlarm;
-			return {
-				time: target.alarmTime,
-				device: {
-					deviceSerial: target.cameraName.split('@')[0],
-					channelNo: parseInt(target.cameraName.split(' ')[1]),
-				} as DeviceInfo,
-				content: target.alarmContent,
-				image: await getAlarmReportImage(target.alarmID),
-			};
-		});
+		if(id === '告警查看') emits('openReport', 'alarmCheck', args[2]);
 		if(id === '处置报告') emits('openReport', 'handleReport');
 	};
 
