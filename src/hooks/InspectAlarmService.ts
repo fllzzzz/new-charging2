@@ -48,6 +48,26 @@ type Detail = {
 	image :string;
 };
 
+type InspectAlarm = {
+	stationID :number;
+	alarmID :number;
+	alarmContent :string[];
+	device :DeviceInfo;
+	time :string;
+	type :string[];
+	status :string;
+};
+
+type StationInfo = {
+	id :number;
+	stationID :number;
+	districtID :number;
+	longitude :number;
+	latitude :number;
+	stationName :string;
+	stationFullName :string;
+	[key :string] :any;
+};
 export default class InspectAlarmService {
 	protected inbound :Inbound;
 	protected static store :Map<string, any> = new Map();
@@ -78,35 +98,74 @@ export default class InspectAlarmService {
 
 	public async pull(
 		pageNum :number
-	) /* :Promise<OutBound[]> */ {
+	) :Promise<OutBound[]> {
 		const result = await Promise.allSettled([
 			getInspectAlarmList(
 				this.inbound.StationID, pageNum
 			),
 			getStationInfo(this.inbound.StationID)
-		]).then( pending => {
-			return pending.map(item => {
+		]).then( pendingList => {
+			return pendingList.map(item => {
 				if(item.status === 'rejected') return null;
-				return item.value;
+				return item.value
 			})
-		})
-/* 		.then(dataList => {
-			return dataList[0].map<OutBound>((item, index) => ({
-				id: index + 1,
-				stationName: dataList[1][0].stationName,
-				alarmContent: dataList[0][index].alarmContent,
-				monitorName: await getDeviceName({
-					stationId: this.inbound.StationID,
-					...item.
-				}),
-				alarmTime: dataList[0][index].time,
-				alarmType: dataList[0][index].type,
-				handleStatus: dataList[0][index].status,
-				options: ['告警查看', '已处理', '处置报告'],
-				alarmId: dataList[0][index].alarmID,
-				device: dataList[0][index].device
-			}));
-		}); */
+		}).then(async dataList => {
+			const alarmList = 
+				((u :any) :u is InspectAlarm[] => 'alarmID' in u)(dataList[0]) ?
+				dataList[0] : null;
+
+			const stationList = 
+				((u :any) :u is StationInfo[] => 'districtID' in u)(dataList[1]) ?
+				dataList[1] : null;
+
+			if(! alarmList) {
+				throw new Error('failed to get insepctAlarmData');
+			}
+
+			const nameList = await Promise.allSettled(
+				alarmList.map(item => getDeviceName({
+					stationId: item.stationID,
+					...item.device
+				}))
+			).then(pendingList => {
+				return pendingList.map(pending => {
+					if(pending.status === 'rejected') return null;
+					return pending.value;
+				})
+			});
+			
+			return {
+				alarmList,
+				stationList,
+				nameList
+			}
+		}).then(data => {
+			return data.alarmList.map<OutBound>((item, index) => {
+				const stationName = data.stationList ? 
+						data.stationList[0].stationName : 'failed to get';
+
+				const getDeviceName = (index :number) => {
+					if(! (index >= 0 && index < data.nameList.length))
+						return 'failed to get';
+
+					if(! data.nameList[index]) return 'failed to get';
+					return data.nameList[index] as string;
+				};
+
+				return {
+					stationName,
+					id: index + 1,
+					alarmContent: item.alarmContent,
+					monitorName: getDeviceName(index),
+					alarmId: item.alarmID,
+					device: item.device,
+					alarmTime: item.time,
+					alarmType: item.type,
+					handleStatus: item.status,
+					options: ['告警查看', '已处理', '处置报告'],
+				}
+			})
+		});
 
 		this.stoarger<typeof result>(result, (result) => {
 			return new Promise(() => {
@@ -114,7 +173,7 @@ export default class InspectAlarmService {
 			})
 		});
 
-		/* return result; */
+		return result;
 	}
 
 	public async getDetails(
