@@ -276,7 +276,6 @@
 	} from 'vue';
 
 	const router = useRouter();
-	const inspAlarmSvc = new InspectAlarmService({StationID: 1})
 
 	const emits = defineEmits(['close']);
 
@@ -284,6 +283,10 @@
 		data: {
 			type: Object as PropType<typeof _reactive.data>,
 			required: false,
+		},
+		id: {
+			type: Number,
+			required: false
 		}
 	});
 
@@ -328,13 +331,15 @@
 	})();
 
 	const init = () => {
-		if(props.data && Object.keys(props.data).length > 0) _reactive.data = props.data;
-	};
-	
+		/* if(props.data && Object.keys(props.data).length > 0) _reactive.data = props.data; */
+		if(! props.id) return;
 
-	inspAlarmSvc.getDetails(1697709315).then(result => {
-		console.log('jx', result);
-	});
+		new InspectAlarmService({
+			StationID: 1
+		}).getDetails(props.id).then(result => {
+			_reactive.data = result;
+		})
+	};
 
 	onMounted(() => {
 		init();

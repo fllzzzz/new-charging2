@@ -371,7 +371,7 @@ export const getDeviceName = (
 ) => {
 	return $default({
 		method: 'post',
-		url: '/alarm_list/GetAlarmPic',
+		url: '/camera_list/GetCameraName',
 		data: {
 			'station_id': params.stationId,
 			deviceSerial: params.deviceSerial,

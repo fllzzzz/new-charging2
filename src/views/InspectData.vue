@@ -111,6 +111,7 @@
 			:is="_reactive.data.reportModel"
 			:class="_reactive.data.boxClassName"
 			:data="_reactive.data.alarmReportData"
+			:id="_reactive.data.alarmId"
 			@close="reportCloseHandler"
 			@monitor="monitorHandler"
 		></component>
@@ -140,6 +141,11 @@
 	import InspectDateFilter from '@/components/InspectFilter.vue';
 	import BasePagination from '@/components/BasePagination.vue';
 	import InspectTable from '@/components/InspectTable.vue';
+
+	import {
+		useAlarmTypeMaker,
+		useInspectReportMaker
+	} from '@/hooks/InspectManager';
 
 	import {
 		videoBox,

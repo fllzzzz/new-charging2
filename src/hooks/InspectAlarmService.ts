@@ -7,11 +7,6 @@ import {
 } from '@/api/default';
 
 import {
-	useAlarmTypeMaker,
-	useInspectReportMaker
-} from '@/hooks/InspectManager';
-
-import {
 	DeviceInfo
 } from "@/types";
 
@@ -111,11 +106,11 @@ export default class InspectAlarmService {
 			})
 		}).then(async dataList => {
 			const alarmList = 
-				((u :any) :u is InspectAlarm[] => 'alarmID' in u)(dataList[0]) ?
+				((u :any) :u is InspectAlarm[] => 'alarmID' in u[0])(dataList[0]) ?
 				dataList[0] : null;
 
 			const stationList = 
-				((u :any) :u is StationInfo[] => 'districtID' in u)(dataList[1]) ?
+				((u :any) :u is StationInfo[] => 'districtID' in u[0])(dataList[1]) ?
 				dataList[1] : null;
 
 			if(! alarmList) {
@@ -178,14 +173,18 @@ export default class InspectAlarmService {
 
 	public async getDetails(
 		id :number
-	) :Promise<Detail | undefined> {
+	) :Promise<Detail> {
 		const list :OutBound[] | undefined = InspectAlarmService.store.get('outbound');
-		if(! list || (list && list.length === 0)) return;
+		if(! list || (list && list.length === 0)) {
+			throw new Error('');
+		}
 
 		const target = list.find(item => {
 			if(item.alarmId === id) return true;
 		});	
-		if(! target) return;
+		if(! target) {
+			throw new Error('');
+		}
 
 		return {
 			deviceInfo: target.device,
