@@ -94,6 +94,8 @@
 		</div>
 		<InspectDateFilter
 			class="inspect-filter-container"
+			@select="dateFilterSelectHandler"
+			@time-range="timeRangeHandler"
 		></InspectDateFilter>
 		<InspectTable
 			v-if="_reactive.state.table"
@@ -143,9 +145,10 @@
 	import InspectTable from '@/components/InspectTable.vue';
 
 	import {
-		useAlarmTypeMaker,
-		useInspectReportMaker
-	} from '@/hooks/InspectManager';
+		useGetCurrentDayRanges,
+		useGetCurrentMonthRanges,
+		useGetCurrentWeekRanges
+	} from '@/hooks/inspectTimeFilter';
 
 	import {
 		videoBox,
@@ -336,6 +339,29 @@ import { DeviceInfo } from '@/types';
 		}
 	};
 
+	const dateFilterSelectHandler = (
+		value :string
+	) => {
+		switch(value) {
+			case '全部':
+				pageChanger(1);
+				break;
+			case '本日':
+				pageChanger(1, useGetCurrentDayRanges());
+				break;
+			case '本周':
+				pageChanger(1, useGetCurrentWeekRanges());
+				break;
+			case '本月':
+				pageChanger(1, useGetCurrentMonthRanges());
+				break;
+		}
+	}
+
+	const timeRangeHandler = (v :string[]) => {
+		pageChanger(1, v);
+	};	
+
 	const modelInovke = new Map<string, ModelInovkeType>([
 		['history', {
 			title: '历史巡检',
@@ -425,9 +451,10 @@ import { DeviceInfo } from '@/types';
 	const getHistoryModelData = (
 		stationId = 1,
 		pageId = 1,
+		timeRange? :string[]
 	) => {
 		return Promise.all([
-			getInspectHistoryList(stationId, pageId),
+			getInspectHistoryList(stationId, pageId, timeRange),
 			getStationInfo(stationId)
 		]).then(dataList => {
 			return dataList[0].map<TableRow>((item, index) => ({
@@ -446,9 +473,10 @@ import { DeviceInfo } from '@/types';
 	const getAlarmModelData = (
 		stationId = 1,
 		pageId = 1,
+		timeRange? :string[]
 	) => {
 		return Promise.all([
-			getInspectAlarmList(stationId, pageId),
+			getInspectAlarmList(stationId, pageId, timeRange),
 			getStationInfo(stationId)
 		]).then(dataList => {
 			return dataList[0].map<TableRow>((item, index) => ({
@@ -459,20 +487,20 @@ import { DeviceInfo } from '@/types';
 				alarmTime: dataList[0][index].time,
 				alarmType: dataList[0][index].type,
 				handleStatus: dataList[0][index].status,
-				options: ['告警查看', '已处理', '处置报告']
+				options: ['告警查看', `${dataList[0][index].status}`, '处置报告']
 			}));
 		});
 	};
 
-	const pageChanger = (index :number) => {
+	const pageChanger = (index :number, timeRange? :string[]) => {
 		if(_reactive.data.model === 'history') {
-			getHistoryModelData(1, index).then(result => {
+			getHistoryModelData(1, index, timeRange).then(result => {
 				_reactive.data.tableData.rowList = result;
 			});
 		}
 
 		if(_reactive.data.model === 'alarm') {
-			getAlarmModelData(1, index).then(result => {
+			getAlarmModelData(1, index, timeRange).then(result => {
 				_reactive.data.tableData.rowList = result;
 			});
 		}
@@ -495,6 +523,7 @@ import { DeviceInfo } from '@/types';
 			});
 		}else if(model === 'warn') {
 			insAlarmService.pull(1).then(result => {
+				console.log('jx', result);
 				_reactive.data.tableData.columnList = 
 					_static.data.warnModel.columnList;
 				_reactive.data.tableData.rowList = result;

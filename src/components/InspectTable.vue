@@ -14,6 +14,9 @@
 			font-family: PingFang SC;
 			font-weight: 500;
 			color: #FFFFFF;
+			.cell {
+				height: 20px;
+			}
 		}
 	}
 	:deep(.table-row) {
@@ -25,6 +28,9 @@
 			font-family: PingFang SC;
 			font-weight: 400;
 			color: #FFFFFF;
+			.cell {
+				height: 27px;
+			}
 		}
 	}
 	:deep(.el-scrollbar__view) {
@@ -96,11 +102,23 @@
 										v-for="item, index in row[column.prop]"
 										:key="index"
 									>
-										<div class="btn"
-											:id="item"
+										<template
+											v-if="item === '已处理'"
 										>
-											<span>{{ item }}</span>
-										</div>
+											<div class="btn"
+												:id="item"
+												style="opacity: 0.3;"
+											>
+												<span>{{ item }}</span>
+											</div>
+										</template>
+										<template v-else>
+											<div class="btn"
+												:id="item"
+											>
+												<span>{{ item }}</span>
+											</div>
+										</template>
 									</template>
 								</div>
 							</template>
@@ -136,7 +154,8 @@
 
 <script setup lang="ts">
 	import {
-		getAlarmReportImage
+		getAlarmReportImage,
+		updateAlarmStatus
 	} from '@/api/default';
 
 	import screenManager from '@/hooks/ScreenManager';
@@ -213,6 +232,22 @@
 		if(id === '查看报告') emits('openReport', ...args);
 		if(id === '告警查看') emits('openReport', 'alarmCheck', args[2]);
 		if(id === '处置报告') emits('openReport', 'handleReport');
+		if(id === '未处理') {
+			updateAlarmStatus(
+				args[2] as number,
+				'已处理'
+			)
+			const el = document.getElementById('未处理');
+			if(el) {
+				el.style.opacity = '0.3';
+				el.innerText = '已处理';
+				el.onclick = function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+				}
+			}
+			
+		}
 	};
 
 	onMounted(() => {

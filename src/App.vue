@@ -33,4 +33,10 @@
 
 	pachResizeObserver();
 	getToken().then(token => tokenStorage.value = token);
+
+	import {
+		useGetCurrentWeekRanges,
+		useGetCurrentMonthRanges,
+		useGetCurrentDayRanges,
+	} from '@/hooks/inspectTimeFilter';
 </script>

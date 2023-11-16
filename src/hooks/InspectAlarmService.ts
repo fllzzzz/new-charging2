@@ -157,7 +157,7 @@ export default class InspectAlarmService {
 					alarmTime: item.time,
 					alarmType: item.type,
 					handleStatus: item.status,
-					options: ['告警查看', '已处理', '处置报告'],
+					options: ['告警查看', `${item.status}`, '处置报告'],
 				}
 			})
 		});

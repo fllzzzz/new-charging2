@@ -171,44 +171,52 @@ export const getDeviceCapture = async (
 
 export const getInspectHistoryList = (
 	stationId :number,
-	pageId :number
+	pageId :number,
+	timeRange? :string[]
 ) => {
 	return $default({
 		method: 'post',
 		url: '/report_list/GetReportList',
 		data: {
 			'station_id': stationId,
-			page: pageId
+			page: pageId,
+			start: timeRange ? timeRange[0] : '',
+			end: timeRange ? timeRange[1] : '',
 		}
 	})
 	.then(res => res.data)
 	.then(result => result.data as any[])
 	.then(list => {
+		if(! list) return [];
 		return list.map(item => {
 			return pullFormat<InspectHistory>(item)
 		});
-	});
+	})
 };
 
 export const getInspectAlarmList = (
 	stationId :number,
-	pageId :number
+	pageId :number,
+	timeRange? :string[]
 ) => {
 	return $default({
 		method: 'post',
 		url: '/alarm_list/GetAlarmList',
 		data: {
 			'station_id': stationId,
-			page: pageId
+			page: pageId,
+			start: timeRange ? timeRange[0] : '',
+			end: timeRange ? timeRange[1] : '',
 		}
 	})
 	.then(res => res.data)
 	.then(result => result.data as any[])
 	.then(list => {
+		if(! list) return [];
 		return list.map(item => {
 			return pullFormat<InspectAlarm>(item)
 		});
-	});
+	})
 };
 
 export const getStationInfo = (
@@ -363,7 +371,6 @@ export const getAlarmReportImage = (
 	.then(data => data[0].image as string)
 };
 
-
 export const getDeviceName = (
 	params : DeviceInfo & {
 		stationId :number;
@@ -382,4 +389,28 @@ export const getDeviceName = (
 	.then(res => res.data)
 	.then(result => result.data as any[])
 	.then(data => data[0].cameraName as string)
+};
+
+export const updateAlarmStatus = (
+	id :number,
+	status :string,
+) => {
+	return $default({
+		method: 'post',
+		url: '/alarm_list/update',
+		data: {
+			mainData: {
+				AlarmID: id,
+				Status: status
+			},
+			UpdateContent: "更新处理状态",
+			detailData: null,
+			delKey: null
+		},
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: 'Bearer ' + tokenStorage.value
+		},
+		timeout: 3000
+	});
 };

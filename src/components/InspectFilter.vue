@@ -106,6 +106,8 @@
 			>
 				<el-radio
 					:label="item"
+					v-model="_reactive.data.presetFilterListSelected"
+					@change="radioChanger"
 				></el-radio>
 			</template>
 		</div>
@@ -113,6 +115,8 @@
 		<div class="box" id="custom-filter">
 			<el-radio
 				label="自定义"
+				v-model="_reactive.state.custom"
+				@change="customHandler"
 			></el-radio>
 			<div class="date-picker">
 				<el-date-picker
@@ -120,6 +124,7 @@
 					v-model="_reactive.data.datePick"
 					:format="_reactive.data.dateFormat"
 					:value-format="_reactive.data.dateFormat"
+					@change="datePickChanger"
 				>
 				</el-date-picker>
 			</div>
@@ -136,13 +141,32 @@
 		reactive
 	} from 'vue';
 
+	const emits = defineEmits(['select', 'time-range']);
+
 	const _reactive = reactive({
 		data: {
+			presetFilterListSelected: undefined as undefined | string,
 			presetFilterList: [
 				'全部', '本日', '本周', '本月'
 			],
 			datePick: ['2023-05-15','2023-05-15'],
 			dateFormat: 'YYYY-MM-DD',
+		},
+		state: {
+			custom: undefined as undefined | string
 		}
 	});
+
+	const radioChanger = (value :string | number | boolean) => {
+		_reactive.state.custom = undefined;
+		emits('select', value)
+	};
+
+	const customHandler = () => {
+		_reactive.data.presetFilterListSelected = undefined;
+	};
+
+	const datePickChanger = (value :string[]) => {
+		emits('time-range', value)
+	};
 </script>
