@@ -69,7 +69,7 @@ const $default = axios.create({
 
 const $Ezvis = axios.create({
 	timeout: 10000,
-	baseURL: 'http://192.168.1.95:19028/EZvis',
+	baseURL: 'http://192.168.1.95:19010/EZvis',
 	headers: {
 		'Content-Type': 'application/x-www-form-urlencoded'
 	}
@@ -146,7 +146,7 @@ export const getVideoAddress = async (
 		data: {
 			Act: 'GetCamera_Adress',
 			protocol: 4,
-			quality: 2,
+			quality: 1,
 			...deviceInfo
 		},
 	}).then(res => res.data)
@@ -387,8 +387,8 @@ export const getDeviceName = (
 		timeout: 3000
 	})
 	.then(res => res.data)
-	.then(result => result.data as any[])
-	.then(data => data[0].cameraName as string)
+	.then(result => result.data)
+	.then(data => data.cameraName as string)
 };
 
 export const updateAlarmStatus = (

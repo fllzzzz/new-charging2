@@ -41,6 +41,7 @@ type Detail = {
 	name :string;
 	alarmList :string[];
 	image :string;
+	status :string;
 };
 
 type InspectAlarm = {
@@ -191,7 +192,8 @@ export default class InspectAlarmService {
 			time: target.alarmTime,
 			name: target.monitorName,
 			alarmList: target.alarmContent,
-			image: await getAlarmReportImage(id)
+			image: await getAlarmReportImage(id),
+			status: target.handleStatus
 		} as Detail
 	}
 

@@ -368,6 +368,7 @@
 	});
 
 	const deviceListSelector = (device :DeviceInfo) => {
+		console.log('@full');
 		if(_static.data.videoClickIndex) {
 			if(!_static.data.playerList[_static.data.videoClickIndex!]) return;
 			getVideoAddress(device).then(url => {

@@ -237,7 +237,7 @@
 				args[2] as number,
 				'已处理'
 			)
-			const el = document.getElementById('未处理');
+			const el = event.target as HTMLElement;
 			if(el) {
 				el.style.opacity = '0.3';
 				el.innerText = '已处理';

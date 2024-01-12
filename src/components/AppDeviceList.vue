@@ -225,7 +225,7 @@
 		if(state === 0) return 'is-locked';
 	});
 
-	getDeviceList(1).then((deviceList :any[]) => {
+	getDeviceList(16).then((deviceList :any[]) => {
 		const _arr = deviceList.map(device => {
 			return {
 				id: device.id,

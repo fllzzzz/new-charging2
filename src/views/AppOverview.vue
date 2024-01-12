@@ -22,6 +22,11 @@
 			}
 		}
 	}
+
+	.model-iframe {
+		border: none;
+		overflow: hidden;
+	}
 </style>
 
 <template>
@@ -32,10 +37,16 @@
 					'--width': item.width,
 					'--height': item.height,
 					'--top': item.points[0],
-					'--left': item.points[1]
+					'--left': item.points[1],
 				}"
 			>
-				<img :src="item.image">
+				<!-- <img :src="item.image"> -->
+				<iframe
+					scrolling="no"
+					class="model-iframe"
+					:src="item.src"
+					style="width: 100%;height: 100%;box-sizing: border-box;"
+				></iframe>
 			</div>
 		</template>
 	</div>
@@ -58,35 +69,40 @@
 					width: 343,
 					height: 247,
 					points: [120,18],
-					image: require('@/assets/images/background/system-data-1.png')
+					image: require('@/assets/images/background/system-data-1.png'),
+					src: 'http://localhost:8080/#/operational-data'
 				},
 				{
 					id: 2,
 					width: 343,
 					height: 343,
 					points: [382,18],
-					image: require('@/assets/images/background/charging-data.png')
+					image: require('@/assets/images/background/charging-data.png'),
+					src: 'http://localhost:8080/#/charg-data'
 				},
 				{
 					id: 3,
 					width: 343,
 					height: 265,
 					points: [731,18],
-					image: require('@/assets/images/background/outside-env.png')
+					image: require('@/assets/images/background/outside-env.png'),
+					src: 'http://localhost:8080/#/outdoor-env'
 				},
 				{
 					id: 4,
 					width: 343,
 					height: 468,
 					points: [120,1560],
-					image: require('@/assets/images/background/system-mangle-1.png')
+					image: require('@/assets/images/background/system-mangle-1.png'),
+					src: 'http://localhost:8080/#/sys-overview'
 				},
 				{
 					id: 1,
 					width: 343,
 					height: 388,
 					points: [608,1560],
-					image: require('@/assets/images/background/income-overview-1.png')
+					image: require('@/assets/images/background/income-overview-1.png'),
+					src: 'http://localhost:8080/#/income-overview'
 				},
 			]
 		}

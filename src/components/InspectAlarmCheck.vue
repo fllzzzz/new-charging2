@@ -150,6 +150,12 @@
 			align-items: center;
 		}
 	}
+
+
+	.is-handled {
+		pointer-events: none;
+		opacity: 0.3;
+	}
 </style>
 
 <template>
@@ -244,6 +250,7 @@
 				<span>自动处理</span>
 			</div>
 			<div class="btn"
+				:class="_reactive.data.status === '已处理' ? 'is-handled' : ''"
 				@click="clickImmConHandler">
 				<span>现场管控</span>
 			</div>
@@ -300,6 +307,7 @@
 			name: '1号充电桩东北角',
 			alarmList: ['充电桩未归位', '充电桩外观损坏', '充电桩外观损坏'],
 			image: require<string>('@/assets/images/background/test-1.png'),
+			status: ''
 		}
 	});
 
