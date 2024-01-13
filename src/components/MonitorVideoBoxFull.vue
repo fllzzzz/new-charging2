@@ -236,6 +236,7 @@
 				<div class="block">
 					<AppDeviceList
 						@select="deviceListSelector"
+						:config="deviceListConfig"
 					></AppDeviceList>
 				</div>
 				<div class="block">
@@ -293,6 +294,8 @@
 		DeviceInfo
 	} from '@/types';
 	import Player from 'video.js/dist/types/player';
+
+	const deviceListConfig = ref<any>({});
 
 
 	type DeviceContext = DeviceInfo & {
@@ -374,7 +377,10 @@
 
 
 	const init0 = () => {
-		
+		deviceListConfig.value = {
+			defaultIndex: 0
+		}
+
 		const target = _reactive.data.targetList.find(
 			target => target.name === 'to-signel'
 		);
@@ -396,8 +402,6 @@
 
 			originDeviceList.push(device);
 
-			console.log('@full', device);
-
 			getVideoAddress(device).then(url => {
 				config.value?.player.src({
 					type: "video/flv",
@@ -409,6 +413,8 @@
 
 	const config = ref<Config | undefined>();
 
+
+	let isInited = true;
 	watchEffect(() => {
 		config.value = props.config;
 
@@ -417,7 +423,9 @@
 
 			// @ts-ignore
 			! config.value?.player.src()
-		) init0()
+		) {
+			init0()
+		}
 	});
 
 	const emits = defineEmits([
@@ -443,6 +451,23 @@
 	});
 
 	const deviceListSelector = (device :DeviceInfo) => {
+		if(isInited) {
+			cloudControllerDevice.value = device;
+
+			console.log('@full => device', device);
+			getVideoAddress(device).then(url => {
+				console.log('@full => befor', {url});
+				config.value?.player.src({
+					type: "video/flv",
+					src: url
+				});
+
+				console.log('@full => after', {url: config.value?.player.src()});
+			}).catch(err => console.log(err))
+
+			return;
+		}
+
 		if(_static.data.videoClickIndex) {
 			if(!_static.data.playerList[_static.data.videoClickIndex!]) return;
 			getVideoAddress(device).then(url => {
@@ -579,6 +604,7 @@
 
 			switch(id) {
 				case 'to-small':
+					isInited = false;
 					useChangeModle('small');
 					usePublish('monitorTotaltargetState', true);
 					usePublish('AppFooterModel', 'inside');
@@ -586,6 +612,7 @@
 					emits('enter-small');
 					break;
 				case 'to-middle':
+					isInited = false;
 					useChangeModle('middle');
 					usePublish('monitorTotaltargetState', true);
 					usePublish('AppFooterModel', 'inside');
@@ -593,6 +620,7 @@
 					emits('enter-middle');
 					break;
 				case 'to-mulit':
+					isInited = false;
 					_static.data.playerList.forEach(
 						player => player.dispose()
 					);
@@ -604,6 +632,7 @@
 					});
 					break;
 				case 'to-signel':
+					isInited = false;
 					_static.data.playerList.forEach(
 						player => player.dispose()
 					);

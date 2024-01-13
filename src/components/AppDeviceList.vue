@@ -121,7 +121,10 @@
 							@click="deviceListClickHandler(
 								$event, device
 							)"
-							:class="getLockState(device.state)"
+							:class="[
+								getLockState(device.state),
+								index === defaultIndex ? 'is-active' : ''
+							]"
 						>
 							<template
 								v-if="device.state === 0"
@@ -160,11 +163,11 @@
 	import {
 		reactive,
 		computed,
-PropType,ref, watchEffect
+		PropType,ref, watchEffect
 	} from 'vue';
 
 	interface Config {
-		defaultIndex :number;
+		defaultIndex :number | undefined;
 	};
 
 	const emits = defineEmits(['select']);
@@ -175,13 +178,19 @@ PropType,ref, watchEffect
 		}
 	});
 
+	console.log('@device', props.config);
+
 	const config = ref<Config | undefined>();
 
+	const defaultIndex = ref(-1);
 	watchEffect(() => {
 		config.value = props.config;
 
-		if(config.value?.defaultIndex) {
-			
+		if(
+			config.value?.defaultIndex ||
+		 	(! config.value?.defaultIndex && config.value?.defaultIndex === 0)
+		) {
+			defaultIndex.value = config.value.defaultIndex;
 		}
 	});
 
@@ -197,8 +206,14 @@ PropType,ref, watchEffect
 	});
 
 
-
 	const deviceListClickHandler = (() => {
+		if(
+			config.value?.defaultIndex ||
+			(! config.value?.defaultIndex && config.value?.defaultIndex === 0)
+		) {
+			config.value.defaultIndex = undefined;
+		}
+
 		let _oldTarget :HTMLElement;
 
 		type DeviceInfos = DeviceInfo & {
@@ -238,6 +253,7 @@ PropType,ref, watchEffect
 			event :MouseEvent,
 			deviceInfo :DeviceInfos
 		) => {
+			defaultIndex.value = -1;
 			if(locker(deviceInfo.state, event)) return;
 			heightLight((event.target as HTMLElement));
 			deviceInfoSync(deviceInfo);
@@ -261,5 +277,10 @@ PropType,ref, watchEffect
 
 		_reactive.data.deviceList = _arr;
 		useOnlineFilter(_arr);
+
+		emits('select', {
+			deviceSerial: _arr[0].deviceSerial,
+			channelNo: _arr[0].channelNo
+		} as DeviceInfo)
 	});
 </script>
