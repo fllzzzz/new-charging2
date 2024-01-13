@@ -414,3 +414,30 @@ export const updateAlarmStatus = (
 		timeout: 3000
 	});
 };
+
+export type Direction = keyof typeof directions;
+export const cloudController = async (
+	deviceInfo :DeviceInfo,
+	direction :keyof typeof directions,
+) :Promise<void> => {
+	$Ezvis({
+		method: 'post',
+		params: {
+			Act: 'ControlCamera_Move_Start',
+			...deviceInfo,
+			direction,
+			speed: 1,
+		},
+	}).then(() => {
+		setTimeout(() => {
+			$Ezvis({
+				method: 'post',
+				params: {
+					Act: 'ControlCamera_Move_Stop',
+					...deviceInfo,
+					speed: 1,
+				},
+			})
+		}, 1000)
+	})
+}

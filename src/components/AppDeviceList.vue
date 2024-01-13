@@ -159,10 +159,31 @@
 
 	import {
 		reactive,
-		computed
+		computed,
+PropType,ref, watchEffect
 	} from 'vue';
 
+	interface Config {
+		defaultIndex :number;
+	};
+
 	const emits = defineEmits(['select']);
+
+	const props = defineProps({
+		config: {
+			type: Object as PropType<Config>
+		}
+	});
+
+	const config = ref<Config | undefined>();
+
+	watchEffect(() => {
+		config.value = props.config;
+
+		if(config.value?.defaultIndex) {
+			
+		}
+	});
 
 	const _reactive = reactive({
 		data: {
@@ -174,6 +195,8 @@
 			deviceList: [] as any[]
 		}
 	});
+
+
 
 	const deviceListClickHandler = (() => {
 		let _oldTarget :HTMLElement;

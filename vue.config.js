@@ -5,6 +5,7 @@ const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
 
 module.exports = defineConfig({
   transpileDependencies: false,
+  lintOnSave: false,
   configureWebpack: {
     plugins: [
       AutoImport({

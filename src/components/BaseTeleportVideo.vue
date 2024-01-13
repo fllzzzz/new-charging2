@@ -56,6 +56,8 @@
 		onBeforeUnmount
 	} from 'vue';
 
+	const emits = defineEmits(['created']);
+
 	const elTelepContainer = ref<HTMLElement | null>(null);
 
 	const props = defineProps({
@@ -146,6 +148,7 @@
 
 	const createPlayer = () => {
 		usePlayerCreater('player').then(player => {
+			emits('created', player);
 			(player.el_ as HTMLElement).style
 				.height = '100%';
 			(player.el_ as HTMLElement).style
@@ -156,6 +159,8 @@
 			if(! props.deviceInfo || Object.keys(props.deviceInfo).length === 0) return;
 			playerSrcChanger(props.deviceInfo);
 		});
+
+		
 	};
 
 	onMounted(() => {

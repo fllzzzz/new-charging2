@@ -77,6 +77,9 @@
 			class="item video-target"
 			:is="videoBox.target"
 			:class="boxClassNameSetter"
+			:config="{
+				player: _player
+			}"
 			@enter-mulit="enterMulitHandler"
 			@enter-signel="enterSignelHandler"
 			@enter-small="enterSmallHandler"
@@ -86,6 +89,7 @@
 			v-if="_reatcive.state.telepVideo"
 			:telep-target="_reatcive.data.teleportTarget"
 			:device-info="_reatcive.data.deviceInfo"
+			@created="handleBTV"
 		></BaseTeleportVideo>
 	</div>
 </template>
@@ -130,8 +134,18 @@
 		computed,
 		onBeforeUnmount,
 		nextTick,
-		onMounted
+		onMounted,
+		ref,
+		watchEffect
 	} from 'vue';
+	import Player from 'video.js/dist/types/player';
+
+	const _player = ref<Player | undefined>(); 
+
+
+	const handleBTV = (player :Player) => {
+		_player.value = player;
+	}
 
 	const _reatcive = reactive({
 		data: {

@@ -138,7 +138,9 @@
 				<div class="graph line"></div>
 				<span>云台控制</span>
 			</div>
-			<AppRingController></AppRingController>
+			<AppRingController
+				@controller="handleController"
+			></AppRingController>
 		</div>
 		<div class="block">
 			<template
@@ -207,8 +209,30 @@
 	import {
 		h,
 		reactive,
-		defineComponent
+		PropType,
+		defineComponent,
+		watchEffect
 	} from 'vue';
+
+	import { cloudController,Direction } from '@/api/default';
+
+	import {
+		DeviceInfo
+	} from '@/types';
+
+	type Config = DeviceInfo;
+
+	const props = defineProps({
+		config: {
+			type: Object as PropType<Config>,
+		}
+	});
+
+	const handleController = (p :Direction) => {
+		if(! props.config) throw new Error('device is not defined');
+
+		cloudController(props.config, p)
+	}
 
 	const _reactive = reactive({
 		data: {

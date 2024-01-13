@@ -6,6 +6,7 @@
 		background-repeat: no-repeat;
 		background-size: contain;
 		position: relative;
+		pointer-events: auto;
 		img {
 			width: 24px;
 			height: 24px;
@@ -70,7 +71,7 @@
 </style>
 
 <template>
-	<div class="container ring-controller">
+	<div class="container ring-controller" @click="handleClick">
 		<img :draggable="false" src="@/assets/images/icon/up.png" id="up">
 		<img :draggable="false" src="@/assets/images/icon/right.png" id="right">
 		<img :draggable="false" src="@/assets/images/icon/down.png" id="down">
@@ -83,3 +84,13 @@
 		<img :draggable="false" src="@/assets/images/icon/narrow.png" id="narrow">
 	</div>
 </template>
+
+<script setup lang="ts">
+	const emits = defineEmits(['controller']);
+
+	const handleClick = (e :MouseEvent) => {
+		if(! (e.target as HTMLElement).id) return;
+
+		emits('controller', (e.target as HTMLElement).id);
+	}
+</script>

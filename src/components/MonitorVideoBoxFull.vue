@@ -8,6 +8,12 @@
 		flex-flow: column nowrap;
 		justify-content: flex-start;
 		align-items: center;
+		video {
+			width: 100% !important;
+			height: 100% !important;
+			object-fit: fill !important;
+		}
+
 		& > .item {
 			box-sizing: border-box;
 			width: 1883px;
@@ -52,7 +58,7 @@
 							flex-flow: row nowrap;
 							justify-content: flex-end;
 							align-items: center;
-							img.btn {
+							img.target {
 								pointer-events: auto;
 								width: 24px;
 								height: 24px;
@@ -194,13 +200,13 @@
 				@click="clickDispensere"
 			>
 				<template
-					v-for="btn in _reactive.data.btnList"
-					:key="btn.id"
+					v-for="target in _reactive.data.targetList"
+					:key="target.id"
 				>
 					<img
-						class="btn"
-						:id="btn.name"
-						:src="btn.imageList[0]"
+						class="target"
+						:id="target.name"
+						:src="target.imageList[0]"
 						:draggable="false"
 					>
 				</template>
@@ -233,7 +239,9 @@
 					></AppDeviceList>
 				</div>
 				<div class="block">
-					<AppCloudController></AppCloudController>
+					<AppCloudController
+						:config="cloudControllerDevice"
+					></AppCloudController>
 				</div>
 			</div>
 		</div>
@@ -271,16 +279,21 @@
 	} from '@/hooks/EventEmitter';
 
 	import {
+		ref,
 		reactive,
 		computed,
 		nextTick,
-		onBeforeUnmount
+		watchEffect,
+		onBeforeUnmount,
+		PropType
 	} from 'vue';
 
 	import {
 		MonitorVideoBox,
 		DeviceInfo
 	} from '@/types';
+	import Player from 'video.js/dist/types/player';
+
 
 	type DeviceContext = DeviceInfo & {
 		id :number;
@@ -288,14 +301,17 @@
 		state :number;
 	};
 
-	const emits = defineEmits([
-		'close',
-		'enter-mulit',
-		'enter-signel',
-		'enter-small',
-		'enter-middle'
-	]);
+	interface Config {
+		player :Player
+	};
 
+	const props = defineProps({
+		config: {
+			type: Object as PropType<Config>
+		}
+	});
+
+	
 	const _reactive = reactive({
 		data: {
 			playerList: [
@@ -304,7 +320,7 @@
 				'my-player-3',
 				'my-player-4',
 			],
-			btnList: [
+			targetList: [
 				{
 					id :1,
 					name: 'to-small',
@@ -356,7 +372,66 @@
 		}
 	};
 
-	usePublish('monitorTotalBtnState', false);
+
+	const init0 = () => {
+		
+		const target = _reactive.data.targetList.find(
+			target => target.name === 'to-signel'
+		);
+
+		if(! target) return;
+
+		[target.imageList[0], target.imageList[1]] = 
+						[target.imageList[1], target.imageList[0]];
+
+		Hunter(() => usePoolGetter<DeviceContext[]>('onlineList'), {
+			frequency: 200,
+			cycle: 50
+		}).then(deviceList => {
+			_static.data.deviceList = deviceList;
+			const device = {
+				deviceSerial: deviceList[0].deviceSerial,
+				channelNo: deviceList[0].channelNo
+			} as DeviceInfo;
+
+			originDeviceList.push(device);
+
+			console.log('@full', device);
+
+			getVideoAddress(device).then(url => {
+				config.value?.player.src({
+					type: "video/flv",
+					src: url
+				});
+			}).catch(err => console.log(err))
+		}).catch(err => console.log(err))
+	}
+
+	const config = ref<Config | undefined>();
+
+	watchEffect(() => {
+		config.value = props.config;
+
+		if(
+			config.value?.player &&
+
+			// @ts-ignore
+			! config.value?.player.src()
+		) init0()
+	});
+
+	const emits = defineEmits([
+		'close',
+		'enter-mulit',
+		'enter-signel',
+		'enter-small',
+		'enter-middle'
+	]);
+
+	const originDeviceList :any = [];
+	const cloudControllerDevice = ref<DeviceInfo | undefined>();
+
+	usePublish('monitorTotaltargetState', false);
 
 	useCompStateChanger('AppSmartGuard', false);
 	useCompStateChanger('AppFooter', false);
@@ -368,7 +443,6 @@
 	});
 
 	const deviceListSelector = (device :DeviceInfo) => {
-		console.log('@full');
 		if(_static.data.videoClickIndex) {
 			if(!_static.data.playerList[_static.data.videoClickIndex!]) return;
 			getVideoAddress(device).then(url => {
@@ -418,6 +492,9 @@
 		} else {
 			_static.data.videoClickIndex = undefined;
 		}
+
+		cloudControllerDevice.value = 
+			originDeviceList[_static.data.videoClickIndex ?? 0];
 		const pEl = (event.target as HTMLElement).parentElement?.parentElement;
 		if(!pEl) return;
 		for(let i=0; i<pEl.children.length; i++) {
@@ -439,8 +516,11 @@
 				return {
 					deviceSerial: device.deviceSerial,
 					channelNo: device.channelNo
-				} as DeviceInfo
+				} as DeviceInfo;
 			});
+
+			originDeviceList.push(..._arr);
+			console.log('@cloud', originDeviceList);
 
 			getAllVideoAddress(_arr).then(urlList => {
 				_reactive.data.playerList.forEach((elVideoId, index) => {
@@ -472,42 +552,42 @@
 	const clickEventInovke = new Map<string[], ((
 		...args :any[]
 	) => void)>([
-		[Array.from(_reactive.data.btnList, btn => btn.name), (...args) => {
+		[Array.from(_reactive.data.targetList, target => target.name), (...args) => {
 			const id = args[0] as string;
 			const oldHeightLightElements = 
-				_reactive.data.btnList.filter(btn => {
-					if (btn.state === 1) {
-						btn.state = 0;
+				_reactive.data.targetList.filter(target => {
+					if (target.state === 1) {
+						target.state = 0;
 						return true;
 					}
 				});
 
 			if(oldHeightLightElements && oldHeightLightElements.length > 0) {
-				oldHeightLightElements.forEach(btn => {
-					[btn.imageList[0], btn.imageList[1]] = 
-						[btn.imageList[1], btn.imageList[0]];
+				oldHeightLightElements.forEach(target => {
+					[target.imageList[0], target.imageList[1]] = 
+						[target.imageList[1], target.imageList[0]];
 				})
 			}
 
-			_reactive.data.btnList.find(btn => {
-				if(btn.name === id) {
-					[btn.imageList[0], btn.imageList[1]] = 
-						[btn.imageList[1], btn.imageList[0]];
-					btn.state = 1;
+			_reactive.data.targetList.find(target => {
+				if(target.name === id) {
+					[target.imageList[0], target.imageList[1]] = 
+						[target.imageList[1], target.imageList[0]];
+					target.state = 1;
 				}
 			});
 
 			switch(id) {
 				case 'to-small':
 					useChangeModle('small');
-					usePublish('monitorTotalBtnState', true);
+					usePublish('monitorTotaltargetState', true);
 					usePublish('AppFooterModel', 'inside');
 					useCompStateChanger('AppFooter', true);
 					emits('enter-small');
 					break;
 				case 'to-middle':
 					useChangeModle('middle');
-					usePublish('monitorTotalBtnState', true);
+					usePublish('monitorTotaltargetState', true);
 					usePublish('AppFooterModel', 'inside');
 					useCompStateChanger('AppFooter', true);
 					emits('enter-middle');
@@ -550,7 +630,7 @@
 		useCompStateChanger('AppSmartGuard', true);
 		usePublish('AppFooterModel', 'inside');
 		useCompStateChanger('AppFooter', true);
-		usePublish('monitorTotalBtnState', true);
+		usePublish('monitorTotaltargetState', true);
 	};
 
 	onBeforeUnmount(() => {
