@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 @font-face {
 	font-family: 'LESLIE';
 	src: url('@/assets/fonts/LESLIEB.ttf');
@@ -13,4 +15,14 @@
 
 .disable_pointer-event {
 	pointer-events: none;
+}
+
+
+
+@function rem($px) {
+	@return math.div($px, 1920) * 100rem;
+}
+
+@function vw($px) {
+	@return math.div($px, 1920) * 100vw;
 }

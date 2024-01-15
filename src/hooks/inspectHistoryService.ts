@@ -46,6 +46,10 @@ type PresetUpdate = {
 	keyWords :string[];
 };
 
+import {
+	stationID
+} from '@/store';
+
 export default class InspectHistoryService {
 	protected constructor() {/*  */}
 	protected static lock = 1;
@@ -66,7 +70,7 @@ export default class InspectHistoryService {
 	protected static async generateInspectList(
 		listPageNum :number,
 	) {
-		const historyList = await getInspectHistoryList(listPageNum, 1);
+		const historyList = await getInspectHistoryList(listPageNum, stationID.value ?? 0);
 		const reportList = await Promise.allSettled(
 			historyList.map(item => item.reportID).map(
 				id => getInspectVideoReport(id)

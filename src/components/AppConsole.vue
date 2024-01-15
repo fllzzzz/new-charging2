@@ -32,7 +32,7 @@
 					height: 22px;
 					position: absolute;
 					top: 4px;right: 4px;
-					z-index: 100;
+					z-index: 100000;
 				}
 			}
 			#controller {
@@ -74,7 +74,10 @@
 <template>
 	<div class="console-container">
 		<div class="item" id="search">
-			<AppDeviceList></AppDeviceList>
+			<AppDeviceList
+				:config="deviceListConfig"
+				@select="handleDeviceListSelect"
+			></AppDeviceList>
 		</div>
 		<div class="item" id="video"
 			v-if="_reatcive.state.video"
@@ -88,11 +91,14 @@
 				<div class="graph line"></div>
 				<span>云台控制</span>
 			</div>
-			<AppRingController></AppRingController>
+			<AppRingController
+				@controller="handleController"
+			></AppRingController>
 		</div>
 		<BaseTeleportVideo
 			:telep-target="_reatcive.data.telepTarget"
 			class-name="telep-src_custom"
+			:device-info="deviceListSelect"
 		>
 		</BaseTeleportVideo>
 	</div>
@@ -105,10 +111,47 @@
 	import AppDeviceList from '@/components/AppDeviceList.vue';
 
 	import {
-		reactive
+	PropType,
+		reactive,
+		ref,
+	watchEffect
 	} from 'vue';
+	import { DeviceInfo } from '@/types';
+	import { cloudController,Direction } from '@/api/default';
 
 	const emits = defineEmits(['videoModelChange']);
+
+	interface Config {
+		hasDefaultIndex :boolean;
+	};
+
+	const props = defineProps({
+		config: {
+			type: Object as PropType<Config>
+		}
+	});
+
+	const config = ref<Config | undefined>();
+
+	watchEffect(() => {
+		config.value = props.config;
+
+		if(props.config?.hasDefaultIndex) {
+			deviceListConfig.value = 0;
+		}
+	})
+
+	const deviceListConfig = ref<any>({defaultIndex: 0});
+	const deviceListSelect = ref<DeviceInfo | undefined>();
+
+	const handleDeviceListSelect = (params :DeviceInfo) => {
+		deviceListSelect.value = params;
+	}
+
+	const handleController = (p :Direction) => {
+		if(! deviceListSelect.value) return;
+		cloudController(deviceListSelect.value , p)
+	}
 
 	const _reatcive = reactive({
 		data: {

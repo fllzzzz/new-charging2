@@ -8,6 +8,22 @@ import type {
 	DeviceInfo
 } from '@/types';
 
+
+interface Result<T> {
+	Status? :boolean;
+	Code? :number;
+	message? :string;
+	data? :T
+};
+
+interface Wrather {
+	description :string;
+	temp :number;
+	humidity :number;
+	windSpeed :number;
+	rain :number;
+};
+
 type InspectHistory = {
 	reportID :number;
 	reportTime :string;
@@ -46,7 +62,7 @@ export type InspectVideoReport = {
 
 export const tokenStorage = ref<string | undefined>(undefined);
 
-enum directions {
+enum Directions {
 	'up' = 0,
 	'right' = 3,
 	'down' = 1,
@@ -415,29 +431,60 @@ export const updateAlarmStatus = (
 	});
 };
 
-export type Direction = keyof typeof directions;
+export type Direction = keyof typeof Directions;
 export const cloudController = async (
 	deviceInfo :DeviceInfo,
-	direction :keyof typeof directions,
+	direction :keyof typeof Directions,
 ) :Promise<void> => {
 	$Ezvis({
 		method: 'post',
-		params: {
+		data: {
 			Act: 'ControlCamera_Move_Start',
 			...deviceInfo,
-			direction,
+			direction: Directions[direction],
 			speed: 1,
 		},
 	}).then(() => {
 		setTimeout(() => {
 			$Ezvis({
 				method: 'post',
-				params: {
+				data: {
 					Act: 'ControlCamera_Move_Stop',
 					...deviceInfo,
 					speed: 1,
 				},
 			})
 		}, 1000)
+	})
+}
+export const getWeather = async (
+	stationId :number
+) => {
+	const areaId = await getStationInfo(stationId).then(
+		result => result[0].districtID
+	);
+
+	return await $default<Result<Wrather[]>>({
+		method: 'post',
+		url: '/weather_system/GetWeatherData',
+		data: {
+			'Area_id': areaId
+		}
+	})
+	.then(res => res.data.data)
+	.then(data => {
+		if(! data) return undefined;
+	
+		const keys = [
+			'description',
+			'temp',
+			'humidity',
+			'windSpeed',
+			'rain',
+		];
+		
+		return Object.fromEntries(Object.entries(data[0]).filter(
+			row => keys.includes(row[0]) ? true : false
+		)) as Wrather;
 	})
 }

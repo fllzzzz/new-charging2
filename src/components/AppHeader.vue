@@ -24,60 +24,9 @@
 			}
 		}
 		#weather {
-			top: 5px;
-			left: 274px;
-			height: 36px;
-			max-width: 460px;
-			overflow: hidden;
-			display: flex;
-			flex-flow: row nowrap;
-			justify-content: flex-start;
-			align-items: center;
-			& > .box {
-				&:last-child {
-					margin-right: 0 !important;
-				}
-				@for $i from 1 to 6 {
-					@if $i == 1 {
-						&:nth-of-type(#{$i}) {
-							width: 36px;
-							height: 36px;
-							margin-right: 3px;
-							img {
-								width: 100%;
-								height: 100%;
-								object-fit: contain;
-							}
-						}
-					}@else {
-						&:nth-of-type(#{$i}) {
-							height: 14px;
-							align-self: flex-end;
-							margin-bottom: 5px;
-							margin-right: 10px;
-							display: flex;
-							flex-flow: row nowrap;
-							justify-content: flex-start;
-							align-items: center;
-							span:first-child {
-								font-size: 16px;
-								font-family: DINPro;
-								font-weight: 400;
-								color: #51F8DE;
-								line-height: 19px;
-							}
-							span:last-child {
-								font-size: 12px;
-								font-family: Source Han Sans CN;
-								font-weight: 400;
-								color: #FFFFFF;
-								line-height: 19px;
-								opacity: 0.6;
-							}
-						}
-					}
-				}
-			}
+			position: absolute;
+			left: vw(280);
+			top: vw(5);
 		}
 		#title {
 			top: 28px;
@@ -181,26 +130,10 @@
 <template>
 	<div class="header-container">
 		<div class="item" id="clock">
-			<span>2023-08-02 00:09:30</span>
+			<AppHeaderClock></AppHeaderClock>
 		</div>
 		<div class="item" id="weather">
-			<div class="box">
-				<img :src="_reactive.data.weatherIcon">
-			</div>
-			<template 
-				v-for="item in _reactive.data.weatherInfoList" 
-				:key="item.id"
-			>
-				<div class="box">
-					<span>{{ item.value }}</span>
-					<span>
-						/{{
-							item.type + weatherUnitMapper
-								.get(item.type)
-						}}
-					</span>
-				</div>
-			</template>
+			<HeaderWeather></HeaderWeather>
 		</div>
 		<div class="item" id="title"
 			@click="clickDispenser"
@@ -239,39 +172,22 @@
 	} from 'vue-router';
 
 	import {
+		stationID
+	} from '@/store';
+
+	import {
 		reactive
 	} from 'vue';
 	import {
 		usePublish
 	} from '@/hooks/EventEmitter';
 
+	import AppHeaderClock from './AppHeaderClock.vue';
+	import HeaderWeather from './HeaderWeather.vue';
 	const router = useRouter();
 
 	const _reactive = reactive({
 		data: {
-			weatherIcon: require('@/assets/images/icon/多云.png'),
-			weatherInfoList: [
-				{
-					id: 0,
-					type: '温度',
-					value: 300.1
-				},
-				{
-					id: 1,
-					type: '湿度',
-					value: 368.4
-				},
-				{
-					id: 2,
-					type: '降雨',
-					value: 302.3
-				},
-				{
-					id: 3,
-					type: '风速',
-					value: 130.7
-				},
-			],
 			inspectInfoList: [
 				{
 					id: 1,
@@ -290,13 +206,6 @@
 			]
 		}
 	});
-
-	const weatherUnitMapper = new Map<string, string>([
-		['温度', '℃'],
-		['湿度', '%'],
-		['降雨', 'mm'],
-		['风速', 'm/s'],
-	])
 
 	const clickEventInvoke = new Map<string, ((
 		event :MouseEvent,
@@ -323,6 +232,7 @@
 			router.push({
 				name: 'map',
 			}).then(() => {
+				stationID.value = undefined;
 				usePublish('setIframerMsg', {
 					ctid: 10111
 				});

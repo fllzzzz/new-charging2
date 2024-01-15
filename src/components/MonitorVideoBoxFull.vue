@@ -286,7 +286,8 @@
 		nextTick,
 		watchEffect,
 		onBeforeUnmount,
-		PropType
+		PropType,
+onMounted
 	} from 'vue';
 
 	import {
@@ -400,7 +401,9 @@
 				channelNo: deviceList[0].channelNo
 			} as DeviceInfo;
 
+			originDeviceList.length = 0;
 			originDeviceList.push(device);
+			console.log('@full', originDeviceList);
 
 			getVideoAddress(device).then(url => {
 				config.value?.player.src({
@@ -414,7 +417,21 @@
 	const config = ref<Config | undefined>();
 
 
-	let isInited = true;
+	const isInited = ref(true);
+	let isFirstBoot = true;
+
+	watchEffect(() => {
+		if(! isInited.value) {
+			const target = _reactive.data.targetList.find(
+				target => target.name === 'to-signel'
+			);
+
+			if(! target) return;
+
+			[target.imageList[0], target.imageList[1]] = 
+							[target.imageList[1], target.imageList[0]];
+			}
+	});
 	watchEffect(() => {
 		config.value = props.config;
 
@@ -450,19 +467,18 @@
 		return '';
 	});
 
+
+	let deviceListSelectorCount = 0;
 	const deviceListSelector = (device :DeviceInfo) => {
-		if(isInited) {
+		if(isInited.value) {
+			if(deviceListSelectorCount === 0) return;
 			cloudControllerDevice.value = device;
 
-			console.log('@full => device', device);
 			getVideoAddress(device).then(url => {
-				console.log('@full => befor', {url});
 				config.value?.player.src({
 					type: "video/flv",
 					src: url
 				});
-
-				console.log('@full => after', {url: config.value?.player.src()});
 			}).catch(err => console.log(err))
 
 			return;
@@ -485,6 +501,8 @@
 				});
 			}).catch(err => console.log(err))
 		}
+
+		deviceListSelectorCount++;
 	};
 
 	const getAllVideoAddress = async (
@@ -520,6 +538,8 @@
 
 		cloudControllerDevice.value = 
 			originDeviceList[_static.data.videoClickIndex ?? 0];
+
+		console.log('@full', index, cloudControllerDevice.value);
 		const pEl = (event.target as HTMLElement).parentElement?.parentElement;
 		if(!pEl) return;
 		for(let i=0; i<pEl.children.length; i++) {
@@ -544,8 +564,9 @@
 				} as DeviceInfo;
 			});
 
+			originDeviceList.length = 0;
 			originDeviceList.push(..._arr);
-			console.log('@cloud', originDeviceList);
+			console.log('@full', originDeviceList);
 
 			getAllVideoAddress(_arr).then(urlList => {
 				_reactive.data.playerList.forEach((elVideoId, index) => {
@@ -604,7 +625,7 @@
 
 			switch(id) {
 				case 'to-small':
-					isInited = false;
+				isInited.value = false;
 					useChangeModle('small');
 					usePublish('monitorTotaltargetState', true);
 					usePublish('AppFooterModel', 'inside');
@@ -612,7 +633,7 @@
 					emits('enter-small');
 					break;
 				case 'to-middle':
-					isInited = false;
+				isInited.value = false;
 					useChangeModle('middle');
 					usePublish('monitorTotaltargetState', true);
 					usePublish('AppFooterModel', 'inside');
@@ -620,7 +641,7 @@
 					emits('enter-middle');
 					break;
 				case 'to-mulit':
-					isInited = false;
+				isInited.value = false;
 					_static.data.playerList.forEach(
 						player => player.dispose()
 					);
@@ -632,7 +653,7 @@
 					});
 					break;
 				case 'to-signel':
-					isInited = false;
+				isInited.value = false;
 					_static.data.playerList.forEach(
 						player => player.dispose()
 					);
@@ -663,6 +684,7 @@
 	};
 
 	onBeforeUnmount(() => {
+		deviceListSelectorCount = 0;
 		_static.data.deviceList.length =0;
 		_static.data.videoClickIndex = undefined;
 		_static.data.playerList.forEach(player => {

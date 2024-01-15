@@ -166,6 +166,10 @@
 		PropType,ref, watchEffect
 	} from 'vue';
 
+	import {
+		stationID
+	} from '@/store';
+
 	interface Config {
 		defaultIndex :number | undefined;
 	};
@@ -264,7 +268,7 @@
 		if(state === 0) return 'is-locked';
 	});
 
-	getDeviceList(16).then((deviceList :any[]) => {
+	getDeviceList(stationID.value ?? 0).then((deviceList :any[]) => {
 		const _arr = deviceList.map(device => {
 			return {
 				id: device.id,

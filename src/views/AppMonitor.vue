@@ -14,6 +14,7 @@
 			height: 36px;
 			top: 83px;
 			right: 27px;
+			z-index: 1000000;
 			background-repeat: no-repeat;
 			background-size: 100% 100%;
 			background-image: url('@/assets/images/background/btn-1.png');
@@ -234,7 +235,8 @@
 	});
 
 	useSubscribe<boolean>('monitorTotalBtnState', (ctx) => {
-		_reatcive.state.totalBtn = ctx;
+
+		/* _reatcive.state.totalBtn = ctx; */
 	})
 
 	usePublish('setIframerMsg', {
@@ -267,12 +269,25 @@
 		});
 	});
 
-	watch(() => videoBox.value.type, type => {
-		if(type === 'close') {
+	onMounted(() => {
+		(document.querySelector('.monitor-container') as HTMLElement)
+			.style.zIndex = '100000';
+	})
+
+	watch(videoBox, videoBox => {
+		if(videoBox.type === 'close') {
 			_reatcive.state.telepVideo = true;
+			_reatcive.state.totalBtn = true;
+			(document.querySelector('.monitor-container') as HTMLElement)
+			.style.zIndex = '100000';
+			return;
 		}
 
+
+		(document.querySelector('.monitor-container') as HTMLElement)
+			.style.zIndex = '100';
+		_reatcive.state.totalBtn = false;
 		_reatcive.data.teleportTarget =
-			videoBoxCompClassNameMapper.get(type);
+			videoBoxCompClassNameMapper.get(videoBox.type);
 	})
 </script>

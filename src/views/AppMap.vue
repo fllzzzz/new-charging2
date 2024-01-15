@@ -130,8 +130,13 @@
 	usePublish<string>('AppFooterModel', 'outside');
 
 	useSubscribe<ctid_12721>('getIFramerMsg_12721', (ctx) => {
-		if(parseInt(ctx.chargestationid) !== -1) {
+		if(
+			parseInt(ctx.chargestationid) !== -1 &&
+			(! stationID.value && stationID.value !== 0)
+		) {
 			stationID.value = parseInt(ctx.chargestationid);
+
+			console.log('@map', ctx, stationID.value);
 			router.push({
 				name: 'overview'
 			});

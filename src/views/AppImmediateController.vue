@@ -470,6 +470,7 @@
 		</div>
 		<div class="item" id="left-box">
 			<AppConsole
+				:config="consoleConfig"
 				@videoModelChange="videoBoxChanger"
 			>
 				<template #default="{ fn }">
@@ -523,11 +524,14 @@
 		usePublish,
 		useSubscribe
 	} from '@/hooks/EventEmitter';
+	import { DeviceInfo } from '@/types';
 
 	import {
 		ref,
 		computed,
-		onUnmounted
+		onUnmounted,
+		PropType,
+		watchEffect
 	} from 'vue';
 
 	import {
@@ -535,8 +539,36 @@
 	} from 'vue-router'
 
 	const router = useRouter();
+	const consoleConfig = ref<any>();
+
+	interface Config {
+		deviceInfo :DeviceInfo;
+	};
 	
+	const props = defineProps({
+		config: {
+			type: Object as PropType<Config>
+		}
+	});
 	
+	const config = ref<Config | undefined>();
+
+	watchEffect(() => {
+		config.value = props.config;
+
+		if(
+			! config.value?.deviceInfo &&
+			(
+				config.value?.deviceInfo &&
+				Object.keys(config.value?.deviceInfo).length === 0
+			)
+		) {
+			consoleConfig.value = {
+				hasDefaultIndex: true
+			}
+		}
+	});
+
 	const _static = {
 		data: {
 			appConsoleSlot_fn: null as null | (() => void)

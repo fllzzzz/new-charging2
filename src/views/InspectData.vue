@@ -171,6 +171,10 @@
 	} from '@/hooks/routerManager';
 
 	import {
+		stationID
+	} from '@/store';
+
+	import {
 		usePublish
 	} from '@/hooks/EventEmitter';
 
@@ -219,7 +223,7 @@ import { DeviceInfo } from '@/types';
 
 	const router = useRouter();
 	const insAlarmService = new InspectAlarmService({
-		StationID: 1
+		StationID: stationID.value ?? 0
 	});
 
 	const telepTargetInovke = new Map<string, string>([
@@ -494,13 +498,13 @@ import { DeviceInfo } from '@/types';
 
 	const pageChanger = (index :number, timeRange? :string[]) => {
 		if(_reactive.data.model === 'history') {
-			getHistoryModelData(1, index, timeRange).then(result => {
+			getHistoryModelData(stationID.value ?? 0, index, timeRange).then(result => {
 				_reactive.data.tableData.rowList = result;
 			});
 		}
 
 		if(_reactive.data.model === 'alarm') {
-			getAlarmModelData(1, index, timeRange).then(result => {
+			getAlarmModelData(stationID.value ?? 0, index, timeRange).then(result => {
 				_reactive.data.tableData.rowList = result;
 			});
 		}
