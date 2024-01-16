@@ -70,7 +70,7 @@
 					height: 247,
 					points: [120,18],
 					image: require('@/assets/images/background/system-data-1.png'),
-					src: 'http://localhost:8082/#/operational-data'
+					src: 'http://192.168.1.115:8082/#/operational-data'
 				},
 				{
 					id: 2,
@@ -78,7 +78,7 @@
 					height: 343,
 					points: [382,18],
 					image: require('@/assets/images/background/charging-data.png'),
-					src: 'http://localhost:8082/#/charg-data'
+					src: 'http://192.168.1.115:8082/#/charg-data'
 				},
 				{
 					id: 3,
@@ -86,7 +86,7 @@
 					height: 265,
 					points: [731,18],
 					image: require('@/assets/images/background/outside-env.png'),
-					src: 'http://localhost:8082/#/outdoor-env'
+					src: 'http://192.168.1.115:8082/#/outdoor-env'
 				},
 				{
 					id: 4,
@@ -94,7 +94,7 @@
 					height: 468,
 					points: [120,1560],
 					image: require('@/assets/images/background/system-mangle-1.png'),
-					src: 'http://localhost:8082/#/sys-overview'
+					src: 'http://192.168.1.115:8082/#/sys-overview'
 				},
 				{
 					id: 1,
@@ -102,7 +102,7 @@
 					height: 388,
 					points: [608,1560],
 					image: require('@/assets/images/background/income-overview-1.png'),
-					src: 'http://localhost:8082/#/income-overview'
+					src: 'http://192.168.1.115:8082/#/income-overview'
 				},
 			]
 		}

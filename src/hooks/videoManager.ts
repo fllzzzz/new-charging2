@@ -70,6 +70,9 @@ async function _getEl(
 	]);
 }
 
+export const closeLoading = 
+	() => playerLoadingMapper.forEach(instance => instance.close());
+
 export const usePlayerCreater = async (
 	id: string,
 	options? :Option,
@@ -87,6 +90,12 @@ export const usePlayerCreater = async (
 			function(this :Player) {
 				this.addClass('video-js');
 				(this.el_ as HTMLElement).style.backgroundColor = 'transparent';
+			
+
+				videojs.hook('beforeerror', (...args :unknown[]) => {
+					return null;
+				});
+
 
 				this.on('loadstart', () => {
 					playerLoadingMapper.set(

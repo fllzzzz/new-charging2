@@ -56,7 +56,9 @@
 
 <script setup lang="ts">
 	import {
-		stationID
+		stationID,
+		setStationId ,
+		isMapInit
 	} from '@/store';
 
 	import {
@@ -69,6 +71,7 @@
 	} from '@/hooks/EventEmitter';
 
 	import {
+onMounted,
 		reactive
 	} from 'vue';
 
@@ -130,16 +133,26 @@
 	usePublish<string>('AppFooterModel', 'outside');
 
 	useSubscribe<ctid_12721>('getIFramerMsg_12721', (ctx) => {
-		if(
+		if (
 			parseInt(ctx.chargestationid) !== -1 &&
-			(! stationID.value && stationID.value !== 0)
+			! isMapInit.value
 		) {
-			stationID.value = parseInt(ctx.chargestationid);
+			setStationId(parseInt(ctx.chargestationid));
 
 			console.log('@map', ctx, stationID.value);
 			router.push({
 				name: 'overview'
 			});
+
+			setTimeout(() => {
+				console.log('@map2', ctx, stationID.value);
+			}, 2000);
 		}
+
+		return false;
 	});
+
+	onMounted(() => {
+		isMapInit.value = false;
+	})
 </script>

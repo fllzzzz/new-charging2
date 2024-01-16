@@ -53,7 +53,9 @@
 		reactive,
 		nextTick,
 		onMounted,
-		onBeforeUnmount
+		onBeforeUnmount,
+		onUnmounted,
+		onDeactivated
 	} from 'vue';
 
 	const emits = defineEmits(['created']);
@@ -145,7 +147,6 @@
 		deviceInfo :DeviceInfo
 	) => {
 		getVideoAddress(deviceInfo).then(url => {
-			console.log('@video => befor', {deviceInfo,url});
 
 			if(! _static.data.player) return;
 			_static.data.player.src({
@@ -153,7 +154,6 @@
 				src: url
 			});
 
-			console.log('@video => after', {url: _static.data.player.src()});
 			_static.data.player.load();
 		})
 	};
@@ -180,6 +180,7 @@
 	});
 
 	onBeforeUnmount(() => {
+		console.log('@TP', 77);
 		_static.data.player &&
 			_static.data.player.dispose();
 			_static.data.watcherList.forEach(watcher => {
@@ -205,4 +206,16 @@
 			playerSrcChanger(newValue);
 		})
 	);
+
+	onMounted(() => {
+		console.log('@TP', 99);
+	});
+
+	onUnmounted(() => {
+		console.log('@TP', 88);
+	});
+
+	onDeactivated(() => {
+		console.log('@TP', 88);
+	});
 </script>

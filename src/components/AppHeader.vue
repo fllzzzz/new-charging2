@@ -168,11 +168,13 @@
 
 <script setup lang="ts">
 	import {
-		useRouter
+		useRouter,
+		useRoute
 	} from 'vue-router';
 
 	import {
-		stationID
+		setStationId,
+		isMapInit
 	} from '@/store';
 
 	import {
@@ -185,6 +187,7 @@
 	import AppHeaderClock from './AppHeaderClock.vue';
 	import HeaderWeather from './HeaderWeather.vue';
 	const router = useRouter();
+	const route = useRoute();
 
 	const _reactive = reactive({
 		data: {
@@ -228,14 +231,16 @@
 			});
 		}],
 		['title', (event, ...args) => {
-			
+			usePublish('setIframerMsg', {
+				ctid: 10111
+			});
+
+			if(route.name === 'map') return;
+
+			setStationId(undefined);
+			isMapInit.value = true;
 			router.push({
 				name: 'map',
-			}).then(() => {
-				stationID.value = undefined;
-				usePublish('setIframerMsg', {
-					ctid: 10111
-				});
 			})
 		}],
 	]);

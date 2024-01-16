@@ -206,7 +206,7 @@
 					<img
 						class="target"
 						:id="target.name"
-						:src="target.imageList[0]"
+						:src="target.image"
 						:draggable="false"
 					>
 				</template>
@@ -287,7 +287,9 @@
 		watchEffect,
 		onBeforeUnmount,
 		PropType,
-onMounted
+		onMounted,
+		shallowRef,
+		onUnmounted
 	} from 'vue';
 
 	import {
@@ -329,37 +331,41 @@ onMounted
 					id :1,
 					name: 'to-small',
 					state: 0,
-					imageList: [
-						require<string>('@/assets/images/icon/to-small.png'),
-						require<string>('@/assets/images/icon/to-small_active.png'),
-					]
+					get image() {
+						if(this.state === 0)
+							return require<string>('@/assets/images/icon/to-small.png');
+						return require<string>('@/assets/images/icon/to-small_active.png');
+					},
 				},
 				{
 					id :2,
 					name: 'to-middle',
 					state: 0,
-					imageList: [
-						require<string>('@/assets/images/icon/to-middle.png'),
-						require<string>('@/assets/images/icon/to-middle_active.png'),
-					]
+					get image() {
+						if(this.state === 0)
+							return require<string>('@/assets/images/icon/to-middle.png');
+						return require<string>('@/assets/images/icon/to-middle_active.png');
+					},
 				},
 				{
 					id :3,
 					name: 'to-signel',
 					state: 0,
-					imageList: [
-						require<string>('@/assets/images/icon/to-signel.png'),
-						require<string>('@/assets/images/icon/to-signel_active.png'),
-					]
+					get image() {
+						if(this.state === 0)
+							return require<string>('@/assets/images/icon/to-signel.png');
+						return require<string>('@/assets/images/icon/to-signel_active.png');
+					}
 				},
 				{
 					id :4,
 					name: 'to-mulit',
 					state: 0,
-					imageList: [
-						require<string>('@/assets/images/icon/to-mulit.png'),
-						require<string>('@/assets/images/icon/to-mulit_active.png'),
-					]
+					get image() {
+						if(this.state === 0)
+							return require<string>('@/assets/images/icon/to-mulit.png');
+						return require<string>('@/assets/images/icon/to-mulit_active.png');
+					}
 				},
 			] 
 		},
@@ -378,6 +384,8 @@ onMounted
 
 
 	const init0 = () => {
+		isInited.value = true;
+
 		deviceListConfig.value = {
 			defaultIndex: 0
 		}
@@ -388,8 +396,7 @@ onMounted
 
 		if(! target) return;
 
-		[target.imageList[0], target.imageList[1]] = 
-						[target.imageList[1], target.imageList[0]];
+		target.state = 1;
 
 		Hunter(() => usePoolGetter<DeviceContext[]>('onlineList'), {
 			frequency: 200,
@@ -401,9 +408,10 @@ onMounted
 				channelNo: deviceList[0].channelNo
 			} as DeviceInfo;
 
+			cloudControllerDevice.value = device;
+
 			originDeviceList.length = 0;
 			originDeviceList.push(device);
-			console.log('@full', originDeviceList);
 
 			getVideoAddress(device).then(url => {
 				config.value?.player.src({
@@ -414,24 +422,12 @@ onMounted
 		}).catch(err => console.log(err))
 	}
 
-	const config = ref<Config | undefined>();
+	const config = shallowRef<Config | undefined>();
 
 
-	const isInited = ref(true);
+	const isInited = ref(false);
 	let isFirstBoot = true;
 
-	watchEffect(() => {
-		if(! isInited.value) {
-			const target = _reactive.data.targetList.find(
-				target => target.name === 'to-signel'
-			);
-
-			if(! target) return;
-
-			[target.imageList[0], target.imageList[1]] = 
-							[target.imageList[1], target.imageList[0]];
-			}
-	});
 	watchEffect(() => {
 		config.value = props.config;
 
@@ -439,7 +435,11 @@ onMounted
 			config.value?.player &&
 
 			// @ts-ignore
-			! config.value?.player.src()
+			! config.value?.player.src() ||
+			(
+				config.value?.player.src() &&
+				config.value?.player.src() === 'undefined'
+			)
 		) {
 			init0()
 		}
@@ -471,6 +471,7 @@ onMounted
 	let deviceListSelectorCount = 0;
 	const deviceListSelector = (device :DeviceInfo) => {
 		if(isInited.value) {
+			
 			if(deviceListSelectorCount === 0) return;
 			cloudControllerDevice.value = device;
 
@@ -539,7 +540,6 @@ onMounted
 		cloudControllerDevice.value = 
 			originDeviceList[_static.data.videoClickIndex ?? 0];
 
-		console.log('@full', index, cloudControllerDevice.value);
 		const pEl = (event.target as HTMLElement).parentElement?.parentElement;
 		if(!pEl) return;
 		for(let i=0; i<pEl.children.length; i++) {
@@ -566,7 +566,6 @@ onMounted
 
 			originDeviceList.length = 0;
 			originDeviceList.push(..._arr);
-			console.log('@full', originDeviceList);
 
 			getAllVideoAddress(_arr).then(urlList => {
 				_reactive.data.playerList.forEach((elVideoId, index) => {
@@ -600,67 +599,90 @@ onMounted
 	) => void)>([
 		[Array.from(_reactive.data.targetList, target => target.name), (...args) => {
 			const id = args[0] as string;
-			const oldHeightLightElements = 
-				_reactive.data.targetList.filter(target => {
-					if (target.state === 1) {
-						target.state = 0;
-						return true;
-					}
-				});
+			_reactive.data.targetList.filter(
+				item => item.state === 1
+			).forEach(item => item.state = 0);
 
-			if(oldHeightLightElements && oldHeightLightElements.length > 0) {
-				oldHeightLightElements.forEach(target => {
-					[target.imageList[0], target.imageList[1]] = 
-						[target.imageList[1], target.imageList[0]];
-				})
-			}
+			const target1 = _reactive.data.targetList.find(item => item.name === id)
+			if(! target1) return;
 
-			_reactive.data.targetList.find(target => {
-				if(target.name === id) {
-					[target.imageList[0], target.imageList[1]] = 
-						[target.imageList[1], target.imageList[0]];
-					target.state = 1;
+			target1.state = 1;
+
+
+			if(
+				config.value?.player &&
+				isInited.value
+			) {
+
+				switch(id) {
+					case 'to-small':
+
+						break;
+					case 'to-middle':
+
+						break;
+					case 'to-mulit':
+						if(_static.data.playerList.length > 0) {
+							_static.data.playerList.forEach(
+								player => player.dispose()
+							);
+							_static.data.playerList.length = 0;
+						}
+
+						_reactive.state.model = 'mulit';
+						emits('enter-mulit')
+						nextTick(() => {
+							mulitModelHandler();
+						});
+						break;
+					case 'to-signel':
+						_reactive.state.model = 'signel';
+						emits('enter-signel');
+						cloudControllerDevice.value && 
+						getVideoAddress(cloudControllerDevice.value).then(url => {
+							config.value?.player.src({
+								type: "video/flv",
+								src: url
+							});
+						});
+						break;
 				}
-			});
-
-			switch(id) {
-				case 'to-small':
-				isInited.value = false;
-					useChangeModle('small');
-					usePublish('monitorTotaltargetState', true);
-					usePublish('AppFooterModel', 'inside');
-					useCompStateChanger('AppFooter', true);
-					emits('enter-small');
-					break;
-				case 'to-middle':
-				isInited.value = false;
-					useChangeModle('middle');
-					usePublish('monitorTotaltargetState', true);
-					usePublish('AppFooterModel', 'inside');
-					useCompStateChanger('AppFooter', true);
-					emits('enter-middle');
-					break;
-				case 'to-mulit':
-				isInited.value = false;
-					_static.data.playerList.forEach(
-						player => player.dispose()
-					);
-					_static.data.playerList.length = 0;
-					_reactive.state.model = 'mulit';
-					emits('enter-mulit')
-					nextTick(() => {
-						mulitModelHandler();
-					});
-					break;
-				case 'to-signel':
-				isInited.value = false;
-					_static.data.playerList.forEach(
-						player => player.dispose()
-					);
-					_static.data.playerList.length = 0;
-					_reactive.state.model = 'signel';
-					emits('enter-signel');
-					break;
+			}else {
+				switch (id) {
+					case 'to-small':
+						useChangeModle('small');
+						usePublish('monitorTotaltargetState', true);
+						usePublish('AppFooterModel', 'inside');
+						useCompStateChanger('AppFooter', true);
+						emits('enter-small');
+						break;
+					case 'to-middle':
+						useChangeModle('middle');
+						usePublish('monitorTotaltargetState', true);
+						usePublish('AppFooterModel', 'inside');
+						useCompStateChanger('AppFooter', true);
+						emits('enter-middle');
+						break;
+					case 'to-mulit':
+						_static.data.playerList.forEach(
+							player => player.dispose()
+						);
+						_static.data.playerList.length = 0;
+						_reactive.state.model = 'mulit';
+						emits('enter-mulit')
+						nextTick(() => {
+							mulitModelHandler();
+						});
+						break;
+					case 'to-signel':
+						_static.data.playerList.forEach(
+							player => player.dispose()
+						);
+						_static.data.playerList.length = 0;
+						_reactive.state.model = 'signel';
+						emits('enter-signel');
+						break;
+				}
 			}
 		}]
 	]);
@@ -676,19 +698,29 @@ onMounted
 	};
 
 	const closeHandler = () => {
-		useChangeModle('close');
-		useCompStateChanger('AppSmartGuard', true);
-		usePublish('AppFooterModel', 'inside');
-		useCompStateChanger('AppFooter', true);
-		usePublish('monitorTotaltargetState', true);
-	};
+		config.value?.player.dispose();
 
-	onBeforeUnmount(() => {
-		deviceListSelectorCount = 0;
-		_static.data.deviceList.length =0;
-		_static.data.videoClickIndex = undefined;
-		_static.data.playerList.forEach(player => {
-			player.dispose();
-		})
-	});
+		useChangeModle('close');
+
+		try {
+			deviceListSelectorCount = 0;
+			_static.data.deviceList.length = 0;
+			_static.data.videoClickIndex = undefined;
+			_static.data.playerList.forEach(player => {
+				player.dispose();
+			})
+
+			config.value?.player.src({
+				type: "video/flv",
+				src: 'undefined'
+			});
+			config.value?.player.load();
+			useCompStateChanger('AppSmartGuard', true);
+			usePublish('AppFooterModel', 'inside');
+			useCompStateChanger('AppFooter', true);
+			usePublish('monitorTotaltargetState', true);
+		} catch (error) {
+			console.log(error);
+		}
+	};
 </script>

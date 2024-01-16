@@ -7,6 +7,11 @@ module.exports = defineConfig({
   transpileDependencies: false,
   lintOnSave: false,
   configureWebpack: {
+    devServer: {
+      client: {
+        overlay: true
+      }
+    },
     plugins: [
       AutoImport({
         resolvers: [ElementPlusResolver()],

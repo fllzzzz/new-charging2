@@ -29,14 +29,16 @@ export const usePublish = <T>(
 
 export const useSubscribe = <T>(
 	eventType :string, 
-	callback :(ctx :T, ...args :any[]) => void
+	callback :(ctx :T, ...args :any[]) => void | boolean
 ) :number => {
 	let eventCtx :EventType | undefined;
 	eventCtx = eventPool.get(eventType);
 	if(eventCtx) {
 		eventCtx.callbacks.push(callback);
 		if(eventCtx.ctx) {
-			callback(eventCtx.ctx);
+			if(callback(eventCtx.ctx)) {
+				eventPool.delete(eventType);
+			}
 		}
 	}else 
 		eventPool.set(eventType,{

@@ -102,6 +102,10 @@
 	import Hunter from '@/utils/Hunter';
 
 	import {
+		closeLoading
+	} from '@/hooks/videoManager';
+
+	import {
 		videoBox,
 		useChangeModle
 	} from '@/hooks/videoBoxManager';
@@ -276,10 +280,13 @@
 
 	watch(videoBox, videoBox => {
 		if(videoBox.type === 'close') {
-			_reatcive.state.telepVideo = true;
-			_reatcive.state.totalBtn = true;
+			closeLoading();
+			_reatcive.state.telepVideo = false;
+			_reatcive.data.teleportTarget = 'body';
 			(document.querySelector('.monitor-container') as HTMLElement)
 			.style.zIndex = '100000';
+			_reatcive.data.deviceInfo = undefined;
+			_reatcive.state.telepVideo = true;
 			return;
 		}
 
