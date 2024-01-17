@@ -289,7 +289,8 @@
 		PropType,
 		onMounted,
 		shallowRef,
-		onUnmounted
+		onUnmounted,
+		toRaw
 	} from 'vue';
 
 	import {
@@ -297,6 +298,14 @@
 		DeviceInfo
 	} from '@/types';
 	import Player from 'video.js/dist/types/player';
+
+	import {
+		closeLoading
+	} from '@/hooks/videoManager';
+
+	import {
+		isMonitorFullOnly
+	} from '@/store';
 
 	const deviceListConfig = ref<any>({});
 
@@ -385,7 +394,6 @@
 
 	const init0 = () => {
 		isInited.value = true;
-
 		deviceListConfig.value = {
 			defaultIndex: 0
 		}
@@ -433,13 +441,7 @@
 
 		if(
 			config.value?.player &&
-
-			// @ts-ignore
-			! config.value?.player.src() ||
-			(
-				config.value?.player.src() &&
-				config.value?.player.src() === 'undefined'
-			)
+			isMonitorFullOnly.value
 		) {
 			init0()
 		}
@@ -608,7 +610,6 @@
 
 			target1.state = 1;
 
-
 			if(
 				config.value?.player &&
 				isInited.value
@@ -698,8 +699,6 @@
 	};
 
 	const closeHandler = () => {
-		config.value?.player.dispose();
-
 		useChangeModle('close');
 
 		try {
@@ -710,11 +709,6 @@
 				player.dispose();
 			})
 
-			config.value?.player.src({
-				type: "video/flv",
-				src: 'undefined'
-			});
-			config.value?.player.load();
 			useCompStateChanger('AppSmartGuard', true);
 			usePublish('AppFooterModel', 'inside');
 			useCompStateChanger('AppFooter', true);

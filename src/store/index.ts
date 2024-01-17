@@ -22,3 +22,4 @@ export const setStationId = (
 
 
 export const isMapInit = ref(true);
+export const isMonitorFullOnly = ref(true);

@@ -12,6 +12,11 @@ import {
 	nextTick
 } from 'vue';
 
+
+const u = videojs.getTech('Flvjs');
+
+
+
 const playerLoadingMapper = new Map<string, any>();
 
 export type Option = {
@@ -78,6 +83,9 @@ export const usePlayerCreater = async (
 	options? :Option,
 	fn? :((player :Player) => void)
 ) => {
+	console.log('@video => create player');
+
+
 	const player = videojs.getPlayer(id);
 	if(player) return player;
 
@@ -90,11 +98,6 @@ export const usePlayerCreater = async (
 			function(this :Player) {
 				this.addClass('video-js');
 				(this.el_ as HTMLElement).style.backgroundColor = 'transparent';
-			
-
-				videojs.hook('beforeerror', (...args :unknown[]) => {
-					return null;
-				});
 
 
 				this.on('loadstart', () => {

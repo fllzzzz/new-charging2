@@ -145,6 +145,10 @@
 	} from 'vue';
 	import Player from 'video.js/dist/types/player';
 
+	import {
+		isMonitorFullOnly
+	} from '@/store';
+
 	const _player = ref<Player | undefined>(); 
 
 
@@ -226,6 +230,8 @@
 				return false;
 			},
 			(ctx) => {
+				isMonitorFullOnly.value = false;
+
 				_static.temp[0] = ctx;
 				if(videoBox.value.type !== 'small')
 					useChangeModle('small');
@@ -281,6 +287,7 @@
 	watch(videoBox, videoBox => {
 		if(videoBox.type === 'close') {
 			closeLoading();
+			_reatcive.state.totalBtn = true;
 			_reatcive.state.telepVideo = false;
 			_reatcive.data.teleportTarget = 'body';
 			(document.querySelector('.monitor-container') as HTMLElement)

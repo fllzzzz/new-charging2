@@ -136,16 +136,11 @@
 		})
 	};
 
-	const u = [
-		'https://vjs.zencdn.net/v/oceans.mp4',
-		'https://media.w3.org/2010/05/sintel/trailer.mp4'
-	];
-
-	let i = 0;
-
 	const playerSrcChanger = (
 		deviceInfo :DeviceInfo
 	) => {
+		console.log('@video => src change');
+
 		getVideoAddress(deviceInfo).then(url => {
 
 			if(! _static.data.player) return;
@@ -180,7 +175,6 @@
 	});
 
 	onBeforeUnmount(() => {
-		console.log('@TP', 77);
 		_static.data.player &&
 			_static.data.player.dispose();
 			_static.data.watcherList.forEach(watcher => {
@@ -206,16 +200,4 @@
 			playerSrcChanger(newValue);
 		})
 	);
-
-	onMounted(() => {
-		console.log('@TP', 99);
-	});
-
-	onUnmounted(() => {
-		console.log('@TP', 88);
-	});
-
-	onDeactivated(() => {
-		console.log('@TP', 88);
-	});
 </script>
